@@ -1,6 +1,6 @@
-import com.starter.common.clause.WhereClause;
-import com.starter.common.source.Source;
+import clause.WhereClause;
 import lombok.Data;
+import source.Source;
 
 import java.util.List;
 

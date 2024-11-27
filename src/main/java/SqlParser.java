@@ -9,10 +9,10 @@ public class SqlParser {
     public static void main(String[] args) {
         System.out.println("Type next query");
         String lex;
-        System.out.println();
         while ((lex = nextLex()) != null) {
             System.out.println(lex);
         }
+        System.out.println();
     }
 
     private static String nextLex() {

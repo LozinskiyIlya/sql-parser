@@ -10,7 +10,7 @@ public class SqlParser {
         System.out.println("Type next query");
         String lex;
         while ((lex = nextLex()) != null) {
-            System.out.println(lex);
+            System.out.println("next lex = " + lex);
         }
         System.out.println();
     }
@@ -21,7 +21,10 @@ public class SqlParser {
             final var lex = new StringBuilder();
             while ((character = reader.read()) != -1) {
                 char c = (char) character;
-                if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
+                if (Character.isWhitespace(c)) {
+                    if (lex.isEmpty()) {
+                        continue;
+                    }
                     return lex.toString();
                 }
                 lex.append(c);

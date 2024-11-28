@@ -50,7 +50,7 @@ public class Lexemes {
     );
 
     public static final Set<String> SEPARATORS = Set.of(
-            LEX_DOT, LEX_COMMA, LEX_SEMICOLON, LEX_LEFT_BRACKET, LEX_RIGHT_BRACKET
+            LEX_COMMA, LEX_SEMICOLON, LEX_LEFT_BRACKET, LEX_RIGHT_BRACKET
     );
 
 }

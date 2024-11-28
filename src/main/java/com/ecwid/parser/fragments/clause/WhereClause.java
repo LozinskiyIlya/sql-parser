@@ -1,9 +1,10 @@
-package com.ecwid.parser.clause;
+package com.ecwid.parser.fragments.clause;
 
+import com.ecwid.parser.fragments.Fragment;
 import lombok.Data;
 
 @Data
-public class WhereClause {
+public class WhereClause implements Fragment {
 
     private Operand leftOperand;
     private Operand rightOperand;

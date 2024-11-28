@@ -1,14 +1,14 @@
-package com.ecwid.parser;
+package com.ecwid.parser.fragments;
 
-import com.ecwid.parser.clause.WhereClause;
+import com.ecwid.parser.fragments.clause.WhereClause;
 import lombok.Data;
-import com.ecwid.parser.source.Source;
+import com.ecwid.parser.fragments.source.Source;
 
 import java.util.List;
 
 
 @Data
-public class Query {
+public class Query implements Fragment{
     private List<String> columns;
     private List<Source> fromSources;
     private List<Join> joins;

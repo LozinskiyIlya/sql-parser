@@ -1,6 +1,10 @@
 package com.ecwid.parser;
 
+import com.ecwid.parser.fragments.Fragment;
+
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class Lexemes {
 
@@ -47,7 +51,7 @@ public class Lexemes {
     public static final String LEX_SEMICOLON = ";";
     public static final String LEX_LEFT_BRACKET = "(";
     public static final String LEX_RIGHT_BRACKET = ")";
-
+    public static final String LEX_SINGLE_QUOTE = "'";
 
     public static final Set<String> COMMANDS = Set.of(
             LEX_SELECT,
@@ -72,9 +76,8 @@ public class Lexemes {
 
     public static final Set<String> SEPARATORS = Set.of(
             LEX_COMMA,
-            LEX_SEMICOLON,
             LEX_LEFT_BRACKET,
-            LEX_RIGHT_BRACKET
+            LEX_RIGHT_BRACKET,
+            LEX_SEMICOLON
     );
-
 }

@@ -1,9 +1,9 @@
-package com.ecwid.parser;
+package com.ecwid.parser.fragments;
 
 import lombok.Data;
 
 @Data
-public class Join {
+public class Join implements Fragment{
     private JoinType type;
     private String table;
     private String leftColumn;

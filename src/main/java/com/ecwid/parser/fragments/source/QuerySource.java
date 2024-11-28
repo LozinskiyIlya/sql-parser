@@ -1,4 +1,4 @@
-package com.ecwid.parser.source;
+package com.ecwid.parser.fragments.source;
 
 import lombok.Data;
 

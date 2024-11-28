@@ -1,9 +1,9 @@
-package com.ecwid.parser;
+package com.ecwid.parser.fragments;
 
 import lombok.Data;
 
 @Data
-public class Sort {
+public class Sort implements Fragment{
 
     private Direction direction = Direction.ASC;
     private Nulls nulls = Nulls.LAST;

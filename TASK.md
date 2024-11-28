@@ -33,8 +33,8 @@ select * from (select * from A) a_alias;
 Please write a parser for an arbitrary SELECT query, representing it as a class of approximately this structure:
 
 ```java
-import com.ecwid.parser.Join;
-import com.ecwid.parser.Sort;
+import com.ecwid.parser.fragments.Join;
+import com.ecwid.parser.fragments.Sort;
 
 class Query {
     private List<String> columns;

@@ -1,9 +1,8 @@
 package com.ecwid.parser;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.ecwid.parser.fragments.Query;
+
+import java.io.*;
 import java.util.Stack;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -11,39 +10,42 @@ import static com.ecwid.parser.Lexemes.*;
 
 public class SqlParser {
 
-    public Query parse(String sql) {
+    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Type next query");
+        final var sqlParser = new SqlParser();
+        final var query = sqlParser.parse(reader);
+        System.out.println(query);
+    }
+
+    public Query parse(String sql) throws IOException {
         return parse(readerFromString(sql));
     }
 
-    public Query parse(BufferedReader bufferedReader) {
+    public Query parse(BufferedReader bufferedReader) throws IOException {
         System.out.println("Parsing query...");
-        try (BufferedReader reader = bufferedReader) {
-            return parseQuery(reader);
-        } catch (IOException e) {
-            System.out.println("Error reading input");
+        try (final var reader = new PushbackReader(bufferedReader)) {
+            final var query = parseQuery(reader);
+            System.out.println("Query parsed");
+            return query;
         }
-        return null;
     }
 
-    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-    public static void main(String[] args) {
-        System.out.println("Type next query");
-        final var sqlParser = new SqlParser();
-        sqlParser.parse(reader);
-    }
-
-    private static Query parseQuery(BufferedReader reader) {
+    private static Query parseQuery(PushbackReader reader) throws IOException, IllegalStateException {
         String lex = nextLex(reader);
         if (!LEX_SELECT.equals(lex)) {
-            System.out.println("Expected SELECT command, but got " + lex);
-            return null;
+            throw new IllegalStateException("Query must start with SELECT");
         }
         Stack<String> commandStack = new Stack<>();
+        Query query = new Query();
         commandStack.push(lex);
         while ((lex = nextLex(reader)) != null) {
+            if (LEX_SEMICOLON.equals(lex)) {
+                break;
+            }
             if (COMMANDS.contains(lex)) {
-                resetStack(commandStack);
+                addNodeFromStack(query, commandStack);
             }
             commandStack.push(lex);
 
@@ -51,43 +53,53 @@ public class SqlParser {
                 commandStack.push(nextLex(reader));
             }
         }
-        resetStack(commandStack);
+        addNodeFromStack(query, commandStack);
         System.out.println();
-        return null;
+        return query;
     }
 
-    private static String nextLex(BufferedReader reader) {
+    private static String nextLex(PushbackReader reader) throws IOException {
         int character;
-        try {
-            final var lex = new StringBuilder();
-            while ((character = reader.read()) != -1) {
-                char c = (char) character;
-                if (SEPARATORS.contains(String.valueOf(c))) {
-                    if (lex.isEmpty()) {
-                        continue;
-                    }
-                    return lex.toString().toLowerCase();
-                }
-                if (Character.isWhitespace(c)) {
-                    if (lex.isEmpty()) {
-                        continue;
-                    }
-                    return lex.toString().toLowerCase();
-                }
-                lex.append(c);
+        final var lex = new StringBuilder();
+        while ((character = reader.read()) != -1) {
+            char c = (char) character;
+            if (LEX_SINGLE_QUOTE.equals(String.valueOf(c))) {
+                return readStringToTheEnd(reader);
             }
-        } catch (IOException e) {
-            System.out.println("Error reading input");
-            e.printStackTrace();
+            if (SEPARATORS.contains(String.valueOf(c))) {
+                if (lex.isEmpty()) {
+                    return String.valueOf(c);
+                }
+                reader.unread(c);
+                return lex.toString().toLowerCase();
+            }
+            if (Character.isWhitespace(c)) {
+                if (lex.isEmpty()) {
+                    continue;
+                }
+                return lex.toString().toLowerCase();
+            }
+            lex.append(c);
         }
         return null;
     }
 
-    private static void resetStack(Stack<String> stack) {
-        System.out.println("Stack:");
-        stack.forEach(System.out::println);
-        System.out.println();
-        stack.clear();
+    private static String readStringToTheEnd(PushbackReader reader) throws IOException, IllegalStateException {
+        int character;
+        final var lex = new StringBuilder(LEX_SINGLE_QUOTE);
+        while ((character = reader.read()) != -1) {
+            char c = (char) character;
+            lex.append(c);
+            if (LEX_SINGLE_QUOTE.equals(String.valueOf(c))) {
+                return lex.toString();
+            }
+        }
+        throw new IllegalStateException("String is not closed");
+    }
+
+    private static void addNodeFromStack(Query query, Stack<String> stack) {
+        while (!stack.isEmpty()) {
+        }
     }
 
     private static BufferedReader readerFromString(String s) {

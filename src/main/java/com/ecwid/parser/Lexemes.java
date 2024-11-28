@@ -1,3 +1,7 @@
+package com.ecwid.parser;
+
+import java.util.Set;
+
 public class Lexemes {
 
     public static final String LEX_SELECT = "select";
@@ -20,8 +24,14 @@ public class Lexemes {
     public static final String LEX_LIKE = "like";
     public static final String LEX_GROUP = "group";
     public static final String LEX_ORDER = "order";
-    public static final String LEX_SORT = "sort";
     public static final String LEX_BY = "by";
+    public static final String LEX_LIMIT = "limit";
+    public static final String LEX_OFFSET = "offset";
+    public static final String LEX_COUNT = "count";
+    public static final String LEX_SUM = "sum";
+    public static final String LEX_AVG = "avg";
+    public static final String LEX_MIN = "min";
+    public static final String LEX_MAX = "max";
     public static final String LEX_NULL = "null";
     public static final String LEX_EQUALS = "=";
     public static final String LEX_GREATER_THAN = ">";
@@ -31,5 +41,16 @@ public class Lexemes {
     public static final String LEX_DOT = ".";
     public static final String LEX_COMMA = ",";
     public static final String LEX_SEMICOLON = ";";
+    public static final String LEX_LEFT_BRACKET = "(";
+    public static final String LEX_RIGHT_BRACKET = ")";
+
+
+    public static final Set<String> COMMANDS = Set.of(
+            LEX_SELECT, LEX_FROM, LEX_JOIN, LEX_WHERE, LEX_HAVING, LEX_GROUP, LEX_ORDER, LEX_LIMIT, LEX_OFFSET
+    );
+
+    public static final Set<String> SEPARATORS = Set.of(
+            LEX_DOT, LEX_COMMA, LEX_SEMICOLON, LEX_LEFT_BRACKET, LEX_RIGHT_BRACKET
+    );
 
 }

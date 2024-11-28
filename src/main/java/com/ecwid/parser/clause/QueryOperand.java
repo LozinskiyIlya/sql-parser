@@ -1,4 +1,4 @@
-package clause;
+package com.ecwid.parser.clause;
 
 
 import lombok.Data;

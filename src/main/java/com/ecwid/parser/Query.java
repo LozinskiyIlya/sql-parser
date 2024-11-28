@@ -1,6 +1,8 @@
-import clause.WhereClause;
+package com.ecwid.parser;
+
+import com.ecwid.parser.clause.WhereClause;
 import lombok.Data;
-import source.Source;
+import com.ecwid.parser.source.Source;
 
 import java.util.List;
 

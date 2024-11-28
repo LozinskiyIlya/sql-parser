@@ -12,7 +12,6 @@ public class Lexemes {
     public static final String LEX_LEFT = "left";
     public static final String LEX_RIGHT = "right";
     public static final String LEX_FULL = "full";
-    public static final String LEX_INNER = "inner";
     public static final String LEX_ON = "on";
     public static final String LEX_WHERE = "where";
     public static final String LEX_HAVING = "having";
@@ -46,11 +45,31 @@ public class Lexemes {
 
 
     public static final Set<String> COMMANDS = Set.of(
-            LEX_SELECT, LEX_FROM, LEX_JOIN, LEX_WHERE, LEX_HAVING, LEX_GROUP, LEX_ORDER, LEX_LIMIT, LEX_OFFSET
+            LEX_SELECT,
+            LEX_FROM,
+            LEX_JOIN,
+            LEX_LEFT,
+            LEX_RIGHT,
+            LEX_FULL,
+            LEX_WHERE,
+            LEX_HAVING,
+            LEX_GROUP,
+            LEX_ORDER,
+            LEX_LIMIT,
+            LEX_OFFSET
+    );
+
+    public static final Set<String> JOINS = Set.of(
+            LEX_LEFT,
+            LEX_RIGHT,
+            LEX_FULL
     );
 
     public static final Set<String> SEPARATORS = Set.of(
-            LEX_COMMA, LEX_SEMICOLON, LEX_LEFT_BRACKET, LEX_RIGHT_BRACKET
+            LEX_COMMA,
+            LEX_SEMICOLON,
+            LEX_LEFT_BRACKET,
+            LEX_RIGHT_BRACKET
     );
 
 }

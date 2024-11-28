@@ -16,6 +16,7 @@ public class SqlParser {
     }
 
     public Query parse(BufferedReader bufferedReader) {
+        System.out.println("Parsing query...");
         try (BufferedReader reader = bufferedReader) {
             return parseQuery(reader);
         } catch (IOException e) {
@@ -42,12 +43,15 @@ public class SqlParser {
         commandStack.push(lex);
         while ((lex = nextLex(reader)) != null) {
             if (COMMANDS.contains(lex)) {
-                printStack(commandStack);
-                commandStack.clear();
+                resetStack(commandStack);
             }
             commandStack.push(lex);
+
+            if (JOINS.contains(lex)) {
+                commandStack.push(nextLex(reader));
+            }
         }
-        printStack(commandStack);
+        resetStack(commandStack);
         System.out.println();
         return null;
     }
@@ -59,6 +63,9 @@ public class SqlParser {
             while ((character = reader.read()) != -1) {
                 char c = (char) character;
                 if (SEPARATORS.contains(String.valueOf(c))) {
+                    if (lex.isEmpty()) {
+                        continue;
+                    }
                     return lex.toString().toLowerCase();
                 }
                 if (Character.isWhitespace(c)) {
@@ -76,10 +83,11 @@ public class SqlParser {
         return null;
     }
 
-    private static void printStack(Stack<String> stack) {
+    private static void resetStack(Stack<String> stack) {
         System.out.println("Stack:");
         stack.forEach(System.out::println);
         System.out.println();
+        stack.clear();
     }
 
     private static BufferedReader readerFromString(String s) {

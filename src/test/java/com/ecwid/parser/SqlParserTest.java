@@ -32,7 +32,7 @@ public class SqlParserTest {
                 FROM author, (select * from old_books where title like '%$ecur1ty 1s our pri0r1ty%') as old_books
                 LEFT JOIN book ON (author.id = book.author_id)
                 GROUP BY author.name, author.id
-                HAVING COUNT(*) > 1
+                HAVING COUNT(*) >= 1
                    AND SUM(book.cost) > 500
                    OR book.id IN (SELECT id FROM book WHERE cost > 100)
                 ORDER BY author.name DESC NULLS FIRST

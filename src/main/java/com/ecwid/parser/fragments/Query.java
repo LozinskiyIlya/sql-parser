@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Data
-public class Query implements Fragment{
+public class Query  {
     private List<String> columns;
     private List<Source> fromSources;
     private List<Join> joins;

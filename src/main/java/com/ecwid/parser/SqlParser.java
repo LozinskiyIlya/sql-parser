@@ -3,7 +3,8 @@ package com.ecwid.parser;
 import com.ecwid.parser.fragments.Query;
 
 import java.io.*;
-import java.util.Stack;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -37,23 +38,22 @@ public class SqlParser {
         if (!LEX_SELECT.equals(lex)) {
             throw new IllegalStateException("Query must start with SELECT");
         }
-        Stack<String> commandStack = new Stack<>();
         Query query = new Query();
-        commandStack.push(lex);
+        Queue<String> fragments = new LinkedList<>();
+        fragments.add(lex);
         while ((lex = nextLex(reader)) != null) {
             if (LEX_SEMICOLON.equals(lex)) {
                 break;
             }
             if (COMMANDS.contains(lex)) {
-                addNodeFromStack(query, commandStack);
+                addNodeFromQueue(query, fragments);
             }
-            commandStack.push(lex);
-
             if (JOINS.contains(lex)) {
-                commandStack.push(nextLex(reader));
+                fragments.add(nextLex(reader));
             }
+            fragments.add(lex);
         }
-        addNodeFromStack(query, commandStack);
+        addNodeFromQueue(query, fragments);
         System.out.println();
         return query;
     }
@@ -97,9 +97,8 @@ public class SqlParser {
         throw new IllegalStateException("String is not closed");
     }
 
-    private static void addNodeFromStack(Query query, Stack<String> stack) {
-        while (!stack.isEmpty()) {
-        }
+    private static void addNodeFromQueue(Query query, Queue<String> fragments) {
+        final var command = fragments.poll();
     }
 
     private static BufferedReader readerFromString(String s) {

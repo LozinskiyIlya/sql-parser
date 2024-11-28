@@ -1,10 +1,7 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragments.Fragment;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class Lexemes {
 

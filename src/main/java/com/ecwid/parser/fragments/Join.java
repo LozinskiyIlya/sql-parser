@@ -3,7 +3,7 @@ package com.ecwid.parser.fragments;
 import lombok.Data;
 
 @Data
-public class Join implements Fragment{
+public class Join {
     private JoinType type;
     private String table;
     private String leftColumn;

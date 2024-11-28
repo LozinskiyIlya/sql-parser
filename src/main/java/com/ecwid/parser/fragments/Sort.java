@@ -3,7 +3,7 @@ package com.ecwid.parser.fragments;
 import lombok.Data;
 
 @Data
-public class Sort implements Fragment{
+public class Sort {
 
     private Direction direction = Direction.ASC;
     private Nulls nulls = Nulls.LAST;

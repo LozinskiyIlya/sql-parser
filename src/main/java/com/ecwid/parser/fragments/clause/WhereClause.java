@@ -1,17 +1,16 @@
 package com.ecwid.parser.fragments.clause;
 
-import com.ecwid.parser.fragments.Fragment;
 import lombok.Data;
 
 @Data
-public class WhereClause implements Fragment {
+public class WhereClause  {
 
     private Operand leftOperand;
     private Operand rightOperand;
     private Operator operator;
     private Delimiter delimiter;
 
-    enum Operator {
+    enum Operator  {
         EQUALS,
         NOT_EQUALS,
         GREATER_THAN,

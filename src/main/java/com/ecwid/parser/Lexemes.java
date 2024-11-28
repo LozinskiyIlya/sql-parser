@@ -24,6 +24,11 @@ public class Lexemes {
     public static final String LEX_GROUP = "group";
     public static final String LEX_ORDER = "order";
     public static final String LEX_BY = "by";
+    public static final String LEX_ASC = "asc";
+    public static final String LEX_DESC = "desc";
+    public static final String LEX_NULLS = "nulls";
+    public static final String LEX_LAST = "last";
+    public static final String LEX_FIRST = "first";
     public static final String LEX_LIMIT = "limit";
     public static final String LEX_OFFSET = "offset";
     public static final String LEX_COUNT = "count";

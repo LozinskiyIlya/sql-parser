@@ -4,7 +4,7 @@ import com.ecwid.parser.fragments.Query;
 
 import java.io.*;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -38,48 +38,67 @@ public class SqlParser {
         if (!LEX_SELECT.equals(lex)) {
             throw new IllegalStateException("Query must start with SELECT");
         }
+
         Query query = new Query();
-        Queue<String> fragments = new LinkedList<>();
-        fragments.add(lex);
+        String command = "select";
+        List<String> parameters = new LinkedList<>();
         while ((lex = nextLex(reader)) != null) {
+            if (lex.isEmpty()) {
+                continue;
+            }
             if (LEX_SEMICOLON.equals(lex)) {
                 break;
             }
             if (COMMANDS.contains(lex)) {
-                addNodeFromQueue(query, fragments);
+                addQueryFragment(query, command, parameters);
+                skipJoinKeywordIfNeeded(lex, reader);
+                parameters.clear();
+                command = lex;
+                continue;
             }
-            if (JOINS.contains(lex)) {
-                fragments.add(nextLex(reader));
-            }
-            fragments.add(lex);
+            parameters.add(lex);
         }
-        addNodeFromQueue(query, fragments);
+        addQueryFragment(query, command, parameters);
         System.out.println();
         return query;
+    }
+
+    private static void skipJoinKeywordIfNeeded(String currentLex, PushbackReader reader) throws IOException {
+        if (JOINS.contains(currentLex)) {
+            final var shouldBeJoin = nextLex(reader);
+            if (!LEX_JOIN.equals(shouldBeJoin)) {
+                throw new IllegalStateException("JOIN keyword expected");
+            }
+        }
     }
 
     private static String nextLex(PushbackReader reader) throws IOException {
         int character;
         final var lex = new StringBuilder();
         while ((character = reader.read()) != -1) {
-            char c = (char) character;
-            if (LEX_SINGLE_QUOTE.equals(String.valueOf(c))) {
+            final var currentChar = (char) character;
+            final var currentCharAsString = String.valueOf(currentChar);
+
+            if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
                 return readStringToTheEnd(reader);
             }
-            if (SEPARATORS.contains(String.valueOf(c))) {
+            if (LEX_COMMA.equals(currentCharAsString)) {
+                continue;
+            }
+            if (SEPARATORS.contains(currentCharAsString)) {
                 if (lex.isEmpty()) {
-                    return String.valueOf(c);
+                    return currentCharAsString;
                 }
-                reader.unread(c);
+                reader.unread(currentChar);
                 return lex.toString().toLowerCase();
             }
-            if (Character.isWhitespace(c)) {
+            if (Character.isWhitespace(currentChar)) {
                 if (lex.isEmpty()) {
                     continue;
                 }
                 return lex.toString().toLowerCase();
             }
-            lex.append(c);
+            lex.append(currentChar);
         }
         return null;
     }
@@ -97,8 +116,9 @@ public class SqlParser {
         throw new IllegalStateException("String is not closed");
     }
 
-    private static void addNodeFromQueue(Query query, Queue<String> fragments) {
-        final var command = fragments.poll();
+    private static void addQueryFragment(Query query, String command, List<String> parameters) {
+        System.out.println("Command: " + command);
+        System.out.println("Parameters: " + parameters);
     }
 
     private static BufferedReader readerFromString(String s) {

@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
-
-
 @Component
 public class ColumnCrawler extends SectionAwareCrawler {
 

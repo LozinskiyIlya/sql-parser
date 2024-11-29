@@ -1,9 +1,11 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.crawler.ColumnCrawler;
-import com.ecwid.parser.crawler.LimitCrawler;
-import com.ecwid.parser.crawler.SourceCrawler;
 import com.ecwid.parser.fragment.Query;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -12,14 +14,18 @@ import java.io.InputStreamReader;
 
 import static com.ecwid.parser.Lexemes.*;
 
-
+@Configuration
+@ComponentScan(basePackages = "com.ecwid.parser")
+@RequiredArgsConstructor
 public class SqlParser {
 
+    private final ColumnCrawler columnCrawler;
 
     public static void main(String[] args) {
+        final var context = new AnnotationConfigApplicationContext(SqlParser.class);
+        final var sqlParser = context.getBean(SqlParser.class);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("Type next query");
-            final var sqlParser = new SqlParser();
             final var query = sqlParser.parse(reader);
             System.out.println(query);
         } catch (IOException e) {
@@ -38,11 +44,10 @@ public class SqlParser {
         return query;
     }
 
-    private static Query parseQuery(BufferedReader reader) throws IllegalStateException {
+    private Query parseQuery(BufferedReader reader) throws IllegalStateException {
         final var command = nextLex(reader);
         final var query = new Query();
-        final var crawler = new ColumnCrawler(new SourceCrawler(new LimitCrawler()));
-        crawler.addQueryFragment(query, command, () -> nextLex(reader));
+        columnCrawler.addFragment(query, command, () -> nextLex(reader));
         return query;
     }
 

@@ -2,17 +2,18 @@ package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.clause.WhereClause;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-public class ClauseCrawler extends SectionAwareCrawler {
+@Component
+class ClauseCrawler extends SectionAwareCrawler {
 
-    Crawler columnCrawler = new ColumnCrawler(new SourceCrawler(this));
 
-    public ClauseCrawler(Crawler next) {
-        super(next, LEX_WHERE);
+    public ClauseCrawler() {
+        super(null, LEX_WHERE);
     }
 
     @Override
@@ -21,14 +22,18 @@ public class ClauseCrawler extends SectionAwareCrawler {
         WhereClause whereClause = null;
         while ((nextFragment = fragmentSupplier.get()) != null) {
             if (QUERY_SECTIONS.contains(nextFragment)) {
-                delegateToNextCrawler(query, nextFragment, fragmentSupplier);
+                delegateToNext(query, nextFragment, fragmentSupplier);
                 return;
             }
             if (LEX_SELECT.equals(nextFragment)) {
-                columnCrawler.addFragment(query, nextFragment, fragmentSupplier);
-
+//                columnCrawler.addFragment(query, nextFragment, fragmentSupplier);
             }
             query.getWhereClauses().add(whereClause);
         }
+    }
+
+    @Override
+    boolean isOptional() {
+        return true;
     }
 }

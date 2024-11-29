@@ -1,19 +1,18 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.LEX_LIMIT;
+import static com.ecwid.parser.Lexemes.LEX_OFFSET;
+
 
 @Component
- class LimitCrawler extends SectionAwareCrawler {
+class OffsetCrawler extends SectionAwareCrawler {
 
-    @Autowired
-    public LimitCrawler(final OffsetCrawler next) {
-        super(next, LEX_LIMIT);
+    public OffsetCrawler() {
+        super(null, LEX_OFFSET);
     }
 
     @Override

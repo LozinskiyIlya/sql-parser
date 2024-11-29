@@ -3,15 +3,37 @@ package com.ecwid.parser;
 import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-public class SqlParserTest {
 
-    private final SqlParser sqlParser = new SqlParser();
+@SpringJUnitConfig(SqlParser.class)
+@DisplayName("Parse query")
+public class SqlParserIT {
+
+    @Autowired
+    SqlParser sqlParser;
 
     @Test
     @DisplayName("Most basic select")
     void mostBasicSelect() throws Exception {
         String sql = "SELECT * FROM table;";
+        Query parsed = sqlParser.parse(sql);
+        System.out.println(parsed);
+    }
+
+    @Test
+    @DisplayName("with multiple columns")
+    void withMultipleColumns() throws Exception {
+        String sql = "SELECT a, b, c FROM table;";
+        Query parsed = sqlParser.parse(sql);
+        System.out.println(parsed);
+    }
+
+    @Test
+    @DisplayName("with count and simple column name")
+    void withCountAndSimpleName() throws Exception {
+        String sql = "SELECT count(*), a FROM table;";
         Query parsed = sqlParser.parse(sql);
         System.out.println(parsed);
     }

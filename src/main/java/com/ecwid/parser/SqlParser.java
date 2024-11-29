@@ -1,6 +1,7 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.crawler.ColumnCrawler;
+import com.ecwid.parser.crawler.LimitCrawler;
 import com.ecwid.parser.crawler.SourceCrawler;
 import com.ecwid.parser.fragment.Query;
 
@@ -40,7 +41,7 @@ public class SqlParser {
     private static Query parseQuery(BufferedReader reader) throws IllegalStateException {
         final var command = nextLex(reader);
         final var query = new Query();
-        final var crawler = new ColumnCrawler(new SourceCrawler(null));
+        final var crawler = new ColumnCrawler(new SourceCrawler(new LimitCrawler()));
         crawler.addQueryFragment(query, command, () -> nextLex(reader));
         return query;
     }

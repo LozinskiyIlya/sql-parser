@@ -11,7 +11,7 @@ import static com.ecwid.parser.Lexemes.*;
 
 public class SourceCrawler extends SectionAwareCrawler {
 
-    private final ColumnCrawler columnCrawler = new ColumnCrawler(this);
+    private final Crawler columnCrawler = new ColumnCrawler(this);
 
     public SourceCrawler(Crawler next) {
         super(next, LEX_FROM);
@@ -29,7 +29,7 @@ public class SourceCrawler extends SectionAwareCrawler {
             if (LEX_SELECT.equals(nextFragment)) {
                 final var nestedQuery = new Query();
                 source = new QuerySource(nestedQuery);
-                columnCrawler.addQueryFragment(nestedQuery, nextFragment, fragmentSupplier);
+                columnCrawler.addFragment(nestedQuery, nextFragment, fragmentSupplier);
             } else {
                 source = new TableSource(nextFragment);
             }

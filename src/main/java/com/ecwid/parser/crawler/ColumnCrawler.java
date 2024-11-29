@@ -1,12 +1,11 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.Query;
-import lombok.AllArgsConstructor;
 
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.QUERY_SECTIONS;
 import static com.ecwid.parser.Lexemes.LEX_SELECT;
+import static com.ecwid.parser.Lexemes.QUERY_SECTIONS;
 
 public class ColumnCrawler extends SectionAwareCrawler {
 

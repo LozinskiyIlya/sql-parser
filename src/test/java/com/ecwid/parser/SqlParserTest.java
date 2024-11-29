@@ -17,6 +17,14 @@ public class SqlParserTest {
     }
 
     @Test
+    @DisplayName("Select with limit")
+    void selectWithLimit() throws Exception {
+        String sql = "SELECT * FROM table LIMIT 10;";
+        Query parsed = sqlParser.parse(sql);
+        System.out.println(parsed);
+    }
+
+    @Test
     @DisplayName("Special chars in string")
     void specialCharsInString() throws Exception {
         String sql = "SELECT * FROM table WHERE id = 'special;chars(,)in.string';";

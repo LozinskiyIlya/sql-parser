@@ -39,9 +39,10 @@ public class SqlParser {
             throw new IllegalStateException("Query must start with SELECT");
         }
 
-        Query query = new Query();
         String command = "select";
-        List<String> parameters = new LinkedList<>();
+        final var parameters = new LinkedList<String>();
+        final var query = new Query();
+
         while ((lex = nextLex(reader)) != null) {
             if (lex.isEmpty()) {
                 continue;
@@ -61,6 +62,11 @@ public class SqlParser {
         addQueryFragment(query, command, parameters);
         System.out.println();
         return query;
+    }
+
+    private static void addQueryFragment(Query query, String command, List<String> parameters) {
+        System.out.println("Command: " + command);
+        System.out.println("Parameters: " + parameters);
     }
 
     private static void skipJoinKeywordIfNeeded(String currentLex, PushbackReader reader) throws IOException {
@@ -114,11 +120,6 @@ public class SqlParser {
             }
         }
         throw new IllegalStateException("String is not closed");
-    }
-
-    private static void addQueryFragment(Query query, String command, List<String> parameters) {
-        System.out.println("Command: " + command);
-        System.out.println("Parameters: " + parameters);
     }
 
     private static BufferedReader readerFromString(String s) {

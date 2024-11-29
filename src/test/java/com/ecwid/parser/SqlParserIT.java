@@ -1,48 +1,52 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Query;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringJUnitConfig(SqlParser.class)
-@DisplayName("Parse query with")
+@DisplayName("Should parse query")
 public class SqlParserIT {
 
     @Autowired
     SqlParser sqlParser;
 
-    @Test
-    @DisplayName("most basic select")
-    void mostBasicSelect() throws Exception {
-        String sql = "SELECT * FROM table;";
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
-    }
+    @Nested
+    @DisplayName("When columns include")
+    class Select {
+        @Test
+        @DisplayName("only asterisk")
+        void onlyAsterisk() throws Exception {
+            String sql = "SELECT * FROM table;";
+            Query parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
+        }
 
-    @Test
-    @DisplayName("multiple columns")
-    void multipleColumns() throws Exception {
-        String sql = "SELECT a, b, c FROM table;";
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
-    }
+        @Test
+        @DisplayName("multiple columns")
+        void multipleColumns() throws Exception {
+            String sql = "SELECT a, b, c FROM table;";
+            Query parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
+        }
 
-    @Test
-    @DisplayName("count and simple column name")
-    void countAndSimpleName() throws Exception {
-        String sql = "SELECT count(*), a FROM table;";
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
+        @Test
+        @DisplayName("count and simple column name")
+        void countAndSimpleName() throws Exception {
+            String sql = "SELECT count(*), a FROM table;";
+            Query parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
+        }
     }
 
     @Nested
+    @DisplayName("When pagination includes")
     class Limit {
         @Test
         @DisplayName("limit")
@@ -54,20 +58,20 @@ public class SqlParserIT {
         }
 
         @Test
-        @DisplayName("limit and offset")
-        void limitAndOffset() throws Exception {
-            String sql = "SELECT * FROM table LIMIT 10 OFFSET 5;";
+        @DisplayName("offset")
+        void offset() throws Exception {
+            String sql = "SELECT * FROM table OFFSET 5;";
             Query parsed = sqlParser.parse(sql);
-            assertEquals(10, parsed.getLimit());
             assertEquals(5, parsed.getOffset());
             System.out.println(parsed);
         }
 
         @Test
-        @DisplayName("offset")
-        void offset() throws Exception {
-            String sql = "SELECT * FROM table OFFSET 5;";
+        @DisplayName("limit and offset")
+        void limitAndOffset() throws Exception {
+            String sql = "SELECT * FROM table LIMIT 10 OFFSET 5;";
             Query parsed = sqlParser.parse(sql);
+            assertEquals(10, parsed.getLimit());
             assertEquals(5, parsed.getOffset());
             System.out.println(parsed);
         }

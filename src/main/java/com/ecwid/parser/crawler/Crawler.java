@@ -4,15 +4,16 @@ import com.ecwid.parser.fragment.Query;
 
 import java.util.function.Supplier;
 
-interface Crawler {
+public interface Crawler {
 
-    Crawler next();
+    Crawler selectNext(String currentSection);
 
-    void addFragment(Query query, String currentSection, Supplier<String> fragmentSupplier);
+    void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
     default void delegateToNext(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        if (next() != null) {
-            next().addFragment(query, currentSection, fragmentSupplier);
+        final var nextCrawler = selectNext(currentSection);
+        if (nextCrawler != null) {
+            nextCrawler.crawl(query, currentSection, fragmentSupplier);
         }
     }
 }

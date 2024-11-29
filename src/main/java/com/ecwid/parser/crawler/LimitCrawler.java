@@ -9,12 +9,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.LEX_LIMIT;
 
 @Component
- class LimitCrawler extends SectionAwareCrawler {
-
-    @Autowired
-    public LimitCrawler(final OffsetCrawler next) {
-        super(next, LEX_LIMIT);
-    }
+class LimitCrawler extends SectionAwareCrawler {
 
     @Override
     void addQueryFragment(Query query, String currentSection, Supplier<String> fragmentSupplier) {
@@ -23,10 +18,5 @@ import static com.ecwid.parser.Lexemes.LEX_LIMIT;
             throw new IllegalStateException("Limit should be the last section in the query");
         }
         query.setLimit(Integer.parseInt(limit));
-    }
-
-    @Override
-    boolean isOptional() {
-        return true;
     }
 }

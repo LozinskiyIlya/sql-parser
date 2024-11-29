@@ -8,7 +8,11 @@ public interface Crawler {
 
     Crawler next();
 
-    String myCommand();
+    void addFragment(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
-    void addQueryFragment(Query query, String command, Supplier<String> fragmentSupplier);
+     default void delegateToNextCrawler(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+        if (next() != null) {
+            next().addFragment(query, currentSection, fragmentSupplier);
+        }
+    }
 }

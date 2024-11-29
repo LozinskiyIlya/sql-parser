@@ -50,8 +50,7 @@ public class Lexemes {
     public static final String LEX_RIGHT_BRACKET = ")";
     public static final String LEX_SINGLE_QUOTE = "'";
 
-    public static final Set<String> COMMANDS = Set.of(
-//            LEX_SELECT,
+    public static final Set<String> QUERY_SECTIONS = Set.of(
             LEX_FROM,
             LEX_JOIN,
             LEX_LEFT,
@@ -65,7 +64,7 @@ public class Lexemes {
             LEX_OFFSET
     );
 
-    public static final Set<String> JOINS = Set.of(
+    public static final Set<String> JOIN_TYPES = Set.of(
             LEX_LEFT,
             LEX_RIGHT,
             LEX_FULL

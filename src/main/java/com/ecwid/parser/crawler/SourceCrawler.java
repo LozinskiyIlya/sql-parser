@@ -9,22 +9,20 @@ import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-public class SourceCrawler implements Crawler {
+public class SourceCrawler extends SectionAwareCrawler {
 
-    private Crawler next;
     private final ColumnCrawler columnCrawler = new ColumnCrawler(this);
 
+    public SourceCrawler(Crawler next) {
+        super(next, LEX_FROM);
+    }
+
     @Override
-    public void addQueryFragment(Query query, String currentCommand, Supplier<String> fragmentSupplier) {
-        if (!myCommand().equals(currentCommand)) {
-            throw new IllegalStateException("Unexpected token ^" + currentCommand);
-        }
+    public void addQueryFragment(Query query, String currentSection, Supplier<String> fragmentSupplier) {
         String nextFragment;
         while ((nextFragment = fragmentSupplier.get()) != null) {
-            if (COMMANDS.contains(nextFragment)) {
-                if (next != null) {
-                    next.addQueryFragment(query, nextFragment, fragmentSupplier);
-                }
+            if (QUERY_SECTIONS.contains(nextFragment)) {
+                delegateToNextCrawler(query, nextFragment, fragmentSupplier);
                 return;
             }
             Source source;
@@ -37,15 +35,5 @@ public class SourceCrawler implements Crawler {
             }
             query.getFromSources().add(source);
         }
-    }
-
-    @Override
-    public Crawler next() {
-        return next;
-    }
-
-    @Override
-    public String myCommand() {
-        return LEX_FROM;
     }
 }

@@ -40,13 +40,13 @@ public class SqlParser {
     private static Query parseQuery(BufferedReader reader) throws IllegalStateException {
         final var command = nextLex(reader);
         final var query = new Query();
-        final var crawler = new ColumnCrawler(new SourceCrawler());
+        final var crawler = new ColumnCrawler(new SourceCrawler(null));
         crawler.addQueryFragment(query, command, () -> nextLex(reader));
         return query;
     }
 
     private static void skipJoinKeywordIfNeeded(String currentLex, BufferedReader reader) {
-        if (JOINS.contains(currentLex)) {
+        if (JOIN_TYPES.contains(currentLex)) {
             final var shouldBeJoin = nextLex(reader);
             if (!LEX_JOIN.equals(shouldBeJoin)) {
                 throw new IllegalStateException("JOIN keyword expected");

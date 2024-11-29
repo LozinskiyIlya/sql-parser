@@ -58,6 +58,8 @@ public class Lexemes {
 
     public static final Set<String> SEPARATORS = Set.of(
             LEX_COMMA,
+            LEX_LEFT_BRACKET,
+            LEX_RIGHT_BRACKET,
             LEX_SEMICOLON
     );
 }

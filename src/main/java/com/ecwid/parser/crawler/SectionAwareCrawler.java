@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-
 abstract class SectionAwareCrawler implements Crawler {
 
     @Autowired

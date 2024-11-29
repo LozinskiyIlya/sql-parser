@@ -1,12 +1,9 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
-
-import static com.ecwid.parser.Lexemes.LEX_LIMIT;
 
 @Component
 class LimitCrawler extends SectionAwareCrawler {

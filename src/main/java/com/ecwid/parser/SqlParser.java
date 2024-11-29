@@ -45,9 +45,9 @@ public class SqlParser {
     }
 
     private Query parseQuery(BufferedReader reader) throws IllegalStateException {
-        final var command = nextLex(reader);
+        final var section = nextLex(reader);
         final var query = new Query();
-        columnCrawler.crawl(query, command, () -> nextLex(reader));
+        columnCrawler.crawl(query, section, () -> nextLex(reader));
         return query;
     }
 

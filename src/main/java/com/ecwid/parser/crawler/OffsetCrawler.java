@@ -9,11 +9,9 @@ import java.util.function.Supplier;
 class OffsetCrawler extends SectionAwareCrawler {
 
     @Override
-    void addQueryFragment(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        final var limit = fragmentSupplier.get();
-        if (limit == null) {
-            throw new IllegalStateException("Limit should be the last section in the query");
-        }
-        query.setLimit(Integer.parseInt(limit));
+    public void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+        final var offset = fragmentSupplier.get();
+        query.setOffset(Integer.parseInt(offset));
+        delegateToNext(query, fragmentSupplier.get(), fragmentSupplier);
     }
 }

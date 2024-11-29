@@ -32,13 +32,7 @@ abstract class SectionAwareCrawler implements Crawler {
         QUERY_SECTIONS.put(LEX_OFFSET, OffsetCrawler.class);
     }
 
-
-    abstract void addQueryFragment(Query query, String currentSection, Supplier<String> fragmentSupplier);
-
-    public final void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        checkSection(currentSection);
-        addQueryFragment(query, currentSection, fragmentSupplier);
-    }
+    public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
     @Override
     public final void delegateToNext(Query query, String currentSection, Supplier<String> fragmentSupplier) {
@@ -52,11 +46,5 @@ abstract class SectionAwareCrawler implements Crawler {
             return null;
         }
         return applicationContext.getBean(beanClass);
-    }
-
-    private void checkSection(String currentSection) {
-//        if (!isOptional() && !section.equals(currentSection)) {
-//            throw new IllegalStateException("Unexpected token ^" + currentSection);
-//        }
     }
 }

@@ -18,7 +18,7 @@ class SourceCrawler extends SectionAwareCrawler {
     private final ColumnCrawler columnCrawler;
 
     @Override
-    void addQueryFragment(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
         String nextFragment;
         while ((nextFragment = fragmentSupplier.get()) != null) {
             Source source;

@@ -1,21 +1,25 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Query;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @SpringJUnitConfig(SqlParser.class)
-@DisplayName("Parse query")
+@DisplayName("Parse query with")
 public class SqlParserIT {
 
     @Autowired
     SqlParser sqlParser;
 
     @Test
-    @DisplayName("Most basic select")
+    @DisplayName("most basic select")
     void mostBasicSelect() throws Exception {
         String sql = "SELECT * FROM table;";
         Query parsed = sqlParser.parse(sql);
@@ -23,27 +27,60 @@ public class SqlParserIT {
     }
 
     @Test
-    @DisplayName("with multiple columns")
-    void withMultipleColumns() throws Exception {
+    @DisplayName("multiple columns")
+    void multipleColumns() throws Exception {
         String sql = "SELECT a, b, c FROM table;";
         Query parsed = sqlParser.parse(sql);
         System.out.println(parsed);
     }
 
     @Test
-    @DisplayName("with count and simple column name")
-    void withCountAndSimpleName() throws Exception {
+    @DisplayName("count and simple column name")
+    void countAndSimpleName() throws Exception {
         String sql = "SELECT count(*), a FROM table;";
         Query parsed = sqlParser.parse(sql);
         System.out.println(parsed);
     }
 
-    @Test
-    @DisplayName("Select with limit")
-    void selectWithLimit() throws Exception {
-        String sql = "SELECT * FROM table LIMIT 10;";
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
+    @Nested
+    class Limit {
+        @Test
+        @DisplayName("limit")
+        void limit() throws Exception {
+            String sql = "SELECT * FROM table LIMIT 10;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(10, parsed.getLimit());
+            System.out.println(parsed);
+        }
+
+        @Test
+        @DisplayName("limit and offset")
+        void limitAndOffset() throws Exception {
+            String sql = "SELECT * FROM table LIMIT 10 OFFSET 5;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(10, parsed.getLimit());
+            assertEquals(5, parsed.getOffset());
+            System.out.println(parsed);
+        }
+
+        @Test
+        @DisplayName("offset")
+        void offset() throws Exception {
+            String sql = "SELECT * FROM table OFFSET 5;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(5, parsed.getOffset());
+            System.out.println(parsed);
+        }
+
+        @Test
+        @DisplayName("offset and limit")
+        void offsetAndLimit() throws Exception {
+            String sql = "SELECT * FROM table OFFSET 5 LIMIT 20;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(20, parsed.getLimit());
+            assertEquals(5, parsed.getOffset());
+            System.out.println(parsed);
+        }
     }
 
     @Test

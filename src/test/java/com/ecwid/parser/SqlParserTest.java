@@ -1,6 +1,6 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragments.Query;
+import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

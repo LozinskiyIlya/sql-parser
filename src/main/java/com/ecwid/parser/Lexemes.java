@@ -51,7 +51,7 @@ public class Lexemes {
     public static final String LEX_SINGLE_QUOTE = "'";
 
     public static final Set<String> COMMANDS = Set.of(
-            LEX_SELECT,
+//            LEX_SELECT,
             LEX_FROM,
             LEX_JOIN,
             LEX_LEFT,

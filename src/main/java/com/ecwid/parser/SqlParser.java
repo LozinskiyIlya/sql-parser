@@ -1,10 +1,13 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragments.Query;
+import com.ecwid.parser.crawler.ColumnCrawler;
+import com.ecwid.parser.crawler.SourceCrawler;
+import com.ecwid.parser.fragment.Query;
 
-import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -34,35 +37,15 @@ public class SqlParser {
         return query;
     }
 
-    private static Query parseQuery(BufferedReader reader) throws IOException, IllegalStateException {
-        String lex = nextLex(reader);
-        if (!LEX_SELECT.equals(lex)) {
-            throw new IllegalStateException("Query must start with SELECT");
-        }
-
-        String command = "select";
-        final var parameters = new LinkedList<String>();
+    private static Query parseQuery(BufferedReader reader) throws IllegalStateException {
+        final var command = nextLex(reader);
         final var query = new Query();
-
-        while ((lex = nextLex(reader)) != null && !LEX_SEMICOLON.equals(lex)) {
-            if (lex.isEmpty()) {
-                continue;
-            }
-            if (COMMANDS.contains(lex)) {
-                addQueryFragment(query, command, parameters);
-                skipJoinKeywordIfNeeded(lex, reader);
-                parameters.clear();
-                command = lex;
-                continue;
-            }
-            parameters.add(lex);
-        }
-        addQueryFragment(query, command, parameters);
-        System.out.println();
+        final var crawler = new ColumnCrawler(new SourceCrawler());
+        crawler.addQueryFragment(query, command, () -> nextLex(reader));
         return query;
     }
 
-    private static void skipJoinKeywordIfNeeded(String currentLex, BufferedReader reader) throws IOException {
+    private static void skipJoinKeywordIfNeeded(String currentLex, BufferedReader reader) {
         if (JOINS.contains(currentLex)) {
             final var shouldBeJoin = nextLex(reader);
             if (!LEX_JOIN.equals(shouldBeJoin)) {
@@ -71,27 +54,28 @@ public class SqlParser {
         }
     }
 
-    private static String nextLex(BufferedReader reader) throws IOException {
+    private static String nextLex(BufferedReader reader) {
         int character;
         final var lex = new StringBuilder();
-        while ((character = reader.read()) != -1) {
-            final var currentChar = (char) character;
-            final var currentCharAsString = String.valueOf(currentChar);
-            if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
-                return readStringToTheEnd(reader);
-            }
-            if (SEPARATORS.contains(currentCharAsString)) {
-                continue;
-            }
-            if (Character.isWhitespace(currentChar)) {
-                if (lex.isEmpty()) {
-                    continue;
+        try {
+            while ((character = reader.read()) != -1) {
+                final var currentChar = (char) character;
+                final var currentCharAsString = String.valueOf(currentChar);
+                if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
+                    return readStringToTheEnd(reader);
                 }
-                return lex.toString().toLowerCase();
+                if (Character.isWhitespace(currentChar) || SEPARATORS.contains(currentCharAsString)) {
+                    if (lex.isEmpty()) {
+                        continue;
+                    }
+                    return lex.toString().toLowerCase();
+                }
+                lex.append(currentChar);
             }
-            lex.append(currentChar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return null;
+        return lex.isEmpty() ? null : lex.toString().toLowerCase();
     }
 
     private static String readStringToTheEnd(BufferedReader reader) throws IOException, IllegalStateException {
@@ -109,10 +93,5 @@ public class SqlParser {
 
     private static BufferedReader readerFromString(String s) {
         return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes())));
-    }
-
-    private static void addQueryFragment(Query query, String command, List<String> parameters) {
-        System.out.println("Command: " + command);
-        System.out.println("Parameters: " + parameters);
     }
 }

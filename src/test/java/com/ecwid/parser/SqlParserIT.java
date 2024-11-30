@@ -7,13 +7,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Should parse query")
 public class SqlParserIT extends AbstractSpringParserTest {
 
-    @Test
-    @DisplayName("with special chars in string")
-    void specialCharsInString() throws Exception {
-        final var sql = "SELECT * FROM table WHERE id = 'special;chars(,)in.string';";
-        final var parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
-    }
 
     @Test
     @DisplayName("with all that beauty")

@@ -11,7 +11,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
-import static java.util.function.Predicate.not;
 
 abstract class SectionAwareCrawler implements Crawler {
 
@@ -42,11 +41,12 @@ abstract class SectionAwareCrawler implements Crawler {
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
-    protected void crawlUntil(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragmentSupplier) {
+    protected String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragmentSupplier) {
         String fragment;
-        while ((fragment = fragmentSupplier.get()) != null && not(fragmentIs).test(fragment)) {
+        while ((fragment = fragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
             andDoAction.accept(fragment);
         }
+        return fragment;
     }
 
     protected final boolean shouldDelegate(String nextFragment) {

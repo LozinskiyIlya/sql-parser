@@ -39,6 +39,7 @@ public class Lexemes {
     public static final String LEX_MAX = "max";
     public static final String LEX_NULL = "null";
     public static final String LEX_EQUALS = "=";
+    public static final String LEX_NOT_EQUALS = "!=";
     public static final String LEX_GREATER_THAN = ">";
     public static final String LEX_LESS_THAN = "<";
     public static final String LEX_GREATER_THAN_OR_EQUALS = ">=";
@@ -49,6 +50,7 @@ public class Lexemes {
     public static final String LEX_OPEN_BRACKET = "(";
     public static final String LEX_CLOSE_BRACKET = ")";
     public static final String LEX_SINGLE_QUOTE = "'";
+    public static final String LEX_SPACE = " ";
 
     public static final Set<String> JOIN_TYPES = Set.of(
             LEX_LEFT,

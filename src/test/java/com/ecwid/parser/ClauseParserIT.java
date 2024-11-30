@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.ecwid.parser.fragment.clause.WhereClause.ClauseType.*;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.EQUALS;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.IN;
+import static com.ecwid.parser.fragment.clause.WhereClause.Operator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -24,21 +23,31 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("WHERE with constant")
         void simpleWhere() throws Exception {
-            final var sql = "SELECT * FROM table WHERE id = 1;";
+            final var sql = "SELECT * FROM table WHERE id < 1;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "1", clause);
+            assertClauseEquals(WHERE, Column.class, "id", LESS_THAN, ConstantOperand.class, "1", clause);
         }
 
         @Test
         @DisplayName("HAVING with constant")
         void simpleHaving() throws Exception {
-            final var sql = "SELECT * FROM table HAVING id = 1;";
+            final var sql = "SELECT * FROM table HAVING id >= 1;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(HAVING, Column.class, "id", EQUALS, ConstantOperand.class, "1", clause);
+            assertClauseEquals(HAVING, Column.class, "id", GREATER_THAN_OR_EQUALS, ConstantOperand.class, "1", clause);
+        }
+
+        @Test
+        @DisplayName("with special chars in string")
+        void specialCharsInString() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 'special;chars(,)in.string';";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getWhereClauses().size());
+            final var clause = parsed.getWhereClauses().getFirst();
+            assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "'special;chars(,)in.string'", clause);
         }
     }
 
@@ -147,8 +156,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             Object rightVal,
             WhereClause actual) {
         assertEquals(type, actual.getClauseType(), "Clause type mismatch");
-//          assertEquals(operator, clause.getOperator(), "Operator mismatch");
-
+        assertEquals(operator, actual.getOperator(), "Operator mismatch");
         final var leftOperand = actual.getLeftOperand();
         final var rightOperand = actual.getRightOperand();
         assertEquals(leftType, leftOperand.getClass(), "Left operand type mismatch");

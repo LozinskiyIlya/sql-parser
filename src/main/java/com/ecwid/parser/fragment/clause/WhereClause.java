@@ -1,7 +1,10 @@
 package com.ecwid.parser.fragment.clause;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import static com.ecwid.parser.Lexemes.*;
 
 @Data
 @RequiredArgsConstructor
@@ -9,7 +12,7 @@ public class WhereClause {
 
     private Operand leftOperand;
     private Operand rightOperand;
-    private String operator;
+    private Operator operator;
     private final ClauseType clauseType;
 
     public void setNextOperand(Operand operand) {
@@ -20,19 +23,27 @@ public class WhereClause {
         }
     }
 
+    @Getter
     public enum Operator {
-        EQUALS,
-        NOT_EQUALS,
-        GREATER_THAN,
-        LESS_THAN,
-        GREATER_THAN_OR_EQUALS,
-        LESS_THAN_OR_EQUALS,
-        LIKE,
-        NOT_LIKE,
-        IN,
-        NOT_IN,
-        IS_NULL,
-        IS_NOT_NULL
+        EQUALS(LEX_EQUALS),
+        NOT_EQUALS(LEX_NOT_EQUALS),
+        GREATER_THAN(LEX_GREATER_THAN),
+        LESS_THAN(LEX_LESS_THAN),
+        GREATER_THAN_OR_EQUALS(LEX_GREATER_THAN_OR_EQUALS),
+        LESS_THAN_OR_EQUALS(LEX_LESS_THAN_OR_EQUALS),
+        LIKE(LEX_LIKE),
+        NOT_LIKE(LEX_NOT + LEX_LIKE),
+        IN(LEX_IN),
+        NOT_IN(LEX_NOT + LEX_IN),
+        IS(LEX_IS),
+        IS_NOT(LEX_IS + LEX_NOT);
+
+        private final String fullLexeme;
+
+        Operator(String fullLexeme) {
+            this.fullLexeme = fullLexeme;
+        }
+
     }
 
     public enum ClauseType {

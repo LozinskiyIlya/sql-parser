@@ -28,7 +28,7 @@ public class ColumnCrawler extends SectionAwareCrawler {
                     // the last inserted column was a function name
                     functionBuilder.insert(0, columns.removeLast().getName());
                 }
-                crawlUntil(this::shouldDelegate, functionBuilder::append, fragmentSupplier);
+                crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, fragmentSupplier);
                 functionBuilder.append(LEX_CLOSE_BRACKET);
                 nextFragment = functionBuilder.toString();
             }

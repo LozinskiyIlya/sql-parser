@@ -3,11 +3,11 @@ package com.ecwid.parser;
 import com.ecwid.parser.fragment.clause.*;
 import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.ecwid.parser.fragment.clause.WhereClause.ClauseType.*;
 import static com.ecwid.parser.fragment.clause.WhereClause.Operator.*;
@@ -74,6 +74,23 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             assertClauseEquals(WHERE, Column.class, "id", IN, ConstantListOperand.class, List.of("1", "2", "3"), clause);
         }
     }
+
+    @TestFactory
+    @DisplayName("various operators")
+    Stream<DynamicTest> variousOperators() {
+        return Arrays.stream(WhereClause.Operator.values()).map(operator -> {
+            final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
+            final var rightType = operator.equals(WhereClause.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
+            final var rightValue = operator.equals(WhereClause.Operator.IN) ? List.of("1") : "1";
+            return DynamicTest.dynamicTest(operator.name(), () -> {
+                final var parsed = sqlParser.parse(sql);
+                assertEquals(1, parsed.getWhereClauses().size());
+                final var clause = parsed.getWhereClauses().getFirst();
+                assertClauseEquals(WHERE, Column.class, "id", operator, rightType, rightValue, clause);
+            });
+        });
+    }
+
 
     @Nested
     @DisplayName("nested one level query")

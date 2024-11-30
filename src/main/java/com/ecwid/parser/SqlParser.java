@@ -48,6 +48,9 @@ public class SqlParser {
 
     private Query parseQuery(PushbackReader reader) throws IllegalStateException {
         final var section = nextLex(reader);
+        if (!LEX_SELECT.equals(section)) {
+            throw new IllegalStateException("Query should start with SELECT keyword");
+        }
         final var query = new Query();
         columnCrawler.crawl(query, section, () -> nextLex(reader));
         return query;

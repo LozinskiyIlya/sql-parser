@@ -26,8 +26,8 @@ class SourceCrawler extends SectionAwareCrawler {
                 final var nestedQuery = new Query();
                 source = new QuerySource(nestedQuery);
                 selectCrawler(nextFragment).crawl(nestedQuery, nextFragment, fragmentSupplier);
-            } else if (QUERY_SECTIONS.containsKey(nextFragment)) {
-                delegateToNextCrawler(query, nextFragment, fragmentSupplier);
+            } else if (shouldDelegate(nextFragment)) {
+                delegate(query, nextFragment, fragmentSupplier);
                 return;
             } else {
                 source = new TableSource(nextFragment);

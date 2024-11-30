@@ -15,36 +15,43 @@ abstract class SectionAwareCrawler implements Crawler {
     @Autowired
     private ApplicationContext applicationContext;
 
-    public static final Map<String, Class<? extends Crawler>> QUERY_SECTIONS = new HashMap<>();
+    private static final Map<String, Class<? extends Crawler>> SECTION_AGAINST_CRAWLER = new HashMap<>();
+    private static final Map<String, Class<? extends Crawler>> SUB_SECTION_AGAINST_CRAWLER = new HashMap<>();
 
     static {
-        QUERY_SECTIONS.put(LEX_SELECT, ColumnCrawler.class);
-        QUERY_SECTIONS.put(LEX_FROM, SourceCrawler.class);
-        QUERY_SECTIONS.put(LEX_JOIN, null);
-        QUERY_SECTIONS.put(LEX_LEFT, null);
-        QUERY_SECTIONS.put(LEX_RIGHT, null);
-        QUERY_SECTIONS.put(LEX_FULL, null);
-        QUERY_SECTIONS.put(LEX_WHERE, ClauseCrawler.class);
-        QUERY_SECTIONS.put(LEX_HAVING, ClauseCrawler.class);
-        QUERY_SECTIONS.put(LEX_AND, ClauseCrawler.class);
-        QUERY_SECTIONS.put(LEX_OR, ClauseCrawler.class);
-        QUERY_SECTIONS.put(LEX_GROUP, null);
-        QUERY_SECTIONS.put(LEX_ORDER, null);
-        QUERY_SECTIONS.put(LEX_LIMIT, LimitCrawler.class);
-        QUERY_SECTIONS.put(LEX_OFFSET, OffsetCrawler.class);
-        QUERY_SECTIONS.put(LEX_CLOSE_BRACKET, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_SELECT, ColumnCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_FROM, SourceCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_JOIN, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_WHERE, ClauseCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_HAVING, ClauseCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_GROUP, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_ORDER, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_LIMIT, LimitCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_OFFSET, OffsetCrawler.class);
+
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_AND, ClauseCrawler.class);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_OR, ClauseCrawler.class);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_CLOSE_BRACKET, NoopCrawler.class);
+
     }
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
+    protected final boolean shouldDelegate(String nextFragment) {
+        return SECTION_AGAINST_CRAWLER.containsKey(nextFragment) || SUB_SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
+    }
+
     @Override
-    public final void delegateToNextCrawler(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        Crawler.super.delegateToNextCrawler(query, currentSection, fragmentSupplier);
+    public final void delegate(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+        Crawler.super.delegate(query, currentSection, fragmentSupplier);
     }
 
     @Override
     public Crawler selectCrawler(String currentSection) {
-        final var beanClass = QUERY_SECTIONS.get(currentSection);
+        final var beanClass = SECTION_AGAINST_CRAWLER.getOrDefault(currentSection, SUB_SECTION_AGAINST_CRAWLER.get(currentSection));
         return beanClass == null ? null : applicationContext.getBean(beanClass);
     }
 }

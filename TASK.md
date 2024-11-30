@@ -1,8 +1,7 @@
 SQL query parser
 
 In SQL, the most syntactically complex and tricky query is probably the SELECT query. It has explicit and implicit
-joins, groupings,
-subqueries, sorting and truncation of selects - all this beauty can occur repeatedly even in one single
+joins, groupings, subqueries, sorting and truncation of selects - all this beauty can occur repeatedly even in one single
 select query.
 
 For example, like this:

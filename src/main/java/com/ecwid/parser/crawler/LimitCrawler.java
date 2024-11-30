@@ -12,6 +12,6 @@ class LimitCrawler extends SectionAwareCrawler {
     public void crawl(Query query, String limitKeyword, Supplier<String> fragmentSupplier) {
         final var limit = fragmentSupplier.get();
         query.setLimit(Integer.parseInt(limit));
-        delegateToNextCrawler(query, fragmentSupplier.get(), fragmentSupplier);
+        delegate(query, fragmentSupplier.get(), fragmentSupplier);
     }
 }

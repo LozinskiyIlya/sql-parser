@@ -12,6 +12,6 @@ class OffsetCrawler extends SectionAwareCrawler {
     public void crawl(Query query, String offsetKeyword, Supplier<String> fragmentSupplier) {
         final var offset = fragmentSupplier.get();
         query.setOffset(Integer.parseInt(offset));
-        delegateToNextCrawler(query, fragmentSupplier.get(), fragmentSupplier);
+        delegate(query, fragmentSupplier.get(), fragmentSupplier);
     }
 }

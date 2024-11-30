@@ -20,7 +20,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
         final var nexFragment = setOperandAndReturnNextFragment(clause, fragmentSupplier, operator);
         clause.setOperator(operator);
         query.getWhereClauses().add(clause);
-        delegateToNextCrawler(query, nexFragment, fragmentSupplier);
+        delegate(query, nexFragment, fragmentSupplier);
     }
 
 
@@ -39,7 +39,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
             operand = new ListOperand();
             final var values = ((ListOperand) operand).getValues();
             values.add(fragment);
-            parseUntilCondition(fragmentSupplier, QUERY_SECTIONS::containsKey, values::add);
+            crawlUntil(fragmentSupplier, this::shouldDelegate, values::add);
         } else if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);
@@ -52,13 +52,13 @@ public class ClauseCrawler extends SectionAwareCrawler {
         return fragment;
     }
 
-    private void parseUntilCondition(Supplier<String> fragmentSupplier, Predicate<String> condition, Consumer<String> consumer) {
+    private void crawlUntil(Supplier<String> fragmentSupplier, Predicate<String> until, Consumer<String> action) {
         String fragment;
         while ((fragment = fragmentSupplier.get()) != null) {
-            if (condition.test(fragment)) {
+            if (until.test(fragment)) {
                 break;
             }
-            consumer.accept(fragment);
+            action.accept(fragment);
         }
     }
 

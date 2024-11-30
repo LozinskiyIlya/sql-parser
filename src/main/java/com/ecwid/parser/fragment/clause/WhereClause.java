@@ -3,14 +3,22 @@ package com.ecwid.parser.fragment.clause;
 import lombok.Data;
 
 @Data
-public class WhereClause  {
+public class WhereClause {
 
     private Operand leftOperand;
     private Operand rightOperand;
     private Operator operator;
     private Delimiter delimiter;
 
-    enum Operator  {
+    public void setNextOperand(Operand operand) {
+        if (leftOperand == null) {
+            leftOperand = operand;
+        } else {
+            rightOperand = operand;
+        }
+    }
+
+    public enum Operator {
         EQUALS,
         NOT_EQUALS,
         GREATER_THAN,

@@ -1,12 +1,16 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.clause.ColumnOperand;
+import com.ecwid.parser.fragment.clause.ConstantOperand;
+import com.ecwid.parser.fragment.source.TableSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import static com.ecwid.parser.fragment.clause.WhereClause.Operator.EQUALS;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -19,13 +23,18 @@ public class SqlParserIT {
 
     @Nested
     @DisplayName("When columns include")
-    class Select {
+    class Columns {
         @Test
         @DisplayName("only asterisk")
         void onlyAsterisk() throws Exception {
             String sql = "SELECT * FROM table;";
             Query parsed = sqlParser.parse(sql);
-            System.out.println(parsed);
+            assertEquals(1, parsed.getColumns().size());
+            assertEquals("*", parsed.getColumns().getFirst());
+            assertEquals(1, parsed.getFromSources().size());
+            final var source = parsed.getFromSources().getFirst();
+            assertEquals(TableSource.class, source.getClass());
+            assertEquals("table", ((TableSource) source).getTableName());
         }
 
         @Test
@@ -33,7 +42,10 @@ public class SqlParserIT {
         void multipleColumns() throws Exception {
             String sql = "SELECT a, b, c FROM table;";
             Query parsed = sqlParser.parse(sql);
-            System.out.println(parsed);
+            assertEquals(3, parsed.getColumns().size());
+            assertEquals("a", parsed.getColumns().get(0));
+            assertEquals("b", parsed.getColumns().get(1));
+            assertEquals("c", parsed.getColumns().get(2));
         }
 
         @Test
@@ -41,6 +53,64 @@ public class SqlParserIT {
         void countAndSimpleName() throws Exception {
             String sql = "SELECT count(*), a FROM table;";
             Query parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getColumns().size());
+            assertEquals("count(*)", parsed.getColumns().get(0));
+            assertEquals("a", parsed.getColumns().get(1));
+        }
+    }
+
+    @Nested
+    @DisplayName("When sources include")
+    class Sources {
+        @Test
+        @DisplayName("One level nested source")
+        void oneLevelNestedSource() throws Exception {
+            String sql = "select * from (select * from some_table) a_alias";
+            Query parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
+        }
+    }
+
+    @Nested
+    @DisplayName("When clause include")
+    class Clause {
+        @Test
+        @DisplayName("simple where with constant")
+        void simpleWhere() throws Exception {
+            String sql = "SELECT * FROM table WHERE id = 1;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getWhereClauses().size());
+            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(EQUALS, clause.getOperator());
+            final var left = clause.getLeftOperand();
+            assertEquals(ColumnOperand.class, left.getClass());
+            assertEquals("id", ((ColumnOperand) left).getColumn());
+            final var right = clause.getRightOperand();
+            assertEquals(ConstantOperand.class, right.getClass());
+            assertEquals("1", ((ConstantOperand) right).getValue());
+            System.out.println(parsed);
+        }
+
+        @Test
+        @DisplayName("simple having")
+        void simpleHaving() throws Exception {
+            String sql = "SELECT * FROM table HAVING id = 1;";
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getWhereClauses().size());
+            System.out.println(parsed);
+        }
+
+        @Test
+        @DisplayName("one level nested condition and constant")
+        void oneLevelNestedCondition() throws Exception {
+            String sql = """
+                    select *
+                    from users
+                    where id in (select user_id from participants where id = 'a')
+                       or id = 2;
+                    """;
+            Query parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getWhereClauses().size());
             System.out.println(parsed);
         }
     }
@@ -54,7 +124,6 @@ public class SqlParserIT {
             String sql = "SELECT * FROM table LIMIT 10;";
             Query parsed = sqlParser.parse(sql);
             assertEquals(10, parsed.getLimit());
-            System.out.println(parsed);
         }
 
         @Test
@@ -63,7 +132,6 @@ public class SqlParserIT {
             String sql = "SELECT * FROM table OFFSET 5;";
             Query parsed = sqlParser.parse(sql);
             assertEquals(5, parsed.getOffset());
-            System.out.println(parsed);
         }
 
         @Test
@@ -73,7 +141,6 @@ public class SqlParserIT {
             Query parsed = sqlParser.parse(sql);
             assertEquals(10, parsed.getLimit());
             assertEquals(5, parsed.getOffset());
-            System.out.println(parsed);
         }
 
         @Test
@@ -83,12 +150,11 @@ public class SqlParserIT {
             Query parsed = sqlParser.parse(sql);
             assertEquals(20, parsed.getLimit());
             assertEquals(5, parsed.getOffset());
-            System.out.println(parsed);
         }
     }
 
     @Test
-    @DisplayName("Special chars in string")
+    @DisplayName("with special chars in string")
     void specialCharsInString() throws Exception {
         String sql = "SELECT * FROM table WHERE id = 'special;chars(,)in.string';";
         Query parsed = sqlParser.parse(sql);
@@ -96,7 +162,7 @@ public class SqlParserIT {
     }
 
     @Test
-    @DisplayName("Select with all that beauty")
+    @DisplayName("with all that beauty")
     void selectWithAllThatBeauty() throws Exception {
         String sql = """
                 SELECT author.name, count(book.id), sum(book.cost) AS total_cost
@@ -109,27 +175,6 @@ public class SqlParserIT {
                 ORDER BY author.name DESC NULLS FIRST
                 LIMIT 10
                 OFFSET 5;
-                """;
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
-    }
-
-    @Test
-    @DisplayName("One level nested source")
-    void oneLevelNestedSource() throws Exception {
-        String sql = "select * from (select * from some_table) a_alias";
-        Query parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
-    }
-
-    @Test
-    @DisplayName("One level nested condition")
-    void oneLevelNestedCondition() throws Exception {
-        String sql = """
-                select *
-                from users
-                where id in (select user_id from participants where id = 'a')
-                   or id = 2;
                 """;
         Query parsed = sqlParser.parse(sql);
         System.out.println(parsed);

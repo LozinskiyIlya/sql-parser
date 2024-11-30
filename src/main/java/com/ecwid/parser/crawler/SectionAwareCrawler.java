@@ -24,8 +24,8 @@ abstract class SectionAwareCrawler implements Crawler {
         QUERY_SECTIONS.put(LEX_LEFT, null);
         QUERY_SECTIONS.put(LEX_RIGHT, null);
         QUERY_SECTIONS.put(LEX_FULL, null);
-        QUERY_SECTIONS.put(LEX_WHERE, null);
-        QUERY_SECTIONS.put(LEX_HAVING, null);
+        QUERY_SECTIONS.put(LEX_WHERE, ClauseCrawler.class);
+        QUERY_SECTIONS.put(LEX_HAVING, ClauseCrawler.class);
         QUERY_SECTIONS.put(LEX_GROUP, null);
         QUERY_SECTIONS.put(LEX_ORDER, null);
         QUERY_SECTIONS.put(LEX_LIMIT, LimitCrawler.class);
@@ -35,12 +35,12 @@ abstract class SectionAwareCrawler implements Crawler {
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
     @Override
-    public final void delegateToNext(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        Crawler.super.delegateToNext(query, currentSection, fragmentSupplier);
+    public final void delegateToNextCrawler(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+        Crawler.super.delegateToNextCrawler(query, currentSection, fragmentSupplier);
     }
 
     @Override
-    public Crawler selectNext(String currentSection) {
+    public Crawler selectCrawler(String currentSection) {
         final var beanClass = QUERY_SECTIONS.get(currentSection);
         if (beanClass == null) {
             return null;

@@ -38,10 +38,7 @@ public class SqlParser {
     }
 
     public Query parse(BufferedReader reader) throws IOException {
-        System.out.println("Parsing query...");
-        final var query = parseQuery(reader);
-        System.out.println("Query parsed");
-        return query;
+        return parseQuery(reader);
     }
 
     private Query parseQuery(BufferedReader reader) throws IllegalStateException {

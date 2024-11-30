@@ -13,7 +13,7 @@ public class ColumnCrawler extends SectionAwareCrawler {
         String nextFragment;
         while ((nextFragment = fragmentSupplier.get()) != null) {
             if (QUERY_SECTIONS.containsKey(nextFragment)) {
-                delegateToNext(query, nextFragment, fragmentSupplier);
+                delegateToNextCrawler(query, nextFragment, fragmentSupplier);
                 return;
             }
             query.getColumns().add(nextFragment);

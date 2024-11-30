@@ -6,14 +6,14 @@ import java.util.function.Supplier;
 
 public interface Crawler {
 
-    Crawler selectNext(String currentSection);
+    Crawler selectCrawler(String nextSection);
 
     void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
 
-    default void delegateToNext(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        final var nextCrawler = selectNext(currentSection);
+    default void delegateToNextCrawler(Query query, String nextSection, Supplier<String> fragmentSupplier) {
+        final var nextCrawler = selectCrawler(nextSection);
         if (nextCrawler != null) {
-            nextCrawler.crawl(query, currentSection, fragmentSupplier);
+            nextCrawler.crawl(query, nextSection, fragmentSupplier);
         }
     }
 }

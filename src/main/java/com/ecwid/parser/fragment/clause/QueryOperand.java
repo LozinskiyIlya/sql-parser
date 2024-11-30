@@ -1,11 +1,11 @@
 package com.ecwid.parser.fragment.clause;
 
-
+import com.ecwid.parser.fragment.Query;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.management.Query;
-
 @Data
+@AllArgsConstructor
 public class QueryOperand implements Operand {
     private Query query;
 }

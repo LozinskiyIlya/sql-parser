@@ -3,12 +3,10 @@ package com.ecwid.parser;
 import com.ecwid.parser.fragment.clause.*;
 import com.ecwid.parser.fragment.source.QuerySource;
 import com.ecwid.parser.fragment.source.TableSource;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.function.Function;
 
@@ -18,13 +16,9 @@ import static com.ecwid.parser.fragment.clause.WhereClause.Operator.IN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-@SpringJUnitConfig(SqlParser.class)
 @DisplayName("Should parse query")
-public class SqlParserIT {
-    protected final ObjectMapper mapper = new ObjectMapper();
+public class SqlParserIT extends AbstractSpringParserTest {
 
-    @Autowired
-    SqlParser sqlParser;
 
     @Nested
     @DisplayName("When columns include")
@@ -83,112 +77,6 @@ public class SqlParserIT {
             assertEquals(TableSource.class, nestedSource.getClass());
             assertEquals("some_table", ((TableSource) nestedSource).getTableName());
             System.out.println(parsed);
-        }
-    }
-
-    @Nested
-    @DisplayName("When clause include")
-    class Clause {
-
-        @Test
-        @DisplayName("simple where with constant")
-        void simpleWhere() throws Exception {
-            final var sql = "SELECT * FROM table WHERE id = 1;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "1", clause);
-        }
-
-        @Test
-        @DisplayName("simple having")
-        void simpleHaving() throws Exception {
-            final var sql = "SELECT * FROM table HAVING id = 1;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(HAVING, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "1", clause);
-        }
-
-        @Test
-        @DisplayName("one level nested condition")
-        void oneLevelNestedCondition() throws Exception {
-            final var sql = """
-                    select *
-                    from users
-                    where id in (select user_id from participants where id = 'a');
-                    """;
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, QueryOperand.class, true, clause);
-        }
-
-        @Test
-        @DisplayName("one level nested condition and constant")
-        void oneLevelNestedConditionAndConstant() throws Exception {
-            final var sql = """
-                    select *
-                    from users
-                    where id in (select user_id from participants where id = 'a')
-                       or id = 2;
-                    """;
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(2, parsed.getWhereClauses().size());
-            final var firstClause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, QueryOperand.class, true, firstClause);
-            final var secondClause = parsed.getWhereClauses().getLast();
-            assertClauseEquals(OR, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "2", secondClause);
-        }
-
-        @Test
-        @DisplayName("constant and one level nested condition")
-        void constantAndOneLevelNestedCondition() throws Exception {
-            final var sql = """
-                    select *
-                    from users
-                    where id = 2 AND
-                    id in (select user_id from participants where id = 'a')
-                    """;
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(2, parsed.getWhereClauses().size());
-            final var firstClause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "2", firstClause);
-            final var secondClause = parsed.getWhereClauses().getLast();
-            assertClauseEquals(AND, ColumnOperand.class, "id", IN, QueryOperand.class, true, secondClause);
-
-        }
-
-        private void assertClauseEquals(
-                WhereClause.ClauseType type,
-                Class<? extends Operand> leftType,
-                Object leftVal,
-                WhereClause.Operator operator,
-                Class<? extends Operand> rightType,
-                Object rightVal,
-                WhereClause actual) {
-            assertEquals(type, actual.getClauseType());
-//          assertEquals(operator, clause.getOperator());
-
-            final var leftOperand = actual.getLeftOperand();
-            final var rightOperand = actual.getRightOperand();
-            assertEquals(leftType, leftOperand.getClass());
-            assertEquals(leftVal, getOperandValue().apply(leftOperand));
-            assertEquals(rightType, rightOperand.getClass());
-            assertEquals(rightVal, getOperandValue().apply(rightOperand));
-        }
-
-
-        private Function<Operand, Object> getOperandValue() {
-            return operand -> switch (operand) {
-                case ColumnOperand o -> o.getColumn();
-                case ConstantOperand o -> o.getValue();
-//                case QueryOperand o -> o.getQuery();
-                case QueryOperand o -> true;
-                case ListOperand o -> o.getValues();
-                default ->
-                        throw new IllegalArgumentException("Operand type not supported: " + operand.getClass().getSimpleName());
-            };
         }
     }
 

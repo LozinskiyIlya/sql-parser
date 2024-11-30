@@ -1,5 +1,6 @@
 package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.fragment.enity.Column;
 import lombok.Data;
 
 @Data
@@ -7,7 +8,7 @@ public class Sort {
 
     private Direction direction = Direction.ASC;
     private Nulls nulls = Nulls.LAST;
-    private String column;
+    private Column column;
 
     enum Direction {
         ASC,

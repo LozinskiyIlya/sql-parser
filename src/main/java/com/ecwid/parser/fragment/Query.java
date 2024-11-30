@@ -1,8 +1,8 @@
 package com.ecwid.parser.fragment;
 
 import com.ecwid.parser.fragment.clause.WhereClause;
-import lombok.Data;
 import com.ecwid.parser.fragment.source.Source;
+import lombok.Data;
 
 import java.util.LinkedList;
 import java.util.List;

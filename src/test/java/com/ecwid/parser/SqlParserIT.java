@@ -1,24 +1,27 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.Query;
-import com.ecwid.parser.fragment.clause.ColumnOperand;
-import com.ecwid.parser.fragment.clause.ConstantOperand;
-import com.ecwid.parser.fragment.clause.QueryOperand;
+import com.ecwid.parser.fragment.clause.*;
 import com.ecwid.parser.fragment.source.QuerySource;
 import com.ecwid.parser.fragment.source.TableSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.util.function.Function;
+
+import static com.ecwid.parser.fragment.clause.WhereClause.ClauseType.*;
 import static com.ecwid.parser.fragment.clause.WhereClause.Operator.EQUALS;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.ecwid.parser.fragment.clause.WhereClause.Operator.IN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringJUnitConfig(SqlParser.class)
 @DisplayName("Should parse query")
 public class SqlParserIT {
+    protected final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     SqlParser sqlParser;
@@ -86,6 +89,7 @@ public class SqlParserIT {
     @Nested
     @DisplayName("When clause include")
     class Clause {
+
         @Test
         @DisplayName("simple where with constant")
         void simpleWhere() throws Exception {
@@ -93,14 +97,7 @@ public class SqlParserIT {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            final var left = clause.getLeftOperand();
-            assertEquals(ColumnOperand.class, left.getClass());
-            assertEquals("id", ((ColumnOperand) left).getColumn());
-            final var right = clause.getRightOperand();
-            assertEquals(ConstantOperand.class, right.getClass());
-            assertEquals("1", ((ConstantOperand) right).getValue());
-            assertEquals(EQUALS, clause.getOperator());
-            System.out.println(parsed);
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "1", clause);
         }
 
         @Test
@@ -109,7 +106,8 @@ public class SqlParserIT {
             final var sql = "SELECT * FROM table HAVING id = 1;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
-            System.out.println(parsed);
+            final var clause = parsed.getWhereClauses().getFirst();
+            assertClauseEquals(HAVING, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "1", clause);
         }
 
         @Test
@@ -123,12 +121,7 @@ public class SqlParserIT {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            final var left = clause.getLeftOperand();
-            assertEquals(ColumnOperand.class, left.getClass());
-            assertEquals("id", ((ColumnOperand) left).getColumn());
-            final var right = clause.getRightOperand();
-            assertEquals(QueryOperand.class, right.getClass());
-            System.out.println(parsed);
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, QueryOperand.class, true, clause);
         }
 
         @Test
@@ -142,7 +135,60 @@ public class SqlParserIT {
                     """;
             final var parsed = sqlParser.parse(sql);
             assertEquals(2, parsed.getWhereClauses().size());
-            System.out.println(parsed);
+            final var firstClause = parsed.getWhereClauses().getFirst();
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, QueryOperand.class, true, firstClause);
+            final var secondClause = parsed.getWhereClauses().getLast();
+            assertClauseEquals(OR, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "2", secondClause);
+        }
+
+        @Test
+        @DisplayName("constant and one level nested condition")
+        void constantAndOneLevelNestedCondition() throws Exception {
+            final var sql = """
+                    select *
+                    from users
+                    where id = 2 AND
+                    id in (select user_id from participants where id = 'a')
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getWhereClauses().size());
+            final var firstClause = parsed.getWhereClauses().getFirst();
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", EQUALS, ConstantOperand.class, "2", firstClause);
+            final var secondClause = parsed.getWhereClauses().getLast();
+            assertClauseEquals(AND, ColumnOperand.class, "id", IN, QueryOperand.class, true, secondClause);
+
+        }
+
+        private void assertClauseEquals(
+                WhereClause.ClauseType type,
+                Class<? extends Operand> leftType,
+                Object leftVal,
+                WhereClause.Operator operator,
+                Class<? extends Operand> rightType,
+                Object rightVal,
+                WhereClause actual) {
+            assertEquals(type, actual.getClauseType());
+//          assertEquals(operator, clause.getOperator());
+
+            final var leftOperand = actual.getLeftOperand();
+            final var rightOperand = actual.getRightOperand();
+            assertEquals(leftType, leftOperand.getClass());
+            assertEquals(leftVal, getOperandValue().apply(leftOperand));
+            assertEquals(rightType, rightOperand.getClass());
+            assertEquals(rightVal, getOperandValue().apply(rightOperand));
+        }
+
+
+        private Function<Operand, Object> getOperandValue() {
+            return operand -> switch (operand) {
+                case ColumnOperand o -> o.getColumn();
+                case ConstantOperand o -> o.getValue();
+//                case QueryOperand o -> o.getQuery();
+                case QueryOperand o -> true;
+                case ListOperand o -> o.getValues();
+                default ->
+                        throw new IllegalArgumentException("Operand type not supported: " + operand.getClass().getSimpleName());
+            };
         }
     }
 

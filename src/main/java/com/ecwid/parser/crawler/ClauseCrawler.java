@@ -27,6 +27,9 @@ public class ClauseCrawler extends SectionAwareCrawler {
     private String setOperandAndReturnNextFragment(WhereClause clause, Supplier<String> fragmentSupplier, String operator) {
         Operand operand;
         var fragment = fragmentSupplier.get();
+        if (LEX_OPEN_BRACKET.equals(fragment)) {
+            fragment = fragmentSupplier.get();
+        }
         if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);

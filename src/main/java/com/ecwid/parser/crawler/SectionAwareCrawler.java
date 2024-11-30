@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -38,7 +38,6 @@ abstract class SectionAwareCrawler implements Crawler {
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_CLOSE_BRACKET, NoopCrawler.class);
-
     }
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);

@@ -1,6 +1,7 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.enity.Column;
+import com.ecwid.parser.fragment.enity.Query;
 import com.ecwid.parser.fragment.clause.*;
 import org.springframework.stereotype.Component;
 
@@ -29,13 +30,12 @@ public class ClauseCrawler extends SectionAwareCrawler {
             fragment = fragmentSupplier.get();
         }
         if (LEX_SELECT.equals(fragment)) {
-            final var nestedQuery = new Query();
-            operand = new QueryOperand(nestedQuery);
-            selectCrawler(fragment).crawl(nestedQuery, fragment, fragmentSupplier);
+            operand = new Query();
+            selectCrawler(fragment).crawl((Query) operand, fragment, fragmentSupplier);
             fragment = fragmentSupplier.get();
         } else if (LEX_IN.equals(operator)) {
-            operand = new ListOperand();
-            final var values = ((ListOperand) operand).getValues();
+            operand = new ConstantListOperand();
+            final var values = ((ConstantListOperand) operand).getValues();
             values.add(fragment);
             crawlUntil(this::shouldDelegate, values::add, fragmentSupplier);
         } else if (isConstant(fragment)) {
@@ -43,7 +43,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
             clause.setNextOperand(operand);
             fragment = fragmentSupplier.get();
         } else {
-            operand = new ColumnOperand(fragment);
+            operand = new Column(fragment, null);
             fragment = fragmentSupplier.get();
         }
         clause.setNextOperand(operand);

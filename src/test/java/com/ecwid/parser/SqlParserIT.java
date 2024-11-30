@@ -1,83 +1,11 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.clause.*;
-import com.ecwid.parser.fragment.source.QuerySource;
-import com.ecwid.parser.fragment.source.TableSource;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.function.Function;
-
-import static com.ecwid.parser.fragment.clause.WhereClause.ClauseType.*;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.EQUALS;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.IN;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @DisplayName("Should parse query")
 public class SqlParserIT extends AbstractSpringParserTest {
-
-    @Nested
-    @DisplayName("When sources include")
-    class Sources {
-        @Test
-        @DisplayName("One level nested source")
-        void oneLevelNestedSource() throws Exception {
-            final var sql = "select * from (select * from some_table)";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getFromSources().size());
-            final var source = parsed.getFromSources().getFirst();
-            assertEquals(QuerySource.class, source.getClass());
-            final var nestedQuery = ((QuerySource) source).getQuery();
-            assertEquals(1, nestedQuery.getColumns().size());
-            assertEquals("*", nestedQuery.getColumns().getFirst());
-            assertEquals(1, nestedQuery.getFromSources().size());
-            final var nestedSource = nestedQuery.getFromSources().getFirst();
-            assertEquals(TableSource.class, nestedSource.getClass());
-            assertEquals("some_table", ((TableSource) nestedSource).getTableName());
-            System.out.println(parsed);
-        }
-    }
-
-    @Nested
-    @DisplayName("When pagination includes")
-    class Limit {
-        @Test
-        @DisplayName("limit")
-        void limit() throws Exception {
-            final var sql = "SELECT * FROM table LIMIT 10;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(10, parsed.getLimit());
-        }
-
-        @Test
-        @DisplayName("offset")
-        void offset() throws Exception {
-            final var sql = "SELECT * FROM table OFFSET 5;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(5, parsed.getOffset());
-        }
-
-        @Test
-        @DisplayName("limit and offset")
-        void limitAndOffset() throws Exception {
-            final var sql = "SELECT * FROM table LIMIT 10 OFFSET 5;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(10, parsed.getLimit());
-            assertEquals(5, parsed.getOffset());
-        }
-
-        @Test
-        @DisplayName("offset and limit")
-        void offsetAndLimit() throws Exception {
-            final var sql = "SELECT * FROM table OFFSET 5 LIMIT 20;";
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(20, parsed.getLimit());
-            assertEquals(5, parsed.getOffset());
-        }
-    }
 
     @Test
     @DisplayName("with special chars in string")

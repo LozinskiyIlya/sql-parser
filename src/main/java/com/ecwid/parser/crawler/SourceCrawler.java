@@ -1,9 +1,8 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.Query;
-import com.ecwid.parser.fragment.source.QuerySource;
+import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.enity.Table;
 import com.ecwid.parser.fragment.source.Source;
-import com.ecwid.parser.fragment.source.TableSource;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
@@ -23,14 +22,13 @@ class SourceCrawler extends SectionAwareCrawler {
             }
             Source source;
             if (LEX_SELECT.equals(nextFragment)) {
-                final var nestedQuery = new Query();
-                source = new QuerySource(nestedQuery);
-                selectCrawler(nextFragment).crawl(nestedQuery, nextFragment, fragmentSupplier);
+                source = new Query();
+                selectCrawler(nextFragment).crawl((Query) source, nextFragment, fragmentSupplier);
             } else if (shouldDelegate(nextFragment)) {
                 delegate(query, nextFragment, fragmentSupplier);
                 return;
             } else {
-                source = new TableSource(nextFragment);
+                source = new Table(nextFragment, null);
             }
             query.getFromSources().add(source);
         }

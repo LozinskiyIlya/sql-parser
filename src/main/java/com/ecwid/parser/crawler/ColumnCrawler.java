@@ -1,6 +1,7 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.enity.Column;
+import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
@@ -25,13 +26,13 @@ public class ColumnCrawler extends SectionAwareCrawler {
                 final var functionBuilder = new StringBuilder(nextFragment);
                 if (!columns.isEmpty()) {
                     // the last inserted column was a function name
-                    functionBuilder.insert(0, columns.removeLast());
+                    functionBuilder.insert(0, columns.removeLast().getName());
                 }
                 crawlUntil(this::shouldDelegate, functionBuilder::append, fragmentSupplier);
                 functionBuilder.append(LEX_CLOSE_BRACKET);
                 nextFragment = functionBuilder.toString();
             }
-            columns.add(nextFragment);
+            columns.add(new Column(nextFragment, null));
         }
     }
 }

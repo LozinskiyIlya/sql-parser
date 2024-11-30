@@ -1,9 +1,8 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.crawler.ColumnCrawler;
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.enity.Query;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

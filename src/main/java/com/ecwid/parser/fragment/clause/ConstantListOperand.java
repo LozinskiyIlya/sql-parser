@@ -6,6 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Data
-public class ListOperand implements Operand {
+public class ConstantListOperand implements Operand {
     private List<String> values = new LinkedList<>();
 }

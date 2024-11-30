@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;

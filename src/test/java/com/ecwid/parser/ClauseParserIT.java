@@ -46,21 +46,21 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("of strings")
         void listOfStrings() throws Exception {
-            final var sql = "SELECT * FROM table WHERE id = ('1', '2', '3');";
+            final var sql = "SELECT * FROM table WHERE id in ('1', '2', '3');";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, ListOperand.class, List.of("1", "2", "3"), clause);
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, ListOperand.class, List.of("'1'", "'2'", "'3'"), clause);
         }
 
         @Test
         @DisplayName("of numbers")
         void listOfNumbers() throws Exception {
-            final var sql = "SELECT * FROM table WHERE id = (1, 2, 3);";
+            final var sql = "SELECT * FROM table WHERE id in (1, 2, 3);";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getWhereClauses().size());
             final var clause = parsed.getWhereClauses().getFirst();
-            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, ListOperand.class, List.of(1, 2, 3), clause);
+            assertClauseEquals(WHERE, ColumnOperand.class, "id", IN, ListOperand.class, List.of("1", "2", "3"), clause);
         }
     }
 
@@ -144,15 +144,15 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             Class<? extends Operand> rightType,
             Object rightVal,
             WhereClause actual) {
-        assertEquals(type, actual.getClauseType());
-//          assertEquals(operator, clause.getOperator());
+        assertEquals(type, actual.getClauseType(), "Clause type mismatch");
+//          assertEquals(operator, clause.getOperator(), "Operator mismatch");
 
         final var leftOperand = actual.getLeftOperand();
         final var rightOperand = actual.getRightOperand();
-        assertEquals(leftType, leftOperand.getClass());
-        assertEquals(leftVal, getOperandValue(leftOperand));
-        assertEquals(rightType, rightOperand.getClass());
-        assertEquals(rightVal, getOperandValue(rightOperand));
+        assertEquals(leftType, leftOperand.getClass(), "Left operand type mismatch");
+        assertEquals(leftVal, getOperandValue(leftOperand), "Left operand value mismatch");
+        assertEquals(rightType, rightOperand.getClass(), "Right operand type mismatch");
+        assertEquals(rightVal, getOperandValue(rightOperand), "Right operand value mismatch");
     }
 
 

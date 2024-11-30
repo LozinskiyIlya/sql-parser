@@ -30,11 +30,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
         if (LEX_OPEN_BRACKET.equals(fragment)) {
             fragment = fragmentSupplier.get();
         }
-        if (isConstant(fragment)) {
-            operand = new ConstantOperand(fragment);
-            clause.setNextOperand(operand);
-            fragment = fragmentSupplier.get();
-        } else if (LEX_SELECT.equals(fragment)) {
+        if (LEX_SELECT.equals(fragment)) {
             final var nestedQuery = new Query();
             operand = new QueryOperand(nestedQuery);
             selectCrawler(fragment).crawl(nestedQuery, fragment, fragmentSupplier);
@@ -42,7 +38,12 @@ public class ClauseCrawler extends SectionAwareCrawler {
         } else if (LEX_IN.equals(operator)) {
             operand = new ListOperand();
             final var values = ((ListOperand) operand).getValues();
+            values.add(fragment);
             parseUntilCondition(fragmentSupplier, QUERY_SECTIONS::containsKey, values::add);
+        } else if (isConstant(fragment)) {
+            operand = new ConstantOperand(fragment);
+            clause.setNextOperand(operand);
+            fragment = fragmentSupplier.get();
         } else {
             operand = new ColumnOperand(fragment);
             fragment = fragmentSupplier.get();

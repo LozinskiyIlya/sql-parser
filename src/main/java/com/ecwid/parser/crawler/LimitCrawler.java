@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 class LimitCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String keywordLimit, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String limitKeyword, Supplier<String> fragmentSupplier) {
         final var limit = fragmentSupplier.get();
         query.setLimit(Integer.parseInt(limit));
         delegateToNextCrawler(query, fragmentSupplier.get(), fragmentSupplier);

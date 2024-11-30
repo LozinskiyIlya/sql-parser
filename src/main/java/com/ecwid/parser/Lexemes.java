@@ -46,8 +46,8 @@ public class Lexemes {
     public static final String LEX_DOT = ".";
     public static final String LEX_COMMA = ",";
     public static final String LEX_SEMICOLON = ";";
-    public static final String LEX_LEFT_BRACKET = "(";
-    public static final String LEX_RIGHT_BRACKET = ")";
+    public static final String LEX_OPEN_BRACKET = "(";
+    public static final String LEX_CLOSE_BRACKET = ")";
     public static final String LEX_SINGLE_QUOTE = "'";
 
     public static final Set<String> JOIN_TYPES = Set.of(
@@ -56,10 +56,13 @@ public class Lexemes {
             LEX_FULL
     );
 
+    public static final Set<String> BRACKETS = Set.of(
+            LEX_OPEN_BRACKET,
+            LEX_CLOSE_BRACKET
+    );
+
     public static final Set<String> SEPARATORS = Set.of(
             LEX_COMMA,
-            LEX_LEFT_BRACKET,
-            LEX_RIGHT_BRACKET,
             LEX_SEMICOLON
     );
 }

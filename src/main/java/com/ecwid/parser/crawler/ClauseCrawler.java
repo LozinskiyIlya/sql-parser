@@ -14,8 +14,8 @@ import static com.ecwid.parser.Lexemes.*;
 public class ClauseCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String currentClause, Supplier<String> fragmentSupplier) {
-        final var clause = new WhereClause(WhereClause.ClauseType.valueOf(currentClause.toUpperCase()));
+    public void crawl(Query query, String clauseName, Supplier<String> fragmentSupplier) {
+        final var clause = new WhereClause(WhereClause.ClauseType.valueOf(clauseName.toUpperCase()));
         final var operator = setOperandAndReturnNextFragment(clause, fragmentSupplier, null);
         final var nexFragment = setOperandAndReturnNextFragment(clause, fragmentSupplier, operator);
         clause.setOperator(operator);

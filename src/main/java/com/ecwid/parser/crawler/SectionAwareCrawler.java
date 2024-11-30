@@ -26,10 +26,13 @@ abstract class SectionAwareCrawler implements Crawler {
         QUERY_SECTIONS.put(LEX_FULL, null);
         QUERY_SECTIONS.put(LEX_WHERE, ClauseCrawler.class);
         QUERY_SECTIONS.put(LEX_HAVING, ClauseCrawler.class);
+        QUERY_SECTIONS.put(LEX_AND, ClauseCrawler.class);
+        QUERY_SECTIONS.put(LEX_OR, ClauseCrawler.class);
         QUERY_SECTIONS.put(LEX_GROUP, null);
         QUERY_SECTIONS.put(LEX_ORDER, null);
         QUERY_SECTIONS.put(LEX_LIMIT, LimitCrawler.class);
         QUERY_SECTIONS.put(LEX_OFFSET, OffsetCrawler.class);
+        QUERY_SECTIONS.put(LEX_CLOSE_BRACKET, null);
     }
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);

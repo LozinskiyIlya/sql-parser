@@ -3,14 +3,14 @@ package com.ecwid.parser;
 import com.ecwid.parser.crawler.ColumnCrawler;
 import com.ecwid.parser.fragment.Query;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -19,17 +19,23 @@ import static com.ecwid.parser.Lexemes.*;
 @RequiredArgsConstructor
 public class SqlParser {
 
+    private static final Logger logger = Logger.getLogger(SqlParser.class.getName());
+
+    static {
+        logger.setLevel(Level.INFO);
+    }
+
     private final ColumnCrawler columnCrawler;
 
     public static void main(String[] args) {
         final var context = new AnnotationConfigApplicationContext(SqlParser.class);
         final var sqlParser = context.getBean(SqlParser.class);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.println("Type next query");
+        try (PushbackReader reader = new PushbackReader(new InputStreamReader(System.in))) {
+            logger.log(Level.INFO, "Enter SQL query:");
             final var query = sqlParser.parse(reader);
-            System.out.println(query);
+            logger.log(Level.INFO, query.toString());
         } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
+            logger.log(Level.SEVERE, "Error while reading SQL query", e);
         }
     }
 
@@ -37,18 +43,18 @@ public class SqlParser {
         return parse(readerFromString(sql));
     }
 
-    public Query parse(BufferedReader reader) throws IOException {
+    public Query parse(PushbackReader reader) throws IOException {
         return parseQuery(reader);
     }
 
-    private Query parseQuery(BufferedReader reader) throws IllegalStateException {
+    private Query parseQuery(PushbackReader reader) throws IllegalStateException {
         final var section = nextLex(reader);
         final var query = new Query();
         columnCrawler.crawl(query, section, () -> nextLex(reader));
         return query;
     }
 
-    private static void skipJoinKeywordIfNeeded(String currentLex, BufferedReader reader) {
+    private static void skipJoinKeywordIfNeeded(String currentLex, PushbackReader reader) {
         if (JOIN_TYPES.contains(currentLex)) {
             final var shouldBeJoin = nextLex(reader);
             if (!LEX_JOIN.equals(shouldBeJoin)) {
@@ -57,7 +63,7 @@ public class SqlParser {
         }
     }
 
-    private static String nextLex(BufferedReader reader) {
+    private static String nextLex(PushbackReader reader) {
         int character;
         final var lex = new StringBuilder();
         try {
@@ -66,6 +72,13 @@ public class SqlParser {
                 final var currentCharAsString = String.valueOf(currentChar);
                 if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
                     return readStringToTheEnd(reader);
+                }
+                if (BRACKETS.contains(currentCharAsString)) {
+                    if (lex.isEmpty()) {
+                        return currentCharAsString;
+                    }
+                    reader.unread(currentChar);
+                    return lex.toString().toLowerCase();
                 }
                 if (Character.isWhitespace(currentChar) || SEPARATORS.contains(currentCharAsString)) {
                     if (lex.isEmpty()) {
@@ -81,7 +94,7 @@ public class SqlParser {
         return lex.isEmpty() ? null : lex.toString().toLowerCase();
     }
 
-    private static String readStringToTheEnd(BufferedReader reader) throws IOException, IllegalStateException {
+    private static String readStringToTheEnd(PushbackReader reader) throws IOException, IllegalStateException {
         int character;
         final var lex = new StringBuilder(LEX_SINGLE_QUOTE);
         while ((character = reader.read()) != -1) {
@@ -94,7 +107,7 @@ public class SqlParser {
         throw new IllegalStateException("String is not closed");
     }
 
-    private static BufferedReader readerFromString(String s) {
-        return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes())));
+    private static PushbackReader readerFromString(String s) {
+        return new PushbackReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes())));
     }
 }

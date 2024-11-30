@@ -4,8 +4,6 @@ import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.clause.*;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -39,7 +37,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
             operand = new ListOperand();
             final var values = ((ListOperand) operand).getValues();
             values.add(fragment);
-            crawlUntil(fragmentSupplier, this::shouldDelegate, values::add);
+            crawlUntil(this::shouldDelegate, values::add, fragmentSupplier);
         } else if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);
@@ -50,16 +48,6 @@ public class ClauseCrawler extends SectionAwareCrawler {
         }
         clause.setNextOperand(operand);
         return fragment;
-    }
-
-    private void crawlUntil(Supplier<String> fragmentSupplier, Predicate<String> until, Consumer<String> action) {
-        String fragment;
-        while ((fragment = fragmentSupplier.get()) != null) {
-            if (until.test(fragment)) {
-                break;
-            }
-            action.accept(fragment);
-        }
     }
 
     private boolean isConstant(String fragment) {

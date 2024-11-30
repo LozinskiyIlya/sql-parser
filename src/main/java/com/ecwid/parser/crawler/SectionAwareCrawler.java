@@ -6,9 +6,12 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
+import static java.util.function.Predicate.not;
 
 abstract class SectionAwareCrawler implements Crawler {
 
@@ -39,6 +42,13 @@ abstract class SectionAwareCrawler implements Crawler {
     }
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
+
+    protected void crawlUntil(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragmentSupplier) {
+        String fragment;
+        while ((fragment = fragmentSupplier.get()) != null && not(fragmentIs).test(fragment)) {
+            andDoAction.accept(fragment);
+        }
+    }
 
     protected final boolean shouldDelegate(String nextFragment) {
         return SECTION_AGAINST_CRAWLER.containsKey(nextFragment) || SUB_SECTION_AGAINST_CRAWLER.containsKey(nextFragment);

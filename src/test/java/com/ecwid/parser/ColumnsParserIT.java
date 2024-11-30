@@ -35,12 +35,45 @@ public class ColumnsParserIT extends AbstractSpringParserTest {
     }
 
     @Test
-    @DisplayName("count and simple column name")
-    void countAndSimpleName() throws Exception {
+    @DisplayName("function and column name")
+    void functionAndSimpleName() throws Exception {
         final var sql = "SELECT count(*), a FROM table;";
         final var parsed = sqlParser.parse(sql);
         assertEquals(2, parsed.getColumns().size());
         assertEquals("count(*)", parsed.getColumns().get(0));
         assertEquals("a", parsed.getColumns().get(1));
+    }
+
+    @Test
+    @DisplayName("column name and function")
+    void simpleNameAndFunction() throws Exception {
+        final var sql = "SELECT a, count(*) FROM table;";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(2, parsed.getColumns().size());
+        assertEquals("a", parsed.getColumns().get(0));
+        assertEquals("count(*)", parsed.getColumns().get(1));
+    }
+
+    @Test
+    @DisplayName("function with column name inside")
+    void functionWithColumnNameInside() throws Exception {
+        final var sql = "SELECT min(cost) FROM table;";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(1, parsed.getColumns().size());
+        assertEquals("min(cost)", parsed.getColumns().get(0));
+    }
+
+    @Test
+    @DisplayName("columns and functions")
+    void simpleNameAndCount() throws Exception {
+        final var sql = "SELECT a, max(cost), avg(t), b, c, count(*) FROM table;";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(6, parsed.getColumns().size());
+        assertEquals("a", parsed.getColumns().get(0));
+        assertEquals("max(cost)", parsed.getColumns().get(1));
+        assertEquals("avg(t)", parsed.getColumns().get(2));
+        assertEquals("b", parsed.getColumns().get(3));
+        assertEquals("c", parsed.getColumns().get(4));
+        assertEquals("count(*)", parsed.getColumns().get(5));
     }
 }

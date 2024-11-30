@@ -7,7 +7,7 @@ public class WhereClause {
 
     private Operand leftOperand;
     private Operand rightOperand;
-    private Operator operator;
+    private String operator;
     private Delimiter delimiter;
 
     public void setNextOperand(Operand operand) {

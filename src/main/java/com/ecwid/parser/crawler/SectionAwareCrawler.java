@@ -42,9 +42,6 @@ abstract class SectionAwareCrawler implements Crawler {
     @Override
     public Crawler selectCrawler(String currentSection) {
         final var beanClass = QUERY_SECTIONS.get(currentSection);
-        if (beanClass == null) {
-            return null;
-        }
-        return applicationContext.getBean(beanClass);
+        return beanClass == null ? null : applicationContext.getBean(beanClass);
     }
 }

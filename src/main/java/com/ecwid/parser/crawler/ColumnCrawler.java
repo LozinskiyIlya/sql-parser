@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 public class ColumnCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String keywordSelect, Supplier<String> fragmentSupplier) {
         String nextFragment;
         while ((nextFragment = fragmentSupplier.get()) != null) {
             if (QUERY_SECTIONS.containsKey(nextFragment)) {

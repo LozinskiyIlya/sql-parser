@@ -14,7 +14,7 @@ import static com.ecwid.parser.Lexemes.LEX_SELECT;
 class SourceCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String keywordFrom, Supplier<String> fragmentSupplier) {
         String nextFragment;
         while ((nextFragment = fragmentSupplier.get()) != null) {
             Source source;

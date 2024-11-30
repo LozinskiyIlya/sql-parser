@@ -1,14 +1,16 @@
 package com.ecwid.parser.fragment.clause;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class WhereClause {
 
     private Operand leftOperand;
     private Operand rightOperand;
     private String operator;
-    private Delimiter delimiter;
+    private final ClauseType clauseType;
 
     public void setNextOperand(Operand operand) {
         if (leftOperand == null) {
@@ -33,8 +35,10 @@ public class WhereClause {
         IS_NOT_NULL
     }
 
-    enum Delimiter {
+    public enum ClauseType {
         AND,
-        OR
+        OR,
+        WHERE,
+        HAVING
     }
 }

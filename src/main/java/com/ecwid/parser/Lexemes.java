@@ -58,13 +58,9 @@ public class Lexemes {
             LEX_FULL
     );
 
-    public static final Set<String> BRACKETS = Set.of(
-            LEX_OPEN_BRACKET,
-            LEX_CLOSE_BRACKET
-    );
-
     public static final Set<String> SEPARATORS = Set.of(
-            LEX_COMMA,
-            LEX_SEMICOLON
+            LEX_OPEN_BRACKET,
+            LEX_CLOSE_BRACKET,
+            LEX_COMMA
     );
 }

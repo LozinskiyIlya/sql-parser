@@ -26,4 +26,8 @@ public interface Crawler {
         }
         return fragment;
     }
+
+    default String crawlListAndReturnNext(Consumer<String> onItem, Supplier<String> nextFragmentSupplier) {
+        return crawlUntilAndReturnNext(fragment -> false, onItem, nextFragmentSupplier);
+    }
 }

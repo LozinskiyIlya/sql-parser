@@ -2,11 +2,11 @@ package com.ecwid.parser;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 @DisplayName("Should parse query")
-public class SqlParserIT extends AbstractSpringParserTest {
-
+public class SqlParserApplicationIT extends AbstractSpringParserTest {
 
     @Test
     @DisplayName("with all that beauty")

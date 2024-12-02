@@ -1,12 +1,24 @@
 package com.ecwid.parser;
 
+import com.ecwid.parser.fragment.enity.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @DisplayName("Should parse query")
 public class SqlParserApplicationIT extends AbstractSpringParserTest {
+
+    @Test
+    @DisplayName("and stop on semi-colon")
+    void selectStopsOnSemiColon() throws Exception {
+        final var sql = "SELECT * FROM table; , another_table;";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(1, parsed.getFromSources().size());
+        final var onlySource = (Table) parsed.getFromSources().getFirst();
+        assertEquals("table", onlySource.getName());
+    }
 
     @Test
     @DisplayName("with all that beauty")

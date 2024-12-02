@@ -14,4 +14,5 @@ public abstract class AbstractSpringParserTest {
 
     @Autowired
     protected SqlParser sqlParser;
+
 }

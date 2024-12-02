@@ -42,10 +42,6 @@ public class SqlParser {
         return query;
     }
 
-    private static PushbackReader readerFromString(String s) {
-        return new PushbackReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes())));
-    }
-
     private void skipJoinKeywordIfNeeded(String currentLex, PushbackReader reader) {
         if (JOIN_TYPES.contains(currentLex)) {
             final var shouldBeJoin = lexemeReader.nextLex(reader);
@@ -54,4 +50,9 @@ public class SqlParser {
             }
         }
     }
+
+    public static PushbackReader readerFromString(String s) {
+        return new PushbackReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes())));
+    }
+
 }

@@ -12,23 +12,27 @@ import static com.ecwid.parser.Lexemes.LEX_SINGLE_QUOTE;
 public class LexemeReader {
 
     public String nextLex(PushbackReader reader) {
-        int character;
+        int c;
         final var lex = new StringBuilder();
         try {
-            while ((character = reader.read()) != -1) {
-                final var currentChar = (char) character;
+            while ((c = reader.read()) != -1) {
+                final var currentChar = (char) c;
                 final var currentCharAsString = String.valueOf(currentChar);
                 if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
-                    return readStringToTheEnd(reader);
+                    if (lex.isEmpty()) {
+                        return readStringToTheEnd(reader);
+                    }
+                    reader.unread(c);
+                    return lex.toString().toLowerCase();
                 }
                 if (SEPARATORS.contains(currentCharAsString)) {
                     if (lex.isEmpty()) {
                         return currentCharAsString;
                     }
-                    reader.unread(currentChar);
+                    reader.unread(c);
                     return lex.toString().toLowerCase();
                 }
-                if (Character.isWhitespace(currentChar) || LEX_SEMICOLON.equals(currentCharAsString)) {
+                if (Character.isWhitespace(c)) {
                     if (lex.isEmpty()) {
                         continue;
                     }

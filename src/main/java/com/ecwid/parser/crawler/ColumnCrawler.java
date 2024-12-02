@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.LEX_CLOSE_BRACKET;
-import static com.ecwid.parser.Lexemes.LEX_OPEN_BRACKET;
+import static com.ecwid.parser.Lexemes.*;
 
 @Component
 public class ColumnCrawler extends SectionAwareCrawler {
@@ -20,6 +19,9 @@ public class ColumnCrawler extends SectionAwareCrawler {
             if (shouldDelegate(nextFragment)) {
                 delegate(query, nextFragment, nextFragmentSupplier);
                 return;
+            }
+            if (LEX_COMMA.equals(nextFragment)) {
+                continue;
             }
             if (LEX_OPEN_BRACKET.equals(nextFragment)) {
                 // it's a function call

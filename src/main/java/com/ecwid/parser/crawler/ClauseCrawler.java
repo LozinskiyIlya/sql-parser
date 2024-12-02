@@ -52,7 +52,15 @@ public class ClauseCrawler extends SectionAwareCrawler {
             operand = new ConstantListOperand();
             final var values = ((ConstantListOperand) operand).getValues();
             values.add(fragment);
-            fragment = crawlUntilAndReturnNext(this::shouldDelegate, values::add, nextFragmentSupplier);
+            fragment = crawlUntilAndReturnNext(
+                    this::shouldDelegate,
+                    fr -> {
+                        if (LEX_COMMA.equals(fr)) {
+                            return;
+                        }
+                        values.add(fr);
+                    },
+                    nextFragmentSupplier);
         } else if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);

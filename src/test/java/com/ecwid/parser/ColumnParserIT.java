@@ -37,6 +37,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void multipleColumns() throws Exception {
             final var sql = "SELECT a, b, c FROM table;";
             final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed.getColumns());
             assertEquals(3, parsed.getColumns().size());
             assertEquals("a", parsed.getColumns().get(0).getName());
             assertEquals("b", parsed.getColumns().get(1).getName());

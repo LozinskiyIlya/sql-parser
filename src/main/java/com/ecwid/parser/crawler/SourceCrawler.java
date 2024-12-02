@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.LEX_OPEN_BRACKET;
-import static com.ecwid.parser.Lexemes.LEX_SELECT;
+import static com.ecwid.parser.Lexemes.*;
 
 @Component
 class SourceCrawler extends SectionAwareCrawler {
@@ -17,7 +16,7 @@ class SourceCrawler extends SectionAwareCrawler {
     public void crawl(Query query, String from, Supplier<String> nextFragmentSupplier) {
         String nextFragment;
         while ((nextFragment = nextFragmentSupplier.get()) != null) {
-            if (nextFragment.equals(LEX_OPEN_BRACKET)) {
+            if (nextFragment.equals(LEX_OPEN_BRACKET) || nextFragment.equals(LEX_COMMA)) {
                 continue;
             }
             Source source;

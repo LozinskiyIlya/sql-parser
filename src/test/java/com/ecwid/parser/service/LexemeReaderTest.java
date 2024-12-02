@@ -29,7 +29,7 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("is newline", "\n", List.of()),
                 new TestCase("has newline", "a\nb", List.of("a", "b")),
                 new TestCase("is quoted string", "'quoted text'", List.of("'quoted text'")),
-                new TestCase("has quoted string", "abc'quoted string'xyz", List.of("abc", "'quoted string'", "xyz")),
+                new TestCase("has quoted string", "abc'abc(,);'xyz", List.of("abc", "'abc(,);'", "xyz")),
                 new TestCase("is semicolon", ";", List.of(";")),
                 new TestCase("has semicolon", "a; b", List.of("a", ";", "b")),
                 new TestCase("is escaped char", "\\", List.of("\\")),
@@ -43,8 +43,9 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),
                 new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'")),
-                new TestCase("is a list of mixed values", "(a, 'b', c(a.d), e)", List.of("(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")"))
-        ).map(testCase -> DynamicTest.dynamicTest(
+                new TestCase("is a list of mixed values", "a, (a, 'b', c(a.d), e), 'e'",
+                        List.of("a", ",", "(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")", ",", "'e'"))
+                ).map(testCase -> DynamicTest.dynamicTest(
                 "when input " + testCase.displayName(),
                 () -> assertInputProduces(testCase.input(), testCase.expected())
         ));

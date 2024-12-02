@@ -30,7 +30,7 @@ class SourceCrawler extends SectionAwareCrawler {
             } else {
                 source = new Table(nextFragment, null);
             }
-            query.getFromSources().add(source);
+            query.getSources().add(source);
         }
     }
 }

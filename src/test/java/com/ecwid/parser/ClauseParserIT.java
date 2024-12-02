@@ -25,8 +25,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         void simpleWhere() throws Exception {
             final var sql = "SELECT * FROM table WHERE id < 1;";
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", LESS_THAN, ConstantOperand.class, "1", clause);
         }
 
@@ -35,8 +35,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         void simpleHaving() throws Exception {
             final var sql = "SELECT * FROM table HAVING id >= 1;";
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(HAVING, Column.class, "id", GREATER_THAN_OR_EQUALS, ConstantOperand.class, "1", clause);
         }
 
@@ -45,8 +45,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         void specialCharsInString() throws Exception {
             final var sql = "SELECT * FROM table WHERE id = 'special;chars(,)in.string';";
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "'special;chars(,)in.string'", clause);
         }
     }
@@ -59,8 +59,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         void listOfStrings() throws Exception {
             final var sql = "SELECT * FROM table WHERE id in ('1', '2', '3');";
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", IN, ConstantListOperand.class, List.of("'1'", "'2'", "'3'"), clause);
         }
 
@@ -69,8 +69,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         void listOfNumbers() throws Exception {
             final var sql = "SELECT * FROM table WHERE id in (1, 2, 3);";
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", IN, ConstantListOperand.class, List.of("1", "2", "3"), clause);
         }
     }
@@ -84,8 +84,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var rightValue = operator.equals(WhereClause.Operator.IN) ? List.of("1") : "1";
             return DynamicTest.dynamicTest(operator.name(), () -> {
                 final var parsed = sqlParser.parse(sql);
-                assertEquals(1, parsed.getWhereClauses().size());
-                final var clause = parsed.getWhereClauses().getFirst();
+                assertEquals(1, parsed.getFilters().size());
+                final var clause = parsed.getFilters().getFirst();
                 assertClauseEquals(WHERE, Column.class, "id", operator, rightType, rightValue, clause);
             });
         });
@@ -105,8 +105,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
                     where id in (select user_id from participants);
                     """;
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", IN, Query.class, true, clause);
         }
 
@@ -119,12 +119,12 @@ public class ClauseParserIT extends AbstractSpringParserTest {
                     where id in (select user_id from participants where id = 'a');
                     """;
             final var parsed = sqlParser.parse(sql);
-            assertEquals(1, parsed.getWhereClauses().size());
-            final var clause = parsed.getWhereClauses().getFirst();
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", IN, Query.class, true, clause);
             final var nestedClause = (Query) clause.getRightOperand();
-            assertEquals(1, nestedClause.getWhereClauses().size());
-            final var nestedWhere = nestedClause.getWhereClauses().getFirst();
+            assertEquals(1, nestedClause.getFilters().size());
+            final var nestedWhere = nestedClause.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "'a'", nestedWhere);
         }
 
@@ -138,10 +138,10 @@ public class ClauseParserIT extends AbstractSpringParserTest {
                        or id = 2;
                     """;
             final var parsed = sqlParser.parse(sql);
-            assertEquals(2, parsed.getWhereClauses().size());
-            final var firstClause = parsed.getWhereClauses().getFirst();
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", IN, Query.class, true, firstClause);
-            final var secondClause = parsed.getWhereClauses().getLast();
+            final var secondClause = parsed.getFilters().getLast();
             assertClauseEquals(OR, Column.class, "id", EQUALS, ConstantOperand.class, "2", secondClause);
         }
 
@@ -155,10 +155,10 @@ public class ClauseParserIT extends AbstractSpringParserTest {
                     id in (select user_id from participants where id = 'a')
                     """;
             final var parsed = sqlParser.parse(sql);
-            assertEquals(2, parsed.getWhereClauses().size());
-            final var firstClause = parsed.getWhereClauses().getFirst();
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
             assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "2", firstClause);
-            final var secondClause = parsed.getWhereClauses().getLast();
+            final var secondClause = parsed.getFilters().getLast();
             assertClauseEquals(AND, Column.class, "id", IN, Query.class, true, secondClause);
 
         }

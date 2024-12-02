@@ -12,14 +12,24 @@ import java.util.List;
 
 
 @Data
-public class Query implements Operand, Source, Aliasable {
+public class Query implements Operand, Source {
     private List<Column> columns = new LinkedList<>();
-    private List<Source> fromSources = new LinkedList<>();
+    private List<Source> sources = new LinkedList<>();
     private List<Join> joins = new LinkedList<>();
-    private List<WhereClause> whereClauses = new LinkedList<>();
-    private List<Column> groupByColumns = new LinkedList<>();
-    private List<Sort> sortColumns = new LinkedList<>();
+    private List<WhereClause> filters = new LinkedList<>();
+    private List<Column> groupings = new LinkedList<>();
+    private List<Sort> sorts = new LinkedList<>();
     private Integer limit;
     private Integer offset;
     private String alias;
+
+    @Override
+    public String getName() {
+        return alias;
+    }
+
+    @Override
+    public void setName(String name) {
+        alias = name;
+    }
 }

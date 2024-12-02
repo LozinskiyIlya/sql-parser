@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Table implements Source, Aliasable{
+public class Table implements Source {
     private String name;
     private String alias;
 }

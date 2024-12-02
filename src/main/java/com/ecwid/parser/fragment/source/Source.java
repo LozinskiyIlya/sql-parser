@@ -1,5 +1,7 @@
 package com.ecwid.parser.fragment.source;
 
 
-public interface Source {
+import com.ecwid.parser.fragment.enity.Aliasable;
+
+public interface Source extends Aliasable {
 }

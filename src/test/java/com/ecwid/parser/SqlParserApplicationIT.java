@@ -15,8 +15,8 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
     void selectStopsOnSemiColon() throws Exception {
         final var sql = "SELECT * FROM table; , another_table;";
         final var parsed = sqlParser.parse(sql);
-        assertEquals(1, parsed.getFromSources().size());
-        final var onlySource = (Table) parsed.getFromSources().getFirst();
+        assertEquals(1, parsed.getSources().size());
+        final var onlySource = (Table) parsed.getSources().getFirst();
         assertEquals("table", onlySource.getName());
     }
 

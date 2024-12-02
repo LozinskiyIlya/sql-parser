@@ -28,7 +28,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
         final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, nextFragmentSupplier, null);
         final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, nextFragmentSupplier);
         final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, nextFragmentSupplier, clause.getOperator());
-        query.getWhereClauses().add(clause);
+        query.getFilters().add(clause);
         delegate(query, nexFragment, nextFragmentSupplier);
     }
 

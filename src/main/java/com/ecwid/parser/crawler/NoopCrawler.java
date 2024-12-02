@@ -8,12 +8,12 @@ import java.util.function.Supplier;
 @Component
 public class NoopCrawler implements Crawler {
     @Override
-    public Crawler selectCrawler(String nextSection) {
+    public Crawler nextCrawler(String nextSection) {
         return null;
     }
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
         // do nothing
     }
 }

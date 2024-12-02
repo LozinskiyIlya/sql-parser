@@ -39,27 +39,19 @@ abstract class SectionAwareCrawler implements Crawler {
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_CLOSE_BRACKET, NoopCrawler.class);
     }
 
-    public abstract void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
-
-    protected String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragmentSupplier) {
-        String fragment;
-        while ((fragment = fragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
-            andDoAction.accept(fragment);
-        }
-        return fragment;
-    }
+    public abstract void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
 
     protected final boolean shouldDelegate(String nextFragment) {
         return SECTION_AGAINST_CRAWLER.containsKey(nextFragment) || SUB_SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
     }
 
     @Override
-    public final void delegate(Query query, String currentSection, Supplier<String> fragmentSupplier) {
-        Crawler.super.delegate(query, currentSection, fragmentSupplier);
+    public final void delegate(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
+        Crawler.super.delegate(query, currentSection, nextFragmentSupplier);
     }
 
     @Override
-    public Crawler selectCrawler(String currentSection) {
+    public Crawler nextCrawler(String currentSection) {
         final var beanClass = SECTION_AGAINST_CRAWLER.getOrDefault(currentSection, SUB_SECTION_AGAINST_CRAWLER.get(currentSection));
         return beanClass == null ? null : applicationContext.getBean(beanClass);
     }

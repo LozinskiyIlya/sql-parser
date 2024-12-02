@@ -14,18 +14,18 @@ import static com.ecwid.parser.Lexemes.LEX_SELECT;
 class SourceCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String from, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String from, Supplier<String> nextFragmentSupplier) {
         String nextFragment;
-        while ((nextFragment = fragmentSupplier.get()) != null) {
+        while ((nextFragment = nextFragmentSupplier.get()) != null) {
             if (nextFragment.equals(LEX_OPEN_BRACKET)) {
                 continue;
             }
             Source source;
             if (LEX_SELECT.equals(nextFragment)) {
                 source = new Query();
-                selectCrawler(nextFragment).crawl((Query) source, nextFragment, fragmentSupplier);
+                nextCrawler(nextFragment).crawl((Query) source, nextFragment, nextFragmentSupplier);
             } else if (shouldDelegate(nextFragment)) {
-                delegate(query, nextFragment, fragmentSupplier);
+                delegate(query, nextFragment, nextFragmentSupplier);
                 return;
             } else {
                 source = new Table(nextFragment, null);

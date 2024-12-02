@@ -2,18 +2,28 @@ package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.enity.Query;
 
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public interface Crawler {
 
-    Crawler selectCrawler(String nextSection);
+    Crawler nextCrawler(String nextSection);
 
-    void crawl(Query query, String currentSection, Supplier<String> fragmentSupplier);
+    void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
 
-    default void delegate(Query query, String nextSection, Supplier<String> fragmentSupplier) {
-        final var nextCrawler = selectCrawler(nextSection);
+    default void delegate(Query query, String nextSection, Supplier<String> nextFragmentSupplier) {
+        final var nextCrawler = nextCrawler(nextSection);
         if (nextCrawler != null) {
-            nextCrawler.crawl(query, nextSection, fragmentSupplier);
+            nextCrawler.crawl(query, nextSection, nextFragmentSupplier);
         }
+    }
+
+    default String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> nextFragmentSupplier) {
+        String fragment;
+        while ((fragment = nextFragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
+            andDoAction.accept(fragment);
+        }
+        return fragment;
     }
 }

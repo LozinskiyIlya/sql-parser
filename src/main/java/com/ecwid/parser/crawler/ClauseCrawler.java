@@ -22,50 +22,50 @@ public class ClauseCrawler extends SectionAwareCrawler {
             .collect(Collectors.toMap(WhereClause.Operator::getFullLexeme, Function.identity()));
 
     @Override
-    public void crawl(Query query, String clauseName, Supplier<String> fragmentSupplier) {
+    public void crawl(Query query, String clauseName, Supplier<String> nextFragmentSupplier) {
         final var clause = new WhereClause(WhereClause.ClauseType.valueOf(clauseName.toUpperCase()));
-        final var leftOperandFirstFragment = fragmentSupplier.get();
-        final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, fragmentSupplier, null);
-        final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, fragmentSupplier);
-        final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, fragmentSupplier, clause.getOperator());
+        final var leftOperandFirstFragment = nextFragmentSupplier.get();
+        final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, nextFragmentSupplier, null);
+        final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, nextFragmentSupplier);
+        final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, nextFragmentSupplier, clause.getOperator());
         query.getWhereClauses().add(clause);
-        delegate(query, nexFragment, fragmentSupplier);
+        delegate(query, nexFragment, nextFragmentSupplier);
     }
 
 
     private String crawlForOperand(
             WhereClause clause,
             String firstFragment,
-            Supplier<String> fragmentSupplier,
+            Supplier<String> nextFragmentSupplier,
             WhereClause.Operator operator
     ) {
         Operand operand;
         var fragment = String.copyValueOf(firstFragment.toCharArray());
         if (LEX_OPEN_BRACKET.equals(fragment)) {
-            fragment = fragmentSupplier.get();
+            fragment = nextFragmentSupplier.get();
         }
         if (LEX_SELECT.equals(fragment)) {
             operand = new Query();
-            selectCrawler(fragment).crawl((Query) operand, fragment, fragmentSupplier);
-            fragment = fragmentSupplier.get();
+            nextCrawler(fragment).crawl((Query) operand, fragment, nextFragmentSupplier);
+            fragment = nextFragmentSupplier.get();
         } else if (operator != null && LEX_IN.equals(operator.getFullLexeme())) {
             operand = new ConstantListOperand();
             final var values = ((ConstantListOperand) operand).getValues();
             values.add(fragment);
-            fragment = crawlUntilAndReturnNext(this::shouldDelegate, values::add, fragmentSupplier);
+            fragment = crawlUntilAndReturnNext(this::shouldDelegate, values::add, nextFragmentSupplier);
         } else if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);
-            fragment = fragmentSupplier.get();
+            fragment = nextFragmentSupplier.get();
         } else {
             operand = new Column(fragment, null);
-            fragment = fragmentSupplier.get();
+            fragment = nextFragmentSupplier.get();
         }
         clause.setNextOperand(operand);
         return fragment;
     }
 
-    private String crawlForOperator(WhereClause clause, String firstFragment, Supplier<String> fragmentSupplier) {
+    private String crawlForOperator(WhereClause clause, String firstFragment, Supplier<String> nextFragmentSupplier) {
         final var operatorParts = new LinkedList<String>();
         operatorParts.add(firstFragment);
         crawlUntilAndReturnNext(
@@ -75,7 +75,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
                 },
                 fragment -> {
                 },
-                fragmentSupplier);
+                nextFragmentSupplier);
         final var nextFragment = operatorParts.removeLast();
         clause.setOperator(operatorFullLexemes.get(String.join("", operatorParts)));
         return nextFragment;

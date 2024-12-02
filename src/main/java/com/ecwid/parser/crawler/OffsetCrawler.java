@@ -9,9 +9,9 @@ import java.util.function.Supplier;
 class OffsetCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String offsetKeyword, Supplier<String> fragmentSupplier) {
-        final var offset = fragmentSupplier.get();
+    public void crawl(Query query, String offsetKeyword, Supplier<String> nextFragmentSupplier) {
+        final var offset = nextFragmentSupplier.get();
         query.setOffset(Integer.parseInt(offset));
-        delegate(query, fragmentSupplier.get(), fragmentSupplier);
+        delegate(query, nextFragmentSupplier.get(), nextFragmentSupplier);
     }
 }

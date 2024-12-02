@@ -74,7 +74,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT min(cost) FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("min(cost)", parsed.getColumns().get(0).getName());
+            assertEquals("min(cost)", parsed.getColumns().getFirst().getName());
         }
 
         @Test

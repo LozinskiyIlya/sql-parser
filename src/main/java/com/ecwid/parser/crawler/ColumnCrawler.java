@@ -4,6 +4,7 @@ import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -26,7 +27,10 @@ public class ColumnCrawler extends SectionAwareCrawler implements FunctionAwareL
         return query ->
                 Optional.of(query.getColumns().isEmpty())
                         .filter(Boolean.FALSE::equals)
-                        .map(b -> query.getColumns().getLast().name())
+                        .map(b -> query)
+                        .map(Query::getColumns)
+                        .map(List::removeLast)
+                        .map(Column::name)
                         .map(StringBuilder::new)
                         .orElseGet(StringBuilder::new);
 

@@ -4,8 +4,10 @@ import com.ecwid.parser.fragment.enity.Query;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import static com.ecwid.parser.Lexemes.LEX_COMMA;
+import static java.util.function.Predicate.not;
 
 public interface ListCrawler {
 
@@ -13,7 +15,7 @@ public interface ListCrawler {
 
     default BiConsumer<Query, String> addToQuery() {
         return (query, fragment) -> Optional.of(fragment)
-                .filter(f -> !LEX_COMMA.equals(f))
-                .ifPresent(f -> onListItem().accept(query, f));
+                .filter(not(LEX_COMMA::equals))
+                .ifPresent(it -> onListItem().accept(query, it));
     }
 }

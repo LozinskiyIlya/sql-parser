@@ -65,6 +65,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void simpleNameAndFunction() throws Exception {
             final var sql = "SELECT a, count(*) FROM table;";
             final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
             assertEquals(2, parsed.getColumns().size());
             assertEquals("a", parsed.getColumns().get(0).name());
             assertEquals("count(*)", parsed.getColumns().get(1).name());

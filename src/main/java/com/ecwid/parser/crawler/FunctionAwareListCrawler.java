@@ -20,17 +20,22 @@ public interface FunctionAwareListCrawler extends ListCrawler {
             final var acc = acc().apply(query);
             if (LEX_OPEN_BRACKET.equals(fragment)) {
                 acc.append(fragment);
+                flushItem().accept(query, acc.toString());
                 return;
             }
             final var currentString = acc.toString();
-            if (currentString.contains(LEX_OPEN_BRACKET) && !currentString.contains(LEX_CLOSE_BRACKET)) {
-                acc.append(fragment);
-                return;
-            }
-            if (LEX_CLOSE_BRACKET.equals(fragment)) {
+            if (currentString.contains(LEX_OPEN_BRACKET)) {
+                if (currentString.contains(LEX_CLOSE_BRACKET)) {
+                    flushItem().accept(query, acc.toString());
+                    flushItem().accept(query, fragment);
+                    return;
+                }
                 acc.append(fragment);
                 flushItem().accept(query, acc.toString());
                 return;
+            }
+            if (!acc.isEmpty()) {
+                flushItem().accept(query, acc.toString());
             }
             flushItem().accept(query, fragment);
         };

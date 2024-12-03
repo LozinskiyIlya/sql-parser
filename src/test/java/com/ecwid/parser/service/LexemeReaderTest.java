@@ -38,7 +38,7 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("has open bracket", "a(b", List.of("a", "(", "b")),
                 new TestCase("is close bracket", ")", List.of(")")),
                 new TestCase("has close bracket", "a)b", List.of("a", ")", "b")),
-                new TestCase("has open and close brackets", "(a)b", List.of("(", "a", ")", "b")),
+                new TestCase("has open and close brackets", "count(*) b, a", List.of("count","(", "*", ")", "b", ",", "a")),
                 new TestCase("is a list of values", "a b c", List.of("a", "b", "c")),
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),

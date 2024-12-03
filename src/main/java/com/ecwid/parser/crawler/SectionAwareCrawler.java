@@ -38,7 +38,6 @@ public abstract class SectionAwareCrawler implements Crawler {
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_CLOSE_BRACKET, null);
     }
 
     protected Predicate<String> crawlUntil;

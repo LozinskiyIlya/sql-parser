@@ -18,25 +18,21 @@ public class LexemeReader {
             while ((c = reader.read()) != -1) {
                 final var currentChar = (char) c;
                 final var currentCharAsString = String.valueOf(currentChar);
-                if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
-                    if (lex.isEmpty()) {
-                        return readStringToTheEnd(reader);
-                    }
-                    reader.unread(c);
-                    return lex.toString().toLowerCase();
-                }
                 if (SEPARATORS.contains(currentCharAsString)) {
                     if (lex.isEmpty()) {
+                        if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
+                            return readStringToTheEnd(reader);
+                        }
                         return currentCharAsString;
                     }
                     reader.unread(c);
-                    return lex.toString().toLowerCase();
+                    break;
                 }
                 if (Character.isWhitespace(c)) {
                     if (lex.isEmpty()) {
                         continue;
                     }
-                    return lex.toString().toLowerCase();
+                    break;
                 }
                 lex.append(currentChar);
             }

@@ -4,18 +4,31 @@ import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Component
-public class ColumnCrawler extends SectionAwareCrawler implements ListCrawler {
+public class ColumnCrawler extends SectionAwareCrawler implements FunctionAwareListCrawler {
 
     {
         crawlUntil = fragment -> false;
-        addToQuery = ListCrawler.super.addToQuery();
+        addToQuery = FunctionAwareListCrawler.super.addToQuery();
     }
 
     @Override
-    public BiConsumer<Query, String> onListItem() {
+    public BiConsumer<Query, String> flushItem() {
         return (query, fragment) -> query.getColumns().add(new Column(fragment, null));
+    }
+
+    @Override
+    public Function<Query, StringBuilder> acc() {
+        return query ->
+                Optional.of(query.getColumns().isEmpty())
+                        .filter(Boolean.FALSE::equals)
+                        .map(b -> query.getColumns().getLast().name())
+                        .map(StringBuilder::new)
+                        .orElseGet(StringBuilder::new);
+
     }
 }

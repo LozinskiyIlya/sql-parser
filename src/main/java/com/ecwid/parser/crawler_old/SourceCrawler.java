@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler_old;
 
 import com.ecwid.parser.fragment.enity.Query;
 import com.ecwid.parser.fragment.enity.Table;

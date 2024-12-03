@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler_old;
 
 import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.beans.factory.annotation.Autowired;

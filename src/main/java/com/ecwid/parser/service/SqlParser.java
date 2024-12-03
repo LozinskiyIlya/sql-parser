@@ -1,7 +1,7 @@
 package com.ecwid.parser.service;
 
 
-import com.ecwid.parser.crawler.ColumnCrawler;
+import com.ecwid.parser.crawler_old.ColumnCrawler;
 import com.ecwid.parser.fragment.enity.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

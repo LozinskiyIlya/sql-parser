@@ -17,7 +17,7 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
         final var parsed = sqlParser.parse(sql);
         assertEquals(1, parsed.getSources().size());
         final var onlySource = (Table) parsed.getSources().getFirst();
-        assertEquals("table", onlySource.getName());
+        assertEquals("table", onlySource.name());
     }
 
     @Test

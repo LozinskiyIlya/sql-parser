@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-@Component
 public class ColumnCrawler extends SectionAwareCrawler {
 
     @Override
@@ -28,7 +27,7 @@ public class ColumnCrawler extends SectionAwareCrawler {
                 final var functionBuilder = new StringBuilder(nextFragment);
                 if (!columns.isEmpty()) {
                     // the last inserted column was a function name
-                    functionBuilder.insert(0, columns.removeLast().getName());
+                    functionBuilder.insert(0, columns.removeLast().name());
                 }
                 crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextFragmentSupplier);
                 functionBuilder.append(LEX_CLOSE_BRACKET);

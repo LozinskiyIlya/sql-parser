@@ -20,7 +20,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT * FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("*", parsed.getColumns().getFirst().getName());
+            assertEquals("*", parsed.getColumns().getFirst().name());
         }
 
         @Test
@@ -29,7 +29,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT a FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().getFirst().getName());
+            assertEquals("a", parsed.getColumns().getFirst().name());
         }
 
         @Test
@@ -39,9 +39,9 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             System.out.println(parsed.getColumns());
             assertEquals(3, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).getName());
-            assertEquals("b", parsed.getColumns().get(1).getName());
-            assertEquals("c", parsed.getColumns().get(2).getName());
+            assertEquals("a", parsed.getColumns().get(0).name());
+            assertEquals("b", parsed.getColumns().get(1).name());
+            assertEquals("c", parsed.getColumns().get(2).name());
         }
     }
 
@@ -55,8 +55,8 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT count(*), a FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(2, parsed.getColumns().size());
-            assertEquals("count(*)", parsed.getColumns().get(0).getName());
-            assertEquals("a", parsed.getColumns().get(1).getName());
+            assertEquals("count(*)", parsed.getColumns().get(0).name());
+            assertEquals("a", parsed.getColumns().get(1).name());
         }
 
         @Test
@@ -65,8 +65,8 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT a, count(*) FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(2, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).getName());
-            assertEquals("count(*)", parsed.getColumns().get(1).getName());
+            assertEquals("a", parsed.getColumns().get(0).name());
+            assertEquals("count(*)", parsed.getColumns().get(1).name());
         }
 
         @Test
@@ -75,7 +75,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT min(cost) FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("min(cost)", parsed.getColumns().getFirst().getName());
+            assertEquals("min(cost)", parsed.getColumns().getFirst().name());
         }
 
         @Test
@@ -84,12 +84,12 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT a, max(cost), avg(t), b, c, count(*) FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(6, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).getName());
-            assertEquals("max(cost)", parsed.getColumns().get(1).getName());
-            assertEquals("avg(t)", parsed.getColumns().get(2).getName());
-            assertEquals("b", parsed.getColumns().get(3).getName());
-            assertEquals("c", parsed.getColumns().get(4).getName());
-            assertEquals("count(*)", parsed.getColumns().get(5).getName());
+            assertEquals("a", parsed.getColumns().get(0).name());
+            assertEquals("max(cost)", parsed.getColumns().get(1).name());
+            assertEquals("avg(t)", parsed.getColumns().get(2).name());
+            assertEquals("b", parsed.getColumns().get(3).name());
+            assertEquals("c", parsed.getColumns().get(4).name());
+            assertEquals("count(*)", parsed.getColumns().get(5).name());
         }
     }
 }

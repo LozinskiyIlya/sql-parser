@@ -10,7 +10,6 @@ import lombok.Data;
 import java.util.LinkedList;
 import java.util.List;
 
-
 @Data
 public class Query implements Operand, Source {
     private List<Column> columns = new LinkedList<>();
@@ -24,12 +23,12 @@ public class Query implements Operand, Source {
     private String alias;
 
     @Override
-    public String getName() {
+    public String name() {
         return alias;
     }
 
     @Override
-    public void setName(String name) {
-        alias = name;
+    public String alias() {
+        return alias;
     }
 }

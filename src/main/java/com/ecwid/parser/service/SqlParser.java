@@ -1,7 +1,7 @@
 package com.ecwid.parser.service;
 
 
-import com.ecwid.parser.crawler_old.ColumnCrawler;
+import com.ecwid.parser.crawler.ColumnCrawler;
 import com.ecwid.parser.fragment.enity.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class SqlParser {
             throw new IllegalStateException("Query should start with SELECT keyword");
         }
         final var query = new Query();
-        firstCrawler.crawl(query, section, () -> {
+        firstCrawler.crawl(query, () -> {
             final var nextLex = lexemeReader.nextLex(reader);
             return LEX_SEMICOLON.equals(nextLex) ? null : nextLex;
         });

@@ -3,10 +3,7 @@ package com.ecwid.parser.fragment.enity;
 import com.ecwid.parser.fragment.source.Source;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
-@AllArgsConstructor
-public class Table implements Source {
-    private String name;
-    private String alias;
+public record Table(String name, String alias) implements Source {
 }

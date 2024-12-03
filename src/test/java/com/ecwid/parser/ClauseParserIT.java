@@ -185,9 +185,9 @@ public class ClauseParserIT extends AbstractSpringParserTest {
 
     private Object getOperandValue(Operand operand) {
         return switch (operand) {
-            case Column o -> o.getName();
+            case Column o -> o.name();
             case ConstantOperand o -> o.getValue();
-//                case Query o -> o.getQuery();
+//            case Query o -> o.getQuery();
             case Query o -> true;
             case ConstantListOperand o -> o.getValues();
             default ->

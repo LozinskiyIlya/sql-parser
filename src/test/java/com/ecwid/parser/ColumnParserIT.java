@@ -1,6 +1,7 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.enity.Aliasable;
+import com.ecwid.parser.fragment.enity.Nameable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         }
     }
 
-    private void assertColumnEquals(Aliasable column, String name, String alias) {
+    private void assertColumnEquals(Nameable column, String name, String alias) {
         assertEquals(name, column.name());
         assertEquals(alias, column.alias());
     }

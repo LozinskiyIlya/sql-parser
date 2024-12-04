@@ -23,11 +23,6 @@ public class Query implements Operand, Source {
     private String alias;
 
     @Override
-    public String name() {
-        return alias;
-    }
-
-    @Override
     public String alias() {
         return alias;
     }

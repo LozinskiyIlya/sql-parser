@@ -13,7 +13,6 @@ public class AliasablePairWithoutAs implements Aliasable {
     @Setter
     private String alias;
 
-    @Override
     public String name() {
         return name;
     }

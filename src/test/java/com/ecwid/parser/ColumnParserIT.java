@@ -104,12 +104,12 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("multiple columns and functions")
         void simpleNameAndCount() throws Exception {
-            final var sql = "SELECT a, max(cost) as m, avg(t) as1 a, b as d, c, count(*) as c1 FROM table;";
+            final var sql = "SELECT a, max(cost) as m, avg(t) as a, b as d, c, count(*) as c1 FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(6, parsed.getColumns().size());
             assertColumnEquals(parsed.getColumns().get(0), "a", null);
             assertColumnEquals(parsed.getColumns().get(1), "max(cost)", "m");
-            assertColumnEquals(parsed.getColumns().get(2), "avg(t)", "as1");
+            assertColumnEquals(parsed.getColumns().get(2), "avg(t)", "a");
             assertColumnEquals(parsed.getColumns().get(3), "b", "d");
             assertColumnEquals(parsed.getColumns().get(4), "c", null);
             assertColumnEquals(parsed.getColumns().get(5), "count(*)", "c1");

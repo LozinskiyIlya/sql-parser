@@ -1,10 +1,12 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.fragment.enity.NameAliasPair;
 import com.ecwid.parser.fragment.enity.Query;
 import com.ecwid.parser.fragment.enity.Table;
 import com.ecwid.parser.fragment.source.Source;
 import org.springframework.stereotype.Component;
 
+import java.util.Stack;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -15,21 +17,54 @@ class SourceCrawler extends SectionAwareCrawler {
     @Override
     public void crawl(Query query, String from, Supplier<String> nextFragmentSupplier) {
         String nextFragment;
+        final var sources = new Stack<Source>();
+        final var pair = new NameAliasPair();
         while ((nextFragment = nextFragmentSupplier.get()) != null) {
-            if (nextFragment.equals(LEX_OPEN_BRACKET) || nextFragment.equals(LEX_COMMA)) {
+            if (LEX_CLOSE_BRACKET.equals(nextFragment)) {
+                break;
+            }
+            if (LEX_OPEN_BRACKET.equals(nextFragment)) {
                 continue;
             }
-            Source source;
-            if (LEX_SELECT.equals(nextFragment)) {
-                source = new Query();
-                nextCrawler(nextFragment).crawl((Query) source, nextFragment, nextFragmentSupplier);
-            } else if (shouldDelegate(nextFragment)) {
-                delegate(query, nextFragment, nextFragmentSupplier);
-                return;
-            } else {
-                source = new Table(nextFragment, null);
+            if (LEX_COMMA.equals(nextFragment)) {
+                flush(query, sources, pair);
+                continue;
             }
-            query.getSources().add(source);
+            if (LEX_SELECT.equals(nextFragment)) {
+                final var nested = new Query();
+                nextCrawler(nextFragment).crawl(nested, nextFragment, nextFragmentSupplier);
+                sources.push(nested);
+                continue;
+            }
+            if (shouldDelegate(nextFragment)) {
+                delegate(query, nextFragment, nextFragmentSupplier);
+                flush(query, sources, pair);
+                return;
+            }
+            if (sources.isEmpty()) {
+                sources.push(new Table());
+            }
+            pair.push(nextFragment);
+        }
+
+        // flushing the last source when:
+        // 1) at a nested query ')' is reached
+        // 2) query is not closed with a semicolon
+        flush(query, sources, pair);
+    }
+
+    private void flush(Query query, Stack<Source> sources, NameAliasPair nameAliasPair) {
+        final var source = sources.pop();
+        if (source instanceof Table) {
+            ((Table) source).setName(nameAliasPair.getFirst());
+            ((Table) source).setAlias(nameAliasPair.getSecond());
+        } else {
+            ((Query) source).setAlias(nameAliasPair.getFirst());
+        }
+        query.getSources().add(source);
+        nameAliasPair.reset();
+        if (!sources.isEmpty()) {
+            throw new IllegalStateException("Syntax error at FROM clause. Expected comma or semicolon.");
         }
     }
 }

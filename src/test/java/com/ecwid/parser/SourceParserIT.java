@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -79,7 +81,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("one level nested source with alias")
         void oneLevelNestedSourceWithAlias() throws Exception {
-            final var sql = "select * from (select * from some_table) as t";
+            final var sql = "SELECT * FROM (SELECT * FROM some_table) t";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSources().size());
             final var source = parsed.getSources().getFirst();
@@ -89,6 +91,58 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertEquals("*", nestedQuery.getColumns().getFirst().name());
             assertEquals(1, nestedQuery.getSources().size());
             assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
+        }
+
+        @Test
+        @DisplayName("one level nested source with AS alias")
+        void oneLevelNestedSourceWithASAlias() throws Exception {
+            final var sql = "SELECT * FROM (SELECT * FROM some_table) AS t";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getSources().size());
+            final var source = parsed.getSources().getFirst();
+            assertSourceEquals(Query.class, null, "t", source);
+            final var nestedQuery = (Query) source;
+            assertEquals(1, nestedQuery.getColumns().size());
+            assertEquals("*", nestedQuery.getColumns().getFirst().name());
+            assertEquals(1, nestedQuery.getSources().size());
+            assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
+        }
+
+        @Test
+        @DisplayName("mixed sources and multiple level nesting")
+        void mixedSources() throws IOException {
+            final var sql = """
+                    SELECT * FROM a, b as c, d,
+                        (SELECT * FROM
+                                (SELECT * FROM e) AS f, g
+                        ) h, i j, k as l,
+                        (SELECT * FROM m) as n, o;
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(8, parsed.getSources().size());
+            assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
+            assertSourceEquals(Table.class, "b", "c", parsed.getSources().get(1));
+            assertSourceEquals(Table.class, "d", null, parsed.getSources().get(2));
+            assertSourceEquals(Query.class, null, "h", parsed.getSources().get(3));
+
+            final var nestedFirst = (Query) parsed.getSources().get(3);
+            assertEquals(2, nestedFirst.getSources().size());
+            assertSourceEquals(Query.class, null, "f", nestedFirst.getSources().getFirst());
+            assertSourceEquals(Table.class, "g", null, nestedFirst.getSources().getLast());
+
+            final var nestedNested = (Query) nestedFirst.getSources().getFirst();
+            assertEquals(1, nestedNested.getSources().size());
+            assertSourceEquals(Table.class, "e", null, nestedNested.getSources().getFirst());
+
+            assertSourceEquals(Table.class, "i", "j", parsed.getSources().get(4));
+            assertSourceEquals(Table.class, "k", "l", parsed.getSources().get(5));
+            assertSourceEquals(Query.class, null, "n", parsed.getSources().get(6));
+
+            final var nestedSecond = (Query) parsed.getSources().get(6);
+            assertEquals(1, nestedSecond.getSources().size());
+            assertSourceEquals(Table.class, "m", null, nestedSecond.getSources().getFirst());
+
+            assertSourceEquals(Table.class, "o", null, parsed.getSources().get(7));
         }
     }
 

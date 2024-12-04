@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.enity.AliasCleaner;
+import com.ecwid.parser.fragment.enity.NameAliasPair;
 import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;
@@ -16,30 +16,30 @@ public class ColumnCrawler extends SectionAwareCrawler {
     @Override
     public void crawl(Query query, String select, Supplier<String> nextFragmentSupplier) {
         String nextFragment;
-        final var aliasCleaner = new AliasCleaner();
+        final var pair = new NameAliasPair();
         while ((nextFragment = nextFragmentSupplier.get()) != null) {
             if (shouldDelegate(nextFragment)) {
-                flush(query, aliasCleaner);
+                flush(query, pair);
                 delegate(query, nextFragment, nextFragmentSupplier);
                 return;
             }
             if (LEX_COMMA.equals(nextFragment)) {
-                flush(query, aliasCleaner);
+                flush(query, pair);
                 continue;
             }
             if (LEX_OPEN_BRACKET.equals(nextFragment)) {
-                nextFragment = crawlFunction(aliasCleaner, nextFragmentSupplier);
+                nextFragment = crawlFunction(pair, nextFragmentSupplier);
             }
-            aliasCleaner.push(nextFragment);
+            pair.push(nextFragment);
         }
     }
 
-    private String crawlFunction(AliasCleaner aliasCleaner, Supplier<String> nextFragmentSupplier) {
+    private String crawlFunction(NameAliasPair pair, Supplier<String> nextFragmentSupplier) {
         final var functionBuilder = new StringBuilder();
-        if (StringUtils.hasText(aliasCleaner.name())) {
+        if (StringUtils.hasText(pair.getFirst())) {
             // the last inserted value was a function name
-            functionBuilder.append(aliasCleaner.name());
-            aliasCleaner.reset();
+            functionBuilder.append(pair.getFirst());
+            pair.reset();
         }
         functionBuilder.append(LEX_OPEN_BRACKET);
         crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextFragmentSupplier);
@@ -47,8 +47,8 @@ public class ColumnCrawler extends SectionAwareCrawler {
         return functionBuilder.toString();
     }
 
-    private void flush(Query query, AliasCleaner aliasCleaner) {
-        query.getColumns().add(new Column(aliasCleaner.name(), aliasCleaner.alias()));
-        aliasCleaner.reset();
+    private void flush(Query query, NameAliasPair pair) {
+        query.getColumns().add(new Column(pair.getFirst(), pair.getSecond()));
+        pair.reset();
     }
 }

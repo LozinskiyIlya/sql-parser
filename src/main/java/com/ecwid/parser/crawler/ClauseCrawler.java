@@ -55,7 +55,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
             fragment = crawlUntilAndReturnNext(
                     this::shouldDelegate,
                     fr -> {
-                        if (LEX_COMMA.equals(fr)) {
+                        if (LEX_COMMA.equals(fr) || LEX_CLOSE_BRACKET.equals(fr)) {
                             return;
                         }
                         values.add(fr);

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import static com.ecwid.parser.Lexemes.LEX_AS;
 
-public class AliasCleaner implements Aliasable {
+public class AliasCleaner implements Nameable {
 
     @Setter(AccessLevel.PRIVATE)
     private String name;

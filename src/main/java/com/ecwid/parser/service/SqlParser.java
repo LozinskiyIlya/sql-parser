@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
+import java.util.Optional;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -38,7 +39,11 @@ public class SqlParser {
             throw new IllegalStateException("Query should start with SELECT keyword");
         }
         final var query = new Query();
-        firstCrawler.crawl(query, section, () -> lexemeReader.nextLex(reader));
+        firstCrawler.crawl(query, section, () -> {
+                    final var lex = lexemeReader.nextLex(reader);
+                    return LEX_SEMICOLON.equals(lex) ? null : lex;
+                }
+        );
         return query;
     }
 

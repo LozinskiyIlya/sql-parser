@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import static com.ecwid.parser.Lexemes.LEX_AS;
 
-public class AliasablePairWithoutAs implements Aliasable {
+public class AliasCleaner implements Aliasable {
 
     @Setter(AccessLevel.PRIVATE)
     private String name;
@@ -22,7 +22,7 @@ public class AliasablePairWithoutAs implements Aliasable {
         return alias;
     }
 
-    public void setPart(String part) {
+    public void push(String part) {
         if (LEX_AS.equals(part)) {
             return;
         }
@@ -31,5 +31,10 @@ public class AliasablePairWithoutAs implements Aliasable {
         } else {
             setAlias(part);
         }
+    }
+
+    public void reset() {
+        setName(null);
+        setAlias(null);
     }
 }

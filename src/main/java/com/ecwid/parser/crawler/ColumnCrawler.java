@@ -1,8 +1,8 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.fragment.enity.AliasCleaner;
 import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -16,62 +16,39 @@ public class ColumnCrawler extends SectionAwareCrawler {
     @Override
     public void crawl(Query query, String select, Supplier<String> nextFragmentSupplier) {
         String nextFragment;
-        Pair columnAndAlias = new Pair();
+        final var aliasCleaner = new AliasCleaner();
         while ((nextFragment = nextFragmentSupplier.get()) != null) {
             if (shouldDelegate(nextFragment)) {
-                flush(query, columnAndAlias);
+                flush(query, aliasCleaner);
                 delegate(query, nextFragment, nextFragmentSupplier);
                 return;
             }
             if (LEX_COMMA.equals(nextFragment)) {
-                flush(query, columnAndAlias);
+                flush(query, aliasCleaner);
                 continue;
             }
             if (LEX_OPEN_BRACKET.equals(nextFragment)) {
-                nextFragment = crawlFunction(columnAndAlias, nextFragment, nextFragmentSupplier);
+                nextFragment = crawlFunction(aliasCleaner, nextFragmentSupplier);
             }
-            columnAndAlias.set(nextFragment);
+            aliasCleaner.push(nextFragment);
         }
     }
 
-    private String crawlFunction(Pair columnAndAlias, String currentFragment, Supplier<String> nextFragmentSupplier) {
-        final var functionBuilder = new StringBuilder(currentFragment);
-        if (StringUtils.hasText(columnAndAlias.getName())) {
+    private String crawlFunction(AliasCleaner aliasCleaner, Supplier<String> nextFragmentSupplier) {
+        final var functionBuilder = new StringBuilder();
+        if (StringUtils.hasText(aliasCleaner.name())) {
             // the last inserted value was a function name
-            functionBuilder.insert(0, columnAndAlias.getName());
-            columnAndAlias.reset();
+            functionBuilder.append(aliasCleaner.name());
+            aliasCleaner.reset();
         }
+        functionBuilder.append(LEX_OPEN_BRACKET);
         crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextFragmentSupplier);
         functionBuilder.append(LEX_CLOSE_BRACKET);
         return functionBuilder.toString();
     }
 
-    private void flush(Query query, Pair columnAndAlias) {
-        query.getColumns().add(new Column(columnAndAlias.getName(), columnAndAlias.getAlias()));
-        columnAndAlias.reset();
-    }
-
-    @Getter
-    private static class Pair {
-        private String name;
-        private String alias;
-
-        void set(String value) {
-            if (name == null) {
-                name = value;
-            } else {
-                alias = value;
-            }
-        }
-
-        void reset() {
-            name = null;
-            alias = null;
-        }
+    private void flush(Query query, AliasCleaner aliasCleaner) {
+        query.getColumns().add(new Column(aliasCleaner.name(), aliasCleaner.alias()));
+        aliasCleaner.reset();
     }
 }
-
-// select a from
-// select a b from
-// select a b, c from
-// select a, b from

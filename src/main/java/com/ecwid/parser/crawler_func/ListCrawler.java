@@ -1,10 +1,9 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler_func;
 
 import com.ecwid.parser.fragment.enity.Query;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 import static com.ecwid.parser.Lexemes.LEX_COMMA;
 import static java.util.function.Predicate.not;

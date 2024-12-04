@@ -2,28 +2,32 @@ package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.enity.Query;
 
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public interface Crawler {
 
-    Predicate<String> crawlUntil();
+    Crawler nextCrawler(String nextSection);
 
-    BiConsumer<Query, String> addToQuery();
+    void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
 
-    Function<String, Crawler> next();
+    default void delegate(Query query, String nextSection, Supplier<String> nextFragmentSupplier) {
+        final var nextCrawler = nextCrawler(nextSection);
+        if (nextCrawler != null) {
+            nextCrawler.crawl(query, nextSection, nextFragmentSupplier);
+        }
+    }
 
-    default String crawl(Query query, Supplier<String> supplier) {
-        return Stream.generate(supplier)
-                .takeWhile(fr -> Objects.nonNull(fr) && crawlUntil().negate().test(fr))
-                .peek(fragment -> addToQuery().accept(query, fragment))
-                .reduce((fragment, last) -> last)
-                .map(next())
-                .map(next -> next.crawl(query, supplier))
-                .orElse(null);
+    default String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> nextFragmentSupplier) {
+        String fragment;
+        while ((fragment = nextFragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
+            andDoAction.accept(fragment);
+        }
+        return fragment;
+    }
+
+    default String crawlListAndReturnNext(Consumer<String> onItem, Supplier<String> nextFragmentSupplier) {
+        return crawlUntilAndReturnNext(fragment -> false, onItem, nextFragmentSupplier);
     }
 }

@@ -1,5 +1,6 @@
 package com.ecwid.parser;
 
+import com.ecwid.parser.fragment.enity.Aliasable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT * FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("*", parsed.getColumns().getFirst().name());
+            assertColumnEquals(parsed.getColumns().getFirst(), "*", null);
         }
 
         @Test
@@ -29,7 +30,16 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT a FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().getFirst().name());
+            assertColumnEquals(parsed.getColumns().getFirst(), "a", null);
+        }
+
+        @Test
+        @DisplayName("only one column with alias")
+        void oneColumnWithAlias() throws Exception {
+            final var sql = "SELECT a as b FROM table;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getColumns().size());
+            assertColumnEquals(parsed.getColumns().getFirst(), "a", "b");
         }
 
         @Test
@@ -39,9 +49,21 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             System.out.println(parsed.getColumns());
             assertEquals(3, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).name());
-            assertEquals("b", parsed.getColumns().get(1).name());
-            assertEquals("c", parsed.getColumns().get(2).name());
+            assertColumnEquals(parsed.getColumns().get(0), "a", null);
+            assertColumnEquals(parsed.getColumns().get(1), "b", null);
+            assertColumnEquals(parsed.getColumns().get(2), "c", null);
+        }
+
+        @Test
+        @DisplayName("multiple columns with alias")
+        void multipleColumnsWithAlias() throws Exception {
+            final var sql = "SELECT a, b as 2, c FROM table;";
+            final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed.getColumns());
+            assertEquals(3, parsed.getColumns().size());
+            assertColumnEquals(parsed.getColumns().get(0), "a", null);
+            assertColumnEquals(parsed.getColumns().get(1), "b", "2");
+            assertColumnEquals(parsed.getColumns().get(2), "c", null);
         }
     }
 
@@ -56,8 +78,8 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             System.out.println(parsed);
             assertEquals(2, parsed.getColumns().size());
-            assertEquals("count(*)", parsed.getColumns().get(0).name());
-            assertEquals("a", parsed.getColumns().get(1).name());
+            assertColumnEquals(parsed.getColumns().get(0), "count(*)", null);
+            assertColumnEquals(parsed.getColumns().get(1), "a", null);
         }
 
         @Test
@@ -65,10 +87,9 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void simpleNameAndFunction() throws Exception {
             final var sql = "SELECT a, count(*) FROM table;";
             final var parsed = sqlParser.parse(sql);
-            System.out.println(parsed);
             assertEquals(2, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).name());
-            assertEquals("count(*)", parsed.getColumns().get(1).name());
+            assertColumnEquals(parsed.getColumns().get(0), "a", null);
+            assertColumnEquals(parsed.getColumns().get(1), "count(*)", null);
         }
 
         @Test
@@ -77,21 +98,26 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT min(cost) FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
-            assertEquals("min(cost)", parsed.getColumns().getFirst().name());
+            assertColumnEquals(parsed.getColumns().getFirst(), "min(cost)", null);
         }
 
         @Test
         @DisplayName("multiple columns and functions")
         void simpleNameAndCount() throws Exception {
-            final var sql = "SELECT a, max(cost), avg(t), b, c, count(*) FROM table;";
+            final var sql = "SELECT a, max(cost) as m, avg(t) as1 a, b as d, c, count(*) as c1 FROM table;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(6, parsed.getColumns().size());
-            assertEquals("a", parsed.getColumns().get(0).name());
-            assertEquals("max(cost)", parsed.getColumns().get(1).name());
-            assertEquals("avg(t)", parsed.getColumns().get(2).name());
-            assertEquals("b", parsed.getColumns().get(3).name());
-            assertEquals("c", parsed.getColumns().get(4).name());
-            assertEquals("count(*)", parsed.getColumns().get(5).name());
+            assertColumnEquals(parsed.getColumns().get(0), "a", null);
+            assertColumnEquals(parsed.getColumns().get(1), "max(cost)", "m");
+            assertColumnEquals(parsed.getColumns().get(2), "avg(t)", "as1");
+            assertColumnEquals(parsed.getColumns().get(3), "b", "d");
+            assertColumnEquals(parsed.getColumns().get(4), "c", null);
+            assertColumnEquals(parsed.getColumns().get(5), "count(*)", "c1");
         }
+    }
+
+    private void assertColumnEquals(Aliasable column, String name, String alias) {
+        assertEquals(name, column.name());
+        assertEquals(alias, column.alias());
     }
 }

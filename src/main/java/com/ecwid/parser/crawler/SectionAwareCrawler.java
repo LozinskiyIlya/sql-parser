@@ -6,15 +6,11 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-public abstract class SectionAwareCrawler implements Crawler {
+abstract class SectionAwareCrawler implements Crawler {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -24,48 +20,37 @@ public abstract class SectionAwareCrawler implements Crawler {
 
     static {
         SECTION_AGAINST_CRAWLER.put(LEX_SELECT, ColumnCrawler.class);
-        SECTION_AGAINST_CRAWLER.put(LEX_FROM, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_FROM, SourceCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_JOIN, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_WHERE, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_HAVING, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_WHERE, ClauseCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_HAVING, ClauseCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_GROUP, null);
         SECTION_AGAINST_CRAWLER.put(LEX_ORDER, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_LIMIT, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_OFFSET, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_LIMIT, LimitCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_OFFSET, OffsetCrawler.class);
 
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_AND, null);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_OR, null);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_AND, ClauseCrawler.class);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_OR, ClauseCrawler.class);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
         SUB_SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
+        SUB_SECTION_AGAINST_CRAWLER.put(LEX_CLOSE_BRACKET, NoopCrawler.class);
     }
 
-    protected Predicate<String> crawlUntil;
-    protected BiConsumer<Query, String> addToQuery;
+    public abstract void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
 
-    @Override
-    public final Predicate<String> crawlUntil() {
-        return shouldDelegate.or(crawlUntil);
-    }
-
-    @Override
-    public final BiConsumer<Query, String> addToQuery() {
-        return addToQuery;
+    protected final boolean shouldDelegate(String nextFragment) {
+        return SECTION_AGAINST_CRAWLER.containsKey(nextFragment) || SUB_SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
     }
 
     @Override
-    public final Function<String, Crawler> next() {
-        return fragment -> Optional.ofNullable(SECTION_AGAINST_CRAWLER.getOrDefault(fragment,
-                        SUB_SECTION_AGAINST_CRAWLER.get(fragment)))
-                .map(applicationContext::getBean)
-                .orElse(null);
+    public final void delegate(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
+        Crawler.super.delegate(query, currentSection, nextFragmentSupplier);
     }
 
     @Override
-    public final String crawl(Query query, Supplier<String> supplier) {
-        return Crawler.super.crawl(query, supplier);
+    public Crawler nextCrawler(String currentSection) {
+        final var beanClass = SECTION_AGAINST_CRAWLER.getOrDefault(currentSection, SUB_SECTION_AGAINST_CRAWLER.get(currentSection));
+        return beanClass == null ? null : applicationContext.getBean(beanClass);
     }
-
-    private final Predicate<String> shouldDelegate = ((Predicate<String>) SECTION_AGAINST_CRAWLER::containsKey)
-            .or(SUB_SECTION_AGAINST_CRAWLER::containsKey);
 }

@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler_old;
+package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.enity.Query;
 import org.springframework.stereotype.Component;

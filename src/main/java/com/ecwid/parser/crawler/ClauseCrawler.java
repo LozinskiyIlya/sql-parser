@@ -3,7 +3,7 @@ package com.ecwid.parser.crawler;
 import com.ecwid.parser.fragment.clause.ConstantListOperand;
 import com.ecwid.parser.fragment.clause.ConstantOperand;
 import com.ecwid.parser.fragment.clause.Operand;
-import com.ecwid.parser.fragment.clause.WhereClause;
+import com.ecwid.parser.fragment.clause.Condition;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.stereotype.Component;
@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.operatorFullLexemes;
+import static com.ecwid.parser.fragment.clause.Condition.Operator.operatorFullLexemes;
 
 @Component
 public class ClauseCrawler extends SectionAwareCrawler {
 
     @Override
     public void crawl(Query query, String clauseName, Supplier<String> fragments) {
-        final var clause = new WhereClause(WhereClause.ClauseType.valueOf(clauseName.toUpperCase()));
+        final var clause = new Condition(Condition.ClauseType.valueOf(clauseName.toUpperCase()));
         final var leftOperandFirstFragment = fragments.get();
         final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, fragments, null);
         final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, fragments);
@@ -31,10 +31,10 @@ public class ClauseCrawler extends SectionAwareCrawler {
 
 
     private String crawlForOperand(
-            WhereClause clause,
+            Condition clause,
             String firstFragment,
             Supplier<String> fragments,
-            WhereClause.Operator operator
+            Condition.Operator operator
     ) {
         Operand operand;
         var fragment = String.copyValueOf(firstFragment.toCharArray());
@@ -70,7 +70,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
         return fragment;
     }
 
-    private String crawlForOperator(WhereClause clause, String firstFragment, Supplier<String> fragments) {
+    private String crawlForOperator(Condition clause, String firstFragment, Supplier<String> fragments) {
         final var operatorParts = new LinkedList<String>();
         operatorParts.add(firstFragment);
         crawlUntilAndReturnNext(

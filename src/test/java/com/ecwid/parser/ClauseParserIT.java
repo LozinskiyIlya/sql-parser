@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.ecwid.parser.fragment.clause.WhereClause.ClauseType.*;
-import static com.ecwid.parser.fragment.clause.WhereClause.Operator.*;
+import static com.ecwid.parser.fragment.clause.Condition.ClauseType.*;
+import static com.ecwid.parser.fragment.clause.Condition.Operator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -151,10 +151,10 @@ public class ClauseParserIT extends AbstractSpringParserTest {
     @TestFactory
     @DisplayName("various operators")
     Stream<DynamicTest> variousOperators() {
-        return Arrays.stream(WhereClause.Operator.values()).map(operator -> {
+        return Arrays.stream(Condition.Operator.values()).map(operator -> {
             final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
-            final var rightType = operator.equals(WhereClause.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
-            final var rightValue = operator.equals(WhereClause.Operator.IN) ? List.of("1") : "1";
+            final var rightType = operator.equals(Condition.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
+            final var rightValue = operator.equals(Condition.Operator.IN) ? List.of("1") : "1";
             return DynamicTest.dynamicTest(operator.name(), () -> {
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(1, parsed.getFilters().size());
@@ -165,13 +165,13 @@ public class ClauseParserIT extends AbstractSpringParserTest {
     }
 
     private void assertClauseEquals(
-            WhereClause.ClauseType type,
+            Condition.ClauseType type,
             Class<? extends Operand> leftType,
             Object leftVal,
-            WhereClause.Operator operator,
+            Condition.Operator operator,
             Class<? extends Operand> rightType,
             Object rightVal,
-            WhereClause actual) {
+            Condition actual) {
         assertEquals(type, actual.getClauseType(), "Clause type mismatch");
         assertEquals(operator, actual.getOperator(), "Operator mismatch");
         final var leftOperand = actual.getLeftOperand();

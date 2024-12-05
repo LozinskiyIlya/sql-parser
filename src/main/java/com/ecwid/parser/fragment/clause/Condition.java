@@ -5,16 +5,13 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.ecwid.parser.Lexemes.*;
 
 @Data
 @RequiredArgsConstructor
-public class WhereClause {
+public class Condition {
 
     private Operand leftOperand;
     private Operand rightOperand;

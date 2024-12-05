@@ -4,6 +4,6 @@ public interface Nameable extends Aliasable {
     String name();
 
     default String print() {
-        return "%s %s".formatted(name(), alias());
+        return name() + (alias() != null ? " " + alias() : "");
     }
 }

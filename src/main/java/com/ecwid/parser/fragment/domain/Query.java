@@ -8,6 +8,7 @@ import com.ecwid.parser.fragment.source.Source;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,16 +35,20 @@ public class Query implements Operand, Source {
 
     @Override
     public String toString() {
-        return QueryPrinter.print(this);
+        return QueryPrinter.print(this).toLowerCase();
     }
 
     static class QueryPrinter {
         public static String print(Query query) {
             final var builder = new LinkedList<String>();
             builder.add(LEX_SELECT);
-            query.columns.stream().map(Column::toString).forEach(builder::add);
+            query.getColumns().stream().map(Column::toString).forEach(builder::add);
             builder.add(LEX_FROM);
-            query.sources.stream().map(Source::toString).forEach(builder::add);
+            query.getSources().stream().map(Source::toString).forEach(builder::add);
+            query.getFilters().stream().map(Condition::toString).forEach(builder::add);
+            if (StringUtils.hasText(query.alias())) {
+                builder.add(query.alias());
+            }
             return String.join(LEX_SPACE, builder);
         }
     }

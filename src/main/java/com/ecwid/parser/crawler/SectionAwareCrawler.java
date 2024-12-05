@@ -23,7 +23,7 @@ abstract class SectionAwareCrawler implements Crawler {
     static {
         SECTION_AGAINST_CRAWLER.put(LEX_SELECT, ColumnCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_FROM, SourceCrawler.class);
-        SECTION_AGAINST_CRAWLER.put(LEX_JOIN, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_JOIN, JoinCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_WHERE, ClauseCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_HAVING, ClauseCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_GROUP, null);
@@ -33,9 +33,14 @@ abstract class SectionAwareCrawler implements Crawler {
 
         SECTION_AGAINST_CRAWLER.put(LEX_AND, ClauseCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_OR, ClauseCrawler.class);
-        SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
-        SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_INNER, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_LEFT, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_FULL, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_CROSS, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_NATURAL, JoinCrawler.class);
+
+
         SECTION_AGAINST_CRAWLER.put(LEX_SEMICOLON, QueryFinishedCrawler.class);
     }
 

@@ -11,8 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.LEX_EQUALS;
-import static com.ecwid.parser.Lexemes.LEX_ON;
+import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.Join.JoinType.joinTypeFullLexemes;
 
 @Component
@@ -34,16 +33,18 @@ public class JoinCrawler extends SectionAwareCrawler {
     private String crawlForJoinType(Join join, String firstFragment, Supplier<String> fragmentSupplier) {
         final var joinTypeParts = new LinkedList<String>();
         joinTypeParts.add(firstFragment);
-        crawlUntilAndReturnNext(
+        final var nextFragment = crawlUntilAndReturnNext(
                 fragment -> {
+                    if (joinTypeParts.contains(LEX_JOIN)) {
+                        return true;
+                    }
                     joinTypeParts.add(fragment);
-                    return !isJoinType(joinTypeParts);
+                    return false;
                 },
                 fragment -> {
                 },
                 fragmentSupplier);
-        final var nextFragment = joinTypeParts.removeLast();
-        join.setType(joinTypeFullLexemes.get(String.join("", joinTypeParts)));
+        join.setType(joinTypeFullLexemes.get(String.join(LEX_SPACE, joinTypeParts)));
         return nextFragment;
     }
 
@@ -60,7 +61,7 @@ public class JoinCrawler extends SectionAwareCrawler {
     }
 
     private boolean isJoinType(List<String> parts) {
-        return joinTypeFullLexemes.containsKey(String.join("", parts));
+        return joinTypeFullLexemes.containsKey(String.join(LEX_SPACE, parts));
     }
 
     private String crawlForColumn(Join join, String firstFragment, Supplier<String> fragmentSupplier) {

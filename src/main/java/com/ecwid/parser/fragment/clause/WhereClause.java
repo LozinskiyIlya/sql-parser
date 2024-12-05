@@ -32,17 +32,18 @@ public class WhereClause {
     @Getter
     public enum Operator implements Constructable {
         EQUALS(LEX_EQUALS),
-        NOT_EQUALS(LEX_NOT_EQUALS),
+        NOT_EQUALS(LEX_NOT + LEX_EQUALS),
         GREATER_THAN(LEX_GREATER_THAN),
         LESS_THAN(LEX_LESS_THAN),
         GREATER_THAN_OR_EQUALS(LEX_GREATER_THAN_OR_EQUALS),
         LESS_THAN_OR_EQUALS(LEX_LESS_THAN_OR_EQUALS),
         LIKE(LEX_LIKE),
-        NOT_LIKE(LEX_NOT + LEX_LIKE),
+        NOT_LIKE(LEX_NOT + LEX_SPACE + LEX_LIKE),
         IN(LEX_IN),
-        NOT_IN(LEX_NOT + LEX_IN),
+        NOT_IN(LEX_NOT + LEX_SPACE + LEX_IN),
         IS(LEX_IS),
-        IS_NOT(LEX_IS + LEX_NOT);
+        IS_NOT(LEX_IS + LEX_SPACE + LEX_NOT);
+
 
         private final String fullLexeme;
 

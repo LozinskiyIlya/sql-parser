@@ -75,22 +75,6 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         }
     }
 
-    @TestFactory
-    @DisplayName("various operators")
-    Stream<DynamicTest> variousOperators() {
-        return Arrays.stream(WhereClause.Operator.values()).map(operator -> {
-            final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
-            final var rightType = operator.equals(WhereClause.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
-            final var rightValue = operator.equals(WhereClause.Operator.IN) ? List.of("1") : "1";
-            return DynamicTest.dynamicTest(operator.name(), () -> {
-                final var parsed = sqlParser.parse(sql);
-                assertEquals(1, parsed.getFilters().size());
-                final var clause = parsed.getFilters().getFirst();
-                assertClauseEquals(WHERE, Column.class, "id", operator, rightType, rightValue, clause);
-            });
-        });
-    }
-
 
     @Nested
     @DisplayName("nested one level query")
@@ -162,6 +146,22 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             assertClauseEquals(AND, Column.class, "id", IN, Query.class, true, secondClause);
 
         }
+    }
+
+    @TestFactory
+    @DisplayName("various operators")
+    Stream<DynamicTest> variousOperators() {
+        return Arrays.stream(WhereClause.Operator.values()).map(operator -> {
+            final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
+            final var rightType = operator.equals(WhereClause.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
+            final var rightValue = operator.equals(WhereClause.Operator.IN) ? List.of("1") : "1";
+            return DynamicTest.dynamicTest(operator.name(), () -> {
+                final var parsed = sqlParser.parse(sql);
+                assertEquals(1, parsed.getFilters().size());
+                final var clause = parsed.getFilters().getFirst();
+                assertClauseEquals(WHERE, Column.class, "id", operator, rightType, rightValue, clause);
+            });
+        });
     }
 
     private void assertClauseEquals(

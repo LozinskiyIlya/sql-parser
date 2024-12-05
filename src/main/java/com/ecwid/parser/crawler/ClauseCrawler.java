@@ -82,12 +82,12 @@ public class ClauseCrawler extends SectionAwareCrawler {
                 },
                 nextFragmentSupplier);
         final var nextFragment = operatorParts.removeLast();
-        clause.setOperator(operatorFullLexemes.get(String.join("", operatorParts)));
+        clause.setOperator(operatorFullLexemes.get(String.join(LEX_SPACE, operatorParts)));
         return nextFragment;
     }
 
     private boolean isOperator(List<String> parts) {
-        return operatorFullLexemes.containsKey(String.join("", parts));
+        return operatorFullLexemes.containsKey(String.join(LEX_SPACE, parts));
     }
 
     private boolean isConstant(String fragment) {

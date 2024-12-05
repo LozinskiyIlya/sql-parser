@@ -4,6 +4,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import static com.ecwid.parser.Lexemes.*;
 
 @Data
@@ -43,6 +48,9 @@ public class WhereClause {
         Operator(String fullLexeme) {
             this.fullLexeme = fullLexeme;
         }
+
+        public static final Map<String, Operator> operatorFullLexemes = Arrays.stream(WhereClause.Operator.values())
+                .collect(Collectors.toMap(WhereClause.Operator::getFullLexeme, Function.identity()));
 
     }
 

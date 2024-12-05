@@ -1,25 +1,22 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.fragment.clause.ConstantListOperand;
+import com.ecwid.parser.fragment.clause.ConstantOperand;
+import com.ecwid.parser.fragment.clause.Operand;
+import com.ecwid.parser.fragment.clause.WhereClause;
 import com.ecwid.parser.fragment.enity.Column;
 import com.ecwid.parser.fragment.enity.Query;
-import com.ecwid.parser.fragment.clause.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static com.ecwid.parser.Lexemes.*;
+import static com.ecwid.parser.fragment.clause.WhereClause.Operator.operatorFullLexemes;
 
 @Component
 public class ClauseCrawler extends SectionAwareCrawler {
-
-    private static final Map<String, WhereClause.Operator> operatorFullLexemes = Arrays.stream(WhereClause.Operator.values())
-            .collect(Collectors.toMap(WhereClause.Operator::getFullLexeme, Function.identity()));
 
     @Override
     public void crawl(Query query, String clauseName, Supplier<String> nextFragmentSupplier) {

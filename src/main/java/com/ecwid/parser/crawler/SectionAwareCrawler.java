@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -16,7 +17,6 @@ abstract class SectionAwareCrawler implements Crawler {
     private ApplicationContext applicationContext;
 
     private static final Map<String, Class<? extends Crawler>> SECTION_AGAINST_CRAWLER = new HashMap<>();
-    private static final Map<String, Class<? extends Crawler>> SUB_SECTION_AGAINST_CRAWLER = new HashMap<>();
 
     static {
         SECTION_AGAINST_CRAWLER.put(LEX_SELECT, ColumnCrawler.class);
@@ -29,18 +29,18 @@ abstract class SectionAwareCrawler implements Crawler {
         SECTION_AGAINST_CRAWLER.put(LEX_LIMIT, LimitCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_OFFSET, OffsetCrawler.class);
 
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_AND, ClauseCrawler.class);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_OR, ClauseCrawler.class);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
-        SUB_SECTION_AGAINST_CRAWLER.put(LEX_SEMICOLON, QueryFinishedCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_AND, ClauseCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_OR, ClauseCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_LEFT, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_RIGHT, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_FULL, null);
+        SECTION_AGAINST_CRAWLER.put(LEX_SEMICOLON, QueryFinishedCrawler.class);
     }
 
     public abstract void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
 
     protected final boolean shouldDelegate(String nextFragment) {
-        return SECTION_AGAINST_CRAWLER.containsKey(nextFragment) || SUB_SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
+        return SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
     }
 
     @Override
@@ -50,7 +50,9 @@ abstract class SectionAwareCrawler implements Crawler {
 
     @Override
     public Crawler nextCrawler(String currentSection) {
-        final var beanClass = SECTION_AGAINST_CRAWLER.getOrDefault(currentSection, SUB_SECTION_AGAINST_CRAWLER.get(currentSection));
-        return beanClass == null ? null : applicationContext.getBean(beanClass);
+        return Optional.ofNullable(SECTION_AGAINST_CRAWLER.get(currentSection))
+                .map(applicationContext::getBean)
+                .orElse(null);
+
     }
 }

@@ -8,12 +8,12 @@ public interface Crawler {
 
     Crawler nextCrawler(String nextSection);
 
-    void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
+    void crawl(Query query, String currentSection, Supplier<String> fragments);
 
-    default void delegate(Query query, String nextSection, Supplier<String> nextFragmentSupplier) {
+    default void delegate(Query query, String nextSection, Supplier<String> fragments) {
         final var nextCrawler = nextCrawler(nextSection);
         if (nextCrawler != null) {
-            nextCrawler.crawl(query, nextSection, nextFragmentSupplier);
+            nextCrawler.crawl(query, nextSection, fragments);
         }
     }
 }

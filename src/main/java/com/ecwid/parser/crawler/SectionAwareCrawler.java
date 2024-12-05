@@ -44,23 +44,23 @@ abstract class SectionAwareCrawler implements Crawler {
         SECTION_AGAINST_CRAWLER.put(LEX_SEMICOLON, QueryFinishedCrawler.class);
     }
 
-    public abstract void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier);
+    public abstract void crawl(Query query, String currentSection, Supplier<String> fragments);
 
     protected final boolean shouldDelegate(String nextFragment) {
         return SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
     }
 
-    protected final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> nextFragmentSupplier) {
+    protected final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragments) {
         String fragment;
-        while ((fragment = nextFragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
+        while ((fragment = fragments.get()) != null && fragmentIs.negate().test(fragment)) {
             andDoAction.accept(fragment);
         }
         return fragment;
     }
 
     @Override
-    public final void delegate(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
-        Crawler.super.delegate(query, currentSection, nextFragmentSupplier);
+    public final void delegate(Query query, String currentSection, Supplier<String> fragments) {
+        Crawler.super.delegate(query, currentSection, fragments);
     }
 
     @Override

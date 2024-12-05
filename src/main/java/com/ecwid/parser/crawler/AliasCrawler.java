@@ -16,17 +16,17 @@ public class AliasCrawler implements Crawler {
     }
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
+    public void crawl(Query query, String currentSection, Supplier<String> fragments) {
         throw new UnsupportedOperationException("Call crawlForAlias instead of this method");
     }
 
-    public String crawForAlias(Supplier<String> nextFragmentSupplier, Consumer<String> setAlias) {
-        String nextFragment = nextFragmentSupplier.get();
+    public String crawForAlias(Supplier<String> fragments, Consumer<String> setAlias) {
+        String nextFragment = fragments.get();
         if (!LEX_AS.equals(nextFragment)) {
             return nextFragment;
         }
-        nextFragment = nextFragmentSupplier.get();
+        nextFragment = fragments.get();
         setAlias.accept(nextFragment);
-        return nextFragmentSupplier.get();
+        return fragments.get();
     }
 }

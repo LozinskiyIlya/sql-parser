@@ -15,7 +15,7 @@ public class QueryFinishedCrawler implements Crawler {
     }
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> nextFragmentSupplier) {
+    public void crawl(Query query, String currentSection, Supplier<String> fragments) {
         log.info("Query finished with {}", currentSection);
     }
 }

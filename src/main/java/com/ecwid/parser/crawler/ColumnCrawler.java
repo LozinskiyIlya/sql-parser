@@ -14,13 +14,13 @@ import static com.ecwid.parser.Lexemes.*;
 public class ColumnCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String select, Supplier<String> nextFragmentSupplier) {
+    public void crawl(Query query, String select, Supplier<String> fragments) {
         String nextFragment;
         final var pair = new NameAliasPair();
-        while ((nextFragment = nextFragmentSupplier.get()) != null) {
+        while ((nextFragment = fragments.get()) != null) {
             if (shouldDelegate(nextFragment)) {
                 flush(query, pair);
-                delegate(query, nextFragment, nextFragmentSupplier);
+                delegate(query, nextFragment, fragments);
                 return;
             }
             if (LEX_COMMA.equals(nextFragment)) {
@@ -28,13 +28,13 @@ public class ColumnCrawler extends SectionAwareCrawler {
                 continue;
             }
             if (LEX_OPEN_BRACKET.equals(nextFragment)) {
-                nextFragment = crawlFunction(pair, nextFragmentSupplier);
+                nextFragment = crawlFunction(pair, fragments);
             }
             pair.push(nextFragment);
         }
     }
 
-    private String crawlFunction(NameAliasPair pair, Supplier<String> nextFragmentSupplier) {
+    private String crawlFunction(NameAliasPair pair, Supplier<String> fragments) {
         final var functionBuilder = new StringBuilder();
         if (StringUtils.hasText(pair.getFirst())) {
             // the last inserted value was a function name
@@ -42,7 +42,7 @@ public class ColumnCrawler extends SectionAwareCrawler {
             pair.reset();
         }
         functionBuilder.append(LEX_OPEN_BRACKET);
-        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextFragmentSupplier);
+        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, fragments);
         functionBuilder.append(LEX_CLOSE_BRACKET);
         return functionBuilder.toString();
     }

@@ -19,32 +19,32 @@ import static com.ecwid.parser.fragment.clause.WhereClause.Operator.operatorFull
 public class ClauseCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String clauseName, Supplier<String> nextFragmentSupplier) {
+    public void crawl(Query query, String clauseName, Supplier<String> fragments) {
         final var clause = new WhereClause(WhereClause.ClauseType.valueOf(clauseName.toUpperCase()));
-        final var leftOperandFirstFragment = nextFragmentSupplier.get();
-        final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, nextFragmentSupplier, null);
-        final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, nextFragmentSupplier);
-        final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, nextFragmentSupplier, clause.getOperator());
+        final var leftOperandFirstFragment = fragments.get();
+        final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, fragments, null);
+        final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, fragments);
+        final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, fragments, clause.getOperator());
         query.getFilters().add(clause);
-        delegate(query, nexFragment, nextFragmentSupplier);
+        delegate(query, nexFragment, fragments);
     }
 
 
     private String crawlForOperand(
             WhereClause clause,
             String firstFragment,
-            Supplier<String> nextFragmentSupplier,
+            Supplier<String> fragments,
             WhereClause.Operator operator
     ) {
         Operand operand;
         var fragment = String.copyValueOf(firstFragment.toCharArray());
         if (LEX_OPEN_BRACKET.equals(fragment)) {
-            fragment = nextFragmentSupplier.get();
+            fragment = fragments.get();
         }
         if (LEX_SELECT.equals(fragment)) {
             operand = new Query();
-            nextCrawler(fragment).crawl((Query) operand, fragment, nextFragmentSupplier);
-            fragment = nextFragmentSupplier.get();
+            nextCrawler(fragment).crawl((Query) operand, fragment, fragments);
+            fragment = fragments.get();
         } else if (operator != null && LEX_IN.equals(operator.getFullLexeme())) {
             operand = new ConstantListOperand();
             final var values = ((ConstantListOperand) operand).getValues();
@@ -57,20 +57,20 @@ public class ClauseCrawler extends SectionAwareCrawler {
                         }
                         values.add(fr);
                     },
-                    nextFragmentSupplier);
+                    fragments);
         } else if (isConstant(fragment)) {
             operand = new ConstantOperand(fragment);
             clause.setNextOperand(operand);
-            fragment = nextFragmentSupplier.get();
+            fragment = fragments.get();
         } else {
             operand = new Column(fragment, null);
-            fragment = nextFragmentSupplier.get();
+            fragment = fragments.get();
         }
         clause.setNextOperand(operand);
         return fragment;
     }
 
-    private String crawlForOperator(WhereClause clause, String firstFragment, Supplier<String> nextFragmentSupplier) {
+    private String crawlForOperator(WhereClause clause, String firstFragment, Supplier<String> fragments) {
         final var operatorParts = new LinkedList<String>();
         operatorParts.add(firstFragment);
         crawlUntilAndReturnNext(
@@ -80,7 +80,7 @@ public class ClauseCrawler extends SectionAwareCrawler {
                 },
                 fragment -> {
                 },
-                nextFragmentSupplier);
+                fragments);
         final var nextFragment = operatorParts.removeLast();
         clause.setOperator(operatorFullLexemes.get(String.join(LEX_SPACE, operatorParts)));
         return nextFragment;

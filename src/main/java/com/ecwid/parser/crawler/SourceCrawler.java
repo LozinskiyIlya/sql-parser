@@ -15,11 +15,11 @@ import static com.ecwid.parser.Lexemes.*;
 class SourceCrawler extends SectionAwareCrawler {
 
     @Override
-    public void crawl(Query query, String from, Supplier<String> nextFragmentSupplier) {
+    public void crawl(Query query, String from, Supplier<String> fragments) {
         String nextFragment;
         final var sources = new Stack<Source>();
         final var pair = new NameAliasPair();
-        while ((nextFragment = nextFragmentSupplier.get()) != null) {
+        while ((nextFragment = fragments.get()) != null) {
             if (LEX_CLOSE_BRACKET.equals(nextFragment)) {
                 break;
             }
@@ -32,12 +32,12 @@ class SourceCrawler extends SectionAwareCrawler {
             }
             if (LEX_SELECT.equals(nextFragment)) {
                 final var nested = new Query();
-                nextCrawler(nextFragment).crawl(nested, nextFragment, nextFragmentSupplier);
+                nextCrawler(nextFragment).crawl(nested, nextFragment, fragments);
                 sources.push(nested);
                 continue;
             }
             if (shouldDelegate(nextFragment)) {
-                delegate(query, nextFragment, nextFragmentSupplier);
+                delegate(query, nextFragment, fragments);
                 flush(query, sources, pair);
                 return;
             }

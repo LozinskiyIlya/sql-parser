@@ -1,10 +1,13 @@
 package com.ecwid.parser.fragment.clause;
 
 import com.ecwid.parser.fragment.domain.Constructable;
+import com.ecwid.parser.fragment.domain.Query;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -23,6 +26,26 @@ public class Condition {
             leftOperand = operand;
         } else {
             rightOperand = operand;
+        }
+    }
+
+    @Override
+    public String toString() {
+        final var builder = new LinkedList<String>();
+        builder.add(clauseType.name());
+        printOperand(builder, leftOperand);
+        builder.add(operator.getFullLexeme());
+        printOperand(builder, rightOperand);
+        return String.join(LEX_SPACE, builder);
+    }
+
+    private static void printOperand(List<String> builder, Operand operand) {
+        if (operand instanceof Query || operand instanceof ConstantListOperand) {
+            builder.add(LEX_OPEN_BRACKET);
+            builder.add(operand.toString());
+            builder.add(LEX_CLOSE_BRACKET);
+        } else {
+            builder.add(operand.toString());
         }
     }
 

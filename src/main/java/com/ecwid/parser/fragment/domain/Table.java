@@ -26,4 +26,9 @@ public class Table implements Source, Nameable {
     public String name() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return this.print();
+    }
 }

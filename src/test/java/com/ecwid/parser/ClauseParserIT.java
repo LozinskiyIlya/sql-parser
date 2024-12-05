@@ -95,7 +95,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         }
 
         @Test
-        @DisplayName("with own WHERE")
+        @DisplayName("with nested WHERE")
         void oneLevelNestedCondition() throws Exception {
             final var sql = """
                     select *
@@ -113,7 +113,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         }
 
         @Test
-        @DisplayName("with own WHERE before constant")
+        @DisplayName("with nested WHERE goes before constant condition")
         void oneLevelNestedConditionAndConstant() throws Exception {
             final var sql = """
                     select *
@@ -130,7 +130,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         }
 
         @Test
-        @DisplayName("with own WHERE after constant")
+        @DisplayName("with nested WHERE goes after constant condition")
         void constantAndOneLevelNestedCondition() throws Exception {
             final var sql = """
                     select *
@@ -144,7 +144,31 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             assertClauseEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "2", firstClause);
             final var secondClause = parsed.getFilters().getLast();
             assertClauseEquals(AND, Column.class, "id", IN, Query.class, true, secondClause);
+        }
 
+        @Test
+        @DisplayName("as a first operand")
+        void oneLevelNestedConditionAsFirstOperand() throws Exception {
+            final var sql = """
+                    select *
+                    from users
+                    where (select user_id from participants where id = 'a') = 2;
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
+            assertClauseEquals(WHERE, Query.class, true, EQUALS, ConstantOperand.class, "2", clause);
+        }
+
+        @Test
+        @DisplayName("as both operands")
+        void oneLevelNestedConditionAsBothOperands() {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (SELECT AVG(salary) FROM employees WHERE department_id = 1) =
+                    (SELECT AVG(salary) FROM employees WHERE department_id = 2);
+                    """;
         }
     }
 

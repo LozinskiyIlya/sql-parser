@@ -1,7 +1,6 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.enity.Aliasable;
-import com.ecwid.parser.fragment.enity.Nameable;
+import com.ecwid.parser.fragment.domain.Nameable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

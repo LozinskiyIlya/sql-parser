@@ -1,7 +1,6 @@
-package com.ecwid.parser.fragment.enity;
+package com.ecwid.parser.fragment.domain;
 
 import com.ecwid.parser.fragment.clause.Operand;
-import lombok.*;
 
 public record Column(String name, String alias) implements Operand, Nameable {
 }

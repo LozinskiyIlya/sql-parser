@@ -1,12 +1,14 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -41,6 +43,14 @@ abstract class SectionAwareCrawler implements Crawler {
 
     protected final boolean shouldDelegate(String nextFragment) {
         return SECTION_AGAINST_CRAWLER.containsKey(nextFragment);
+    }
+
+    protected final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> nextFragmentSupplier) {
+        String fragment;
+        while ((fragment = nextFragmentSupplier.get()) != null && fragmentIs.negate().test(fragment)) {
+            andDoAction.accept(fragment);
+        }
+        return fragment;
     }
 
     @Override

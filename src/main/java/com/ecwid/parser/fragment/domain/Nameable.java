@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment.enity;
+package com.ecwid.parser.fragment.domain;
 
 public interface Nameable extends Aliasable {
     String name();

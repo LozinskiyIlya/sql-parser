@@ -1,6 +1,6 @@
 package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.enity.Column;
+import com.ecwid.parser.fragment.domain.Column;
 import lombok.Data;
 
 @Data

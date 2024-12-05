@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler_func;
 
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 

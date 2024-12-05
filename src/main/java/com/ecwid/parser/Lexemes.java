@@ -10,6 +10,10 @@ public class Lexemes {
     public static final String LEX_AS = "as";
     public static final String LEX_FROM = "from";
     public static final String LEX_JOIN = "join";
+    public static final String LEX_INNER = "inner";
+    public static final String LEX_OUTER = "outer";
+    public static final String LEX_CROSS = "cross";
+    public static final String LEX_NATURAL = "natural";
     public static final String LEX_LEFT = "left";
     public static final String LEX_RIGHT = "right";
     public static final String LEX_FULL = "full";
@@ -55,7 +59,11 @@ public class Lexemes {
     public static final Set<String> JOIN_TYPES = Set.of(
             LEX_LEFT,
             LEX_RIGHT,
-            LEX_FULL
+            LEX_FULL,
+            LEX_INNER,
+            LEX_OUTER,
+            LEX_CROSS,
+            LEX_NATURAL
     );
 
     public static final Set<String> SEPARATORS = Set.of(

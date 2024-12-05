@@ -2,7 +2,7 @@ package com.ecwid.parser.service;
 
 
 import com.ecwid.parser.crawler.ColumnCrawler;
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
-import java.util.Optional;
 
 import static com.ecwid.parser.Lexemes.*;
 
@@ -45,15 +44,6 @@ public class SqlParser {
                 }
         );
         return query;
-    }
-
-    private void skipJoinKeywordIfNeeded(String currentLex, PushbackReader reader) {
-        if (JOIN_TYPES.contains(currentLex)) {
-            final var shouldBeJoin = lexemeReader.nextLex(reader);
-            if (!LEX_JOIN.equals(shouldBeJoin)) {
-                throw new IllegalStateException("JOIN keyword expected");
-            }
-        }
     }
 
     public static PushbackReader readerFromString(String s) {

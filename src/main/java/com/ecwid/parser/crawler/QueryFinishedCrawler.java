@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

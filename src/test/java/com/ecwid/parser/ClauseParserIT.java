@@ -1,8 +1,8 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.clause.*;
-import com.ecwid.parser.fragment.enity.Column;
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Column;
+import com.ecwid.parser.fragment.domain.Query;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;

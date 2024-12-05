@@ -1,8 +1,7 @@
 package com.ecwid.parser.crawler_func;
 
-import com.ecwid.parser.fragment.enity.Column;
-import com.ecwid.parser.fragment.enity.Query;
-import org.springframework.stereotype.Component;
+import com.ecwid.parser.fragment.domain.Column;
+import com.ecwid.parser.fragment.domain.Query;
 
 import java.util.List;
 import java.util.Optional;

@@ -4,8 +4,8 @@ import com.ecwid.parser.fragment.clause.ConstantListOperand;
 import com.ecwid.parser.fragment.clause.ConstantOperand;
 import com.ecwid.parser.fragment.clause.Operand;
 import com.ecwid.parser.fragment.clause.WhereClause;
-import com.ecwid.parser.fragment.enity.Column;
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Column;
+import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;

@@ -1,9 +1,6 @@
-package com.ecwid.parser.fragment.enity;
+package com.ecwid.parser.fragment.domain;
 
 import com.ecwid.parser.fragment.source.Source;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 
 

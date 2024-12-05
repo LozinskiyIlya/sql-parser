@@ -1,5 +1,6 @@
 package com.ecwid.parser.fragment.clause;
 
+import com.ecwid.parser.fragment.domain.Constructable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class WhereClause {
     }
 
     @Getter
-    public enum Operator {
+    public enum Operator implements Constructable {
         EQUALS(LEX_EQUALS),
         NOT_EQUALS(LEX_NOT_EQUALS),
         GREATER_THAN(LEX_GREATER_THAN),
@@ -49,8 +50,7 @@ public class WhereClause {
             this.fullLexeme = fullLexeme;
         }
 
-        public static final Map<String, Operator> operatorFullLexemes = Arrays.stream(WhereClause.Operator.values())
-                .collect(Collectors.toMap(WhereClause.Operator::getFullLexeme, Function.identity()));
+        public static final Map<String, Operator> operatorFullLexemes = Constructable.createLexemeMap(Operator.class);
 
     }
 

@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment.enity;
+package com.ecwid.parser.fragment.domain;
 
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Sort;

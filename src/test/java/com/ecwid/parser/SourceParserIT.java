@@ -1,9 +1,8 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.enity.Aliasable;
-import com.ecwid.parser.fragment.enity.Nameable;
-import com.ecwid.parser.fragment.enity.Query;
-import com.ecwid.parser.fragment.enity.Table;
+import com.ecwid.parser.fragment.domain.Nameable;
+import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.domain.Table;
 import com.ecwid.parser.fragment.source.Source;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

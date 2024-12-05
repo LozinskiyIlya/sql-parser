@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler_func;
 
-import com.ecwid.parser.fragment.enity.Query;
+import com.ecwid.parser.fragment.domain.Query;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;

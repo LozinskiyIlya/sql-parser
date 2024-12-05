@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment.enity;
+package com.ecwid.parser.fragment.domain;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.enity.Table;
+import com.ecwid.parser.fragment.domain.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

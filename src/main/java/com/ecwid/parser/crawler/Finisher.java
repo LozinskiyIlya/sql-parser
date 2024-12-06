@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 @Slf4j
 @Component
-public class QueryFinishedCrawler implements Crawler {
+public class Finisher implements Crawler {
     @Override
     public Optional<Crawler> nextCrawler(String nextSection) {
         return Optional.empty();

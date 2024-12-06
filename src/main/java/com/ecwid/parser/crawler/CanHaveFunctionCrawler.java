@@ -8,9 +8,9 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.LEX_CLOSE_BRACKET;
 import static com.ecwid.parser.Lexemes.LEX_OPEN_BRACKET;
 
-public interface CanHaveFunction extends Crawler {
+public abstract class CanHaveFunctionCrawler extends SectionAwareCrawler {
 
-    default String getFunctionSignature(NameAliasPair pair, Supplier<String> fragments) {
+    protected final String getFunctionSignature(NameAliasPair pair, Supplier<String> fragments) {
         final var functionBuilder = new StringBuilder();
         if (StringUtils.hasText(pair.getFirst())) {
             // the last inserted value was a function name

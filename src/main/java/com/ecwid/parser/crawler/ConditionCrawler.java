@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.condition.Condition.Operator.operatorFullLexemes;
 
-public abstract class ConditionCrawler extends SectionAwareCrawler implements CanHaveFunction {
+public abstract class ConditionCrawler extends CanHaveFunctionCrawler {
 
     protected BiConsumer<Query, Condition> addToQuery;
 

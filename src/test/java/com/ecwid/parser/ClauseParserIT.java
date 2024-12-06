@@ -219,8 +219,8 @@ public class ClauseParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("2 levels and a function comparison")
         void twoLevelsAndFunctionComparison() throws Exception {
-            final var nestedNested = "SELECT department, COUNT(*) FROM employees GROUP BY department";
-            final var nested = "SELECT AVG(count) FROM (%s) AS sub_query".formatted(nestedNested);
+            final var nestedNested = "SELECT department, COUNT(*) FROM employees";
+            final var nested = "SELECT AVG(count) FROM (%s) sub_query".formatted(nestedNested);
             final var sql = """
                     SELECT department, COUNT(*)
                     FROM employees

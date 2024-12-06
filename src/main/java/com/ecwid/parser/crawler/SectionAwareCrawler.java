@@ -16,8 +16,6 @@ abstract class SectionAwareCrawler implements Crawler {
     @Autowired
     private Map<String, Crawler> sectionAgainstCrawler;
 
-    public abstract void crawl(Query query, String currentSection, Supplier<String> fragments);
-
     protected final boolean shouldDelegate(String nextFragment) {
         return sectionAgainstCrawler.containsKey(nextFragment);
     }

@@ -43,7 +43,11 @@ public class ParserApplicationConfig {
         sectionCrawlerMap.put(LEX_ORDER, null);
         sectionCrawlerMap.put(LEX_LIMIT, getByClass(LimitCrawler.class));
         sectionCrawlerMap.put(LEX_OFFSET, getByClass(OffsetCrawler.class));
-        sectionCrawlerMap.put(LEX_SEMICOLON, getByClass(Finisher.class));
+
+        final var finisher = getByClass(Finisher.class);
+        sectionCrawlerMap.put(LEX_SEMICOLON, finisher);
+        sectionCrawlerMap.put(null, finisher);
+        sectionCrawlerMap.put("", finisher);
 
         return sectionCrawlerMap;
     }

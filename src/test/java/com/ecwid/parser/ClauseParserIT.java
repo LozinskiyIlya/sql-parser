@@ -191,6 +191,47 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var clause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Query.class, nestedLeft, EQUALS, Query.class, nestedRight, clause);
         }
+
+        @Test
+        @DisplayName("as both operands with different operators")
+        void asBothOperandsTwice() throws Exception {
+            final var nestedLeft = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
+            final var nestedRight = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (%s) > (%s) AND
+                    (%s) < (%s);
+                    """.formatted(nestedLeft, nestedRight, nestedRight, nestedLeft);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Query.class, nestedLeft, GREATER_THAN, Query.class, nestedRight, firstClause);
+            final var secondClause = parsed.getFilters().getLast();
+            assertConditionEquals(AND, Query.class, nestedRight, LESS_THAN, Query.class, nestedLeft, secondClause);
+        }
+    }
+
+    @Nested
+    @DisplayName("deep nesting with")
+    class DeepNesting {
+
+        @Test
+        @DisplayName("2 levels and a function comparison")
+        void twoLevelsAndFunctionComparison() throws Exception {
+            final var nestedNested = "SELECT department, COUNT(*) FROM employees GROUP BY department";
+            final var nested = "SELECT AVG(count) FROM (%s) AS sub_query".formatted(nestedNested);
+            final var sql = """
+                    SELECT department, COUNT(*)
+                    FROM employees
+                    WHERE COUNT(*) > (%s);
+                    """.formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "count(*)", GREATER_THAN, Query.class, nested, clause);
+
+        }
     }
 
     @TestFactory

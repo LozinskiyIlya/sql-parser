@@ -4,14 +4,13 @@ import com.ecwid.parser.fragment.domain.NameAliasPair;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
 @Component
-public class ColumnCrawler extends SectionAwareCrawler {
+public class ColumnCrawler extends SectionAwareCrawler implements CanHaveFunction {
 
     @Override
     public void crawl(Query query, String select, Supplier<String> fragments) {
@@ -28,23 +27,10 @@ public class ColumnCrawler extends SectionAwareCrawler {
                 continue;
             }
             if (LEX_OPEN_BRACKET.equals(nextFragment)) {
-                nextFragment = crawlFunction(pair, fragments);
+                nextFragment = getFunctionSignature(pair, fragments);
             }
             pair.push(nextFragment);
         }
-    }
-
-    private String crawlFunction(NameAliasPair pair, Supplier<String> fragments) {
-        final var functionBuilder = new StringBuilder();
-        if (StringUtils.hasText(pair.getFirst())) {
-            // the last inserted value was a function name
-            functionBuilder.append(pair.getFirst());
-            pair.reset();
-        }
-        functionBuilder.append(LEX_OPEN_BRACKET);
-        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, fragments);
-        functionBuilder.append(LEX_CLOSE_BRACKET);
-        return functionBuilder.toString();
     }
 
     private void flush(Query query, NameAliasPair pair) {

@@ -1,22 +1,23 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.fragment.clause.Condition;
 import com.ecwid.parser.fragment.clause.ConstantListOperand;
 import com.ecwid.parser.fragment.clause.ConstantOperand;
 import com.ecwid.parser.fragment.clause.Operand;
-import com.ecwid.parser.fragment.clause.Condition;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.clause.Condition.Operator.operatorFullLexemes;
 
-@Component
-public class ClauseCrawler extends SectionAwareCrawler {
+public abstract class ClauseCrawler extends SectionAwareCrawler {
+
+    protected BiConsumer<Query, Condition> addToQuery;
 
     @Override
     public void crawl(Query query, String clauseName, Supplier<String> fragments) {
@@ -25,7 +26,14 @@ public class ClauseCrawler extends SectionAwareCrawler {
         final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, fragments, null);
         final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, fragments);
         final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, fragments, clause.getOperator());
-        query.getFilters().add(clause);
+        addToQuery.accept(query, clause);
+        if (nexFragment == null) {
+            return;
+        }
+        if (CONDITION_SEPARATORS.contains(nexFragment)) {
+            crawl(query, nexFragment, fragments);
+            return;
+        }
         delegate(query, nexFragment, fragments);
     }
 

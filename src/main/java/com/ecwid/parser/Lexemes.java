@@ -66,6 +66,11 @@ public class Lexemes {
             LEX_NATURAL
     );
 
+    public static final Set<String> CONDITION_SEPARATORS = Set.of(
+            LEX_AND,
+            LEX_OR
+    );
+
     public static final Set<String> SEPARATORS = Set.of(
             LEX_OPEN_BRACKET,
             LEX_CLOSE_BRACKET,

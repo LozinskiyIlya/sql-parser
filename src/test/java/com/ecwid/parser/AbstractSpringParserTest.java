@@ -35,6 +35,12 @@ public abstract class AbstractSpringParserTest {
         assertEquals(operator, actual.getOperator(), "Operator mismatch");
         final var leftOperand = actual.getLeftOperand();
         final var rightOperand = actual.getRightOperand();
+        if (leftVal instanceof String) {
+            leftVal = ((String) leftVal).toLowerCase();
+        }
+        if (rightVal instanceof String) {
+            rightVal = ((String) rightVal).toLowerCase();
+        }
         assertEquals(leftType, leftOperand.getClass(), "Left operand type mismatch");
         assertEquals(leftVal, getOperandValue(leftOperand), "Left operand value mismatch");
         assertEquals(rightType, rightOperand.getClass(), "Right operand type mismatch");

@@ -173,7 +173,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Query.class, nested.toLowerCase(), GREATER_THAN, ConstantOperand.class, "3", clause);
+            assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, ConstantOperand.class, "3", clause);
         }
 
         @Test
@@ -189,7 +189,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Query.class, nestedLeft.toLowerCase(), EQUALS, Query.class, nestedRight.toLowerCase(), clause);
+            assertConditionEquals(WHERE, Query.class, nestedLeft, EQUALS, Query.class, nestedRight, clause);
         }
     }
 

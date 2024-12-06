@@ -46,6 +46,17 @@ public class Query implements Operand, Source {
             builder.add(LEX_FROM);
             query.getSources().stream().map(Source::toString).forEach(builder::add);
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
+            //joins
+            // groupings
+            // sorts
+            if (query.limit != null) {
+                builder.add(LEX_LIMIT);
+                builder.add(query.limit.toString());
+            }
+            if (query.offset != null) {
+                builder.add(LEX_OFFSET);
+                builder.add(query.offset.toString());
+            }
             if (StringUtils.hasText(query.alias())) {
                 builder.add(query.alias());
             }

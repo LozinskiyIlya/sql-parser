@@ -96,11 +96,15 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
     }
 
     private boolean isConstant(String fragment) {
-        return isQuotedString(fragment) || isConstantNumber(fragment);
+        return isQuotedString(fragment) || isConstantNumber(fragment) || isNullConstant(fragment);
     }
 
     private boolean isQuotedString(String fragment) {
         return fragment.startsWith(LEX_SINGLE_QUOTE) && fragment.endsWith(LEX_SINGLE_QUOTE);
+    }
+
+    private boolean isNullConstant(String fragment) {
+        return LEX_NULL.equals(fragment);
     }
 
     private boolean isConstantNumber(String fragment) {

@@ -47,7 +47,6 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void multipleColumns() throws Exception {
             final var sql = "SELECT a, b, c FROM table;";
             final var parsed = sqlParser.parse(sql);
-            System.out.println(parsed.getColumns());
             assertEquals(3, parsed.getColumns().size());
             assertColumnEquals(parsed.getColumns().get(0), "a", null);
             assertColumnEquals(parsed.getColumns().get(1), "b", null);
@@ -59,7 +58,6 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void multipleColumnsWithAlias() throws Exception {
             final var sql = "SELECT a, b as 2, c FROM table;";
             final var parsed = sqlParser.parse(sql);
-            System.out.println(parsed.getColumns());
             assertEquals(3, parsed.getColumns().size());
             assertColumnEquals(parsed.getColumns().get(0), "a", null);
             assertColumnEquals(parsed.getColumns().get(1), "b", "2");
@@ -76,7 +74,6 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         void functionAndSimpleName() throws Exception {
             final var sql = "SELECT count(*), a FROM table;";
             final var parsed = sqlParser.parse(sql);
-            System.out.println(parsed);
             assertEquals(2, parsed.getColumns().size());
             assertColumnEquals(parsed.getColumns().get(0), "count(*)", null);
             assertColumnEquals(parsed.getColumns().get(1), "a", null);

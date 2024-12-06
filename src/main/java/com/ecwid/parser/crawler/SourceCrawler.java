@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 
 @Component
-class SourceCrawler extends SectionAwareCrawler {
+public class SourceCrawler extends SectionAwareCrawler {
 
     @Override
     public void crawl(Query query, String from, Supplier<String> fragments) {

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Supplier;
 
 @Component
-class OffsetCrawler extends SectionAwareCrawler {
+public class OffsetCrawler extends SectionAwareCrawler {
 
     @Override
     public void crawl(Query query, String offsetKeyword, Supplier<String> fragments) {

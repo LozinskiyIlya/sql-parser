@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Supplier;
 
 @Component
-class LimitCrawler extends SectionAwareCrawler {
+public class LimitCrawler extends SectionAwareCrawler {
 
     @Override
     public void crawl(Query query, String limitKeyword, Supplier<String> fragments) {

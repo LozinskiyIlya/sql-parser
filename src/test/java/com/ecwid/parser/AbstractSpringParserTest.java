@@ -1,6 +1,7 @@
 package com.ecwid.parser;
 
 
+import com.ecwid.parser.config.ParserApplicationConfig;
 import com.ecwid.parser.fragment.condition.Condition;
 import com.ecwid.parser.fragment.condition.ConstantListOperand;
 import com.ecwid.parser.fragment.condition.ConstantOperand;
@@ -15,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig(SqlParserApplication.class)
+@SpringJUnitConfig(classes = ParserApplicationConfig.class)
 @DisplayName("Should parse SQL")
 public abstract class AbstractSpringParserTest {
     protected final ObjectMapper mapper = new ObjectMapper();

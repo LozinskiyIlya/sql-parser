@@ -56,21 +56,6 @@ public class Lexemes {
     public static final String LEX_SINGLE_QUOTE = "'";
     public static final String LEX_SPACE = " ";
 
-    public static final Set<String> JOIN_TYPES = Set.of(
-            LEX_LEFT,
-            LEX_RIGHT,
-            LEX_FULL,
-            LEX_INNER,
-            LEX_OUTER,
-            LEX_CROSS,
-            LEX_NATURAL
-    );
-
-    public static final Set<String> CONDITION_SEPARATORS = Set.of(
-            LEX_AND,
-            LEX_OR
-    );
-
     public static final Set<String> SEPARATORS = Set.of(
             LEX_OPEN_BRACKET,
             LEX_CLOSE_BRACKET,

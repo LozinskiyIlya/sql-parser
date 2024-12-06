@@ -1,6 +1,6 @@
 package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.clause.Condition;
+import com.ecwid.parser.fragment.condition.Condition;
 import com.ecwid.parser.fragment.domain.Constructable;
 import com.ecwid.parser.fragment.domain.Table;
 import lombok.Data;

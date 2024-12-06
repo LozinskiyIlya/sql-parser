@@ -1,6 +1,6 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.clause.*;
+import com.ecwid.parser.fragment.condition.*;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
 import org.junit.jupiter.api.*;
@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.ecwid.parser.fragment.clause.Condition.ClauseType.*;
-import static com.ecwid.parser.fragment.clause.Condition.Operator.*;
+import static com.ecwid.parser.fragment.condition.Condition.ClauseType.*;
+import static com.ecwid.parser.fragment.condition.Condition.Operator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

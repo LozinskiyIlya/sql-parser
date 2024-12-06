@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment.clause;
+package com.ecwid.parser.fragment.condition;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

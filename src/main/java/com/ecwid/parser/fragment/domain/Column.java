@@ -1,6 +1,6 @@
 package com.ecwid.parser.fragment.domain;
 
-import com.ecwid.parser.fragment.clause.Operand;
+import com.ecwid.parser.fragment.condition.Operand;
 
 public record Column(String name, String alias) implements Operand, Nameable {
 

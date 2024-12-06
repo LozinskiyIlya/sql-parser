@@ -1,9 +1,9 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.clause.Condition;
-import com.ecwid.parser.fragment.clause.ConstantListOperand;
-import com.ecwid.parser.fragment.clause.ConstantOperand;
-import com.ecwid.parser.fragment.clause.Operand;
+import com.ecwid.parser.fragment.condition.Condition;
+import com.ecwid.parser.fragment.condition.ConstantListOperand;
+import com.ecwid.parser.fragment.condition.ConstantOperand;
+import com.ecwid.parser.fragment.condition.Operand;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
 
@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
-import static com.ecwid.parser.fragment.clause.Condition.Operator.operatorFullLexemes;
+import static com.ecwid.parser.fragment.condition.Condition.Operator.operatorFullLexemes;
 
 public abstract class ConditionCrawler extends SectionAwareCrawler {
 
@@ -27,10 +27,7 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
         final var rightOperandFirstFragment = crawlForOperator(condition, operatorFirstFragment, fragments);
         final var nexFragment = crawlForOperand(condition, rightOperandFirstFragment, fragments, condition.getOperator());
         addToQuery.accept(query, condition);
-        if (nexFragment == null) {
-            return;
-        }
-        if (CONDITION_SEPARATORS.contains(nexFragment)) {
+        if (hasNextCondition(nexFragment)) {
             crawl(query, nexFragment, fragments);
             return;
         }
@@ -108,5 +105,9 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
 
     private boolean isConstantNumber(String fragment) {
         return fragment.matches("\\d+");
+    }
+
+    private boolean hasNextCondition(String fragment) {
+        return LEX_AND.equals(fragment) || LEX_OR.equals(fragment);
     }
 }

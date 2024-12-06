@@ -1,10 +1,9 @@
-package com.ecwid.parser.fragment.clause;
+package com.ecwid.parser.fragment.condition;
 
 import lombok.Data;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class ConstantListOperand implements Operand {

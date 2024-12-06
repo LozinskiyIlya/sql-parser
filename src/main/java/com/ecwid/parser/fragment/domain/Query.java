@@ -2,8 +2,8 @@ package com.ecwid.parser.fragment.domain;
 
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Sort;
-import com.ecwid.parser.fragment.clause.Operand;
-import com.ecwid.parser.fragment.clause.Condition;
+import com.ecwid.parser.fragment.condition.Operand;
+import com.ecwid.parser.fragment.condition.Condition;
 import com.ecwid.parser.fragment.source.Source;
 import lombok.AccessLevel;
 import lombok.Data;

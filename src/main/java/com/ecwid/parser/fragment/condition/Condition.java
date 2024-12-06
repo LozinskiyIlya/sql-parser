@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment.clause;
+package com.ecwid.parser.fragment.condition;
 
 import com.ecwid.parser.fragment.domain.Constructable;
 import com.ecwid.parser.fragment.domain.Query;

@@ -1,10 +1,10 @@
 package com.ecwid.parser;
 
 
-import com.ecwid.parser.fragment.clause.Condition;
-import com.ecwid.parser.fragment.clause.ConstantListOperand;
-import com.ecwid.parser.fragment.clause.ConstantOperand;
-import com.ecwid.parser.fragment.clause.Operand;
+import com.ecwid.parser.fragment.condition.Condition;
+import com.ecwid.parser.fragment.condition.ConstantListOperand;
+import com.ecwid.parser.fragment.condition.ConstantOperand;
+import com.ecwid.parser.fragment.condition.Operand;
 import com.ecwid.parser.fragment.domain.Column;
 import com.ecwid.parser.fragment.domain.Query;
 import com.ecwid.parser.service.SqlParser;

@@ -32,7 +32,7 @@ public class SourceCrawler extends SectionAwareCrawler {
             }
             if (LEX_SELECT.equals(nextFragment)) {
                 final var nested = new Query();
-                nextCrawler(nextFragment).crawl(nested, nextFragment, fragments);
+                nextCrawler(nextFragment).orElseThrow().crawl(nested, nextFragment, fragments);
                 sources.push(nested);
                 continue;
             }

@@ -48,7 +48,7 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
         }
         if (LEX_SELECT.equals(fragment)) {
             operand = new Query();
-            nextCrawler(fragment).crawl((Query) operand, fragment, fragments);
+            nextCrawler(fragment).orElseThrow().crawl((Query) operand, fragment, fragments);
             fragment = fragments.get();
         } else if (operator != null && LEX_IN.equals(operator.getFullLexeme())) {
             operand = new ConstantListOperand();

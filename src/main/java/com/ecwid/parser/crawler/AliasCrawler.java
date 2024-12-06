@@ -3,6 +3,7 @@ package com.ecwid.parser.crawler;
 import com.ecwid.parser.fragment.domain.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -11,8 +12,8 @@ import static com.ecwid.parser.Lexemes.LEX_AS;
 @Component
 public class AliasCrawler implements Crawler {
     @Override
-    public Crawler nextCrawler(String nextSection) {
-        return null;
+    public Optional<Crawler> nextCrawler(String nextSection) {
+        return Optional.empty();
     }
 
     @Override

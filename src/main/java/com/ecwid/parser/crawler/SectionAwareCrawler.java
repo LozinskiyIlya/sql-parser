@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 abstract class SectionAwareCrawler implements Crawler {
@@ -25,8 +28,12 @@ abstract class SectionAwareCrawler implements Crawler {
     }
 
     @Override
-    public final Crawler nextCrawler(String currentSection) {
-        return sectionAgainstCrawler.get(currentSection);
+    public final Optional<Crawler> nextCrawler(String currentSection) {
+        return Optional.ofNullable(sectionAgainstCrawler.get(currentSection));
+    }
 
+    @Override
+    public final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragments) {
+        return Crawler.super.crawlUntilAndReturnNext(fragmentIs, andDoAction, fragments);
     }
 }

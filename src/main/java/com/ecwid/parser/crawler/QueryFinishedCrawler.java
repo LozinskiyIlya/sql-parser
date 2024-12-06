@@ -4,14 +4,15 @@ import com.ecwid.parser.fragment.domain.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Slf4j
 @Component
 public class QueryFinishedCrawler implements Crawler {
     @Override
-    public Crawler nextCrawler(String nextSection) {
-        return null;
+    public Optional<Crawler> nextCrawler(String nextSection) {
+        return Optional.empty();
     }
 
     @Override

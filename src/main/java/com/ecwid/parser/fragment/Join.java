@@ -1,11 +1,13 @@
 package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.domain.Column;
+import com.ecwid.parser.fragment.clause.Condition;
 import com.ecwid.parser.fragment.domain.Constructable;
 import com.ecwid.parser.fragment.domain.Table;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -14,8 +16,7 @@ import static com.ecwid.parser.Lexemes.*;
 public class Join {
     private JoinType type;
     private Table table;
-    private Column leftColumn;
-    private Column rightColumn;
+    private List<Condition> conditions = new LinkedList<>();
 
     @Getter
     public enum JoinType implements Constructable {

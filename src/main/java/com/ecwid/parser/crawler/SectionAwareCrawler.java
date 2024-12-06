@@ -33,6 +33,8 @@ abstract class SectionAwareCrawler implements Crawler {
         SECTION_AGAINST_CRAWLER.put(LEX_FULL, JoinCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_CROSS, JoinCrawler.class);
         SECTION_AGAINST_CRAWLER.put(LEX_NATURAL, JoinCrawler.class);
+        SECTION_AGAINST_CRAWLER.put(LEX_ON, JoinConditionCrawler.class);
+
         SECTION_AGAINST_CRAWLER.put(LEX_GROUP, null);
         SECTION_AGAINST_CRAWLER.put(LEX_ORDER, null);
         SECTION_AGAINST_CRAWLER.put(LEX_LIMIT, LimitCrawler.class);

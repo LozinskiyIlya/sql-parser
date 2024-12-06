@@ -15,18 +15,18 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.clause.Condition.Operator.operatorFullLexemes;
 
-public abstract class ClauseCrawler extends SectionAwareCrawler {
+public abstract class ConditionCrawler extends SectionAwareCrawler {
 
     protected BiConsumer<Query, Condition> addToQuery;
 
     @Override
     public void crawl(Query query, String clauseName, Supplier<String> fragments) {
-        final var clause = new Condition(Condition.ClauseType.valueOf(clauseName.toUpperCase()));
+        final var condition = new Condition(Condition.ClauseType.valueOf(clauseName.toUpperCase()));
         final var leftOperandFirstFragment = fragments.get();
-        final var operatorFirstFragment = crawlForOperand(clause, leftOperandFirstFragment, fragments, null);
-        final var rightOperandFirstFragment = crawlForOperator(clause, operatorFirstFragment, fragments);
-        final var nexFragment = crawlForOperand(clause, rightOperandFirstFragment, fragments, clause.getOperator());
-        addToQuery.accept(query, clause);
+        final var operatorFirstFragment = crawlForOperand(condition, leftOperandFirstFragment, fragments, null);
+        final var rightOperandFirstFragment = crawlForOperator(condition, operatorFirstFragment, fragments);
+        final var nexFragment = crawlForOperand(condition, rightOperandFirstFragment, fragments, condition.getOperator());
+        addToQuery.accept(query, condition);
         if (nexFragment == null) {
             return;
         }

@@ -76,6 +76,7 @@ public class Condition {
     }
 
     public enum ClauseType {
+        ON,
         AND,
         OR,
         WHERE,

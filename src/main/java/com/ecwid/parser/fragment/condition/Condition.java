@@ -1,6 +1,6 @@
 package com.ecwid.parser.fragment.condition;
 
-import com.ecwid.parser.fragment.domain.Constructable;
+import com.ecwid.parser.fragment.domain.MultiLex;
 import com.ecwid.parser.fragment.domain.Query;
 import lombok.Data;
 import lombok.Getter;
@@ -50,7 +50,7 @@ public class Condition {
     }
 
     @Getter
-    public enum Operator implements Constructable {
+    public enum Operator implements MultiLex {
         EQUALS(LEX_EQUALS),
         NOT_EQUALS(LEX_NOT + LEX_EQUALS),
         GREATER_THAN(LEX_GREATER_THAN),
@@ -71,7 +71,7 @@ public class Condition {
             this.fullLexeme = fullLexeme;
         }
 
-        public static final Map<String, Operator> operatorFullLexemes = Constructable.createLexemeMap(Operator.class);
+        public static final Map<String, Operator> operatorFullLexemes = MultiLex.createLexemeMap(Operator.class);
 
     }
 

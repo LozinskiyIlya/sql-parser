@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 
 @Component
-public class ColumnCrawler extends CanHaveFunctionCrawler {
+public class ColumnCrawler extends SectionAwareCrawler {
 
     @Override
     public void crawl(Query query, String select, Supplier<String> fragments) {

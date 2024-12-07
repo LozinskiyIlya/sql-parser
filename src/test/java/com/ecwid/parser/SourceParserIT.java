@@ -7,6 +7,7 @@ import com.ecwid.parser.fragment.source.Source;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
@@ -65,11 +66,12 @@ public class SourceParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("one level nested source")
         void oneLevelNestedSource() throws Exception {
-            final var sql = "select * from (select * from some_table)";
+            final var nested = "select * from some_table";
+            final var sql = "select * from (%s)".formatted(nested);
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSources().size());
             final var source = parsed.getSources().getFirst();
-            assertSourceEquals(Query.class, null, null, source);
+            assertSourceEquals(Query.class, nested, null, source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
             assertEquals("*", nestedQuery.getColumns().getFirst().name());
@@ -80,11 +82,12 @@ public class SourceParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("one level nested source with alias")
         void oneLevelNestedSourceWithAlias() throws Exception {
-            final var sql = "SELECT * FROM (SELECT * FROM some_table) t";
+            final var nested = "SELECT * FROM some_table";
+            final var sql = "SELECT * FROM (%s) t".formatted(nested);
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSources().size());
             final var source = parsed.getSources().getFirst();
-            assertSourceEquals(Query.class, null, "t", source);
+            assertSourceEquals(Query.class, nested, "t", source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
             assertEquals("*", nestedQuery.getColumns().getFirst().name());
@@ -95,16 +98,29 @@ public class SourceParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("one level nested source with AS alias")
         void oneLevelNestedSourceWithASAlias() throws Exception {
-            final var sql = "SELECT * FROM (SELECT * FROM some_table) AS t";
+            final var nested = "SELECT * FROM some_table";
+            final var sql = "SELECT * FROM (%s) AS t".formatted(nested);
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSources().size());
             final var source = parsed.getSources().getFirst();
-            assertSourceEquals(Query.class, null, "t", source);
+            assertSourceEquals(Query.class, nested, "t", source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
             assertEquals("*", nestedQuery.getColumns().getFirst().name());
             assertEquals(1, nestedQuery.getSources().size());
             assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
+        }
+
+        @Test
+        @DisplayName("one level nested surrounded by tables")
+        void oneLevelNestedSourceSurroundedByTables() throws Exception {
+            final var nested = "SELECT * FROM some_table";
+            final var sql = "SELECT * FROM a, (%s), b".formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getSources().size());
+            assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
+            assertSourceEquals(Query.class, nested, null, parsed.getSources().get(1));
+            assertSourceEquals(Table.class, "b", null, parsed.getSources().get(2));
         }
 
         @Test
@@ -122,11 +138,11 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
             assertSourceEquals(Table.class, "b", "c", parsed.getSources().get(1));
             assertSourceEquals(Table.class, "d", null, parsed.getSources().get(2));
-            assertSourceEquals(Query.class, null, "h", parsed.getSources().get(3));
+            assertSourceIsQuery("h", parsed.getSources().get(3));
 
             final var nestedFirst = (Query) parsed.getSources().get(3);
             assertEquals(2, nestedFirst.getSources().size());
-            assertSourceEquals(Query.class, null, "f", nestedFirst.getSources().getFirst());
+            assertSourceIsQuery("f", nestedFirst.getSources().getFirst());
             assertSourceEquals(Table.class, "g", null, nestedFirst.getSources().getLast());
 
             final var nestedNested = (Query) nestedFirst.getSources().getFirst();
@@ -135,7 +151,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
 
             assertSourceEquals(Table.class, "i", "j", parsed.getSources().get(4));
             assertSourceEquals(Table.class, "k", "l", parsed.getSources().get(5));
-            assertSourceEquals(Query.class, null, "n", parsed.getSources().get(6));
+            assertSourceIsQuery("n", parsed.getSources().get(6));
 
             final var nestedSecond = (Query) parsed.getSources().get(6);
             assertEquals(1, nestedSecond.getSources().size());
@@ -145,13 +161,19 @@ public class SourceParserIT extends AbstractSpringParserTest {
         }
     }
 
-    private void assertSourceEquals(Class<? extends Source> expectedClass, String expectedName, String expectedAlias, Source actual) {
+    private void assertSourceEquals(Class<? extends Source> expectedClass, String expectedVal, String expectedAlias, Source actual) {
         assertEquals(expectedClass, actual.getClass());
         assertEquals(expectedAlias, actual.alias());
         if (actual instanceof Nameable nameable) {
-            assertEquals(expectedName, nameable.name());
+            assertEquals(expectedVal, nameable.name());
         } else {
-            assertNull(expectedName);
+            final var alias = StringUtils.hasText(expectedAlias) ? " " + expectedAlias : "";
+            assertEquals(expectedVal.toLowerCase() + alias, actual.toString());
         }
+    }
+
+    private void assertSourceIsQuery(String expectedAlias, Source actual) {
+        assertEquals(Query.class, actual.getClass());
+        assertEquals(expectedAlias, actual.alias());
     }
 }

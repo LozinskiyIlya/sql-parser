@@ -1,8 +1,8 @@
 package com.ecwid.parser.fragment;
 
 import com.ecwid.parser.fragment.condition.Condition;
-import com.ecwid.parser.fragment.domain.Constructable;
-import com.ecwid.parser.fragment.domain.Table;
+import com.ecwid.parser.fragment.domain.MultiLex;
+import com.ecwid.parser.fragment.source.Source;
 import lombok.Data;
 import lombok.Getter;
 
@@ -15,11 +15,11 @@ import static com.ecwid.parser.Lexemes.*;
 @Data
 public class Join {
     private JoinType type;
-    private Table table;
+    private Source table;
     private List<Condition> conditions = new LinkedList<>();
 
     @Getter
-    public enum JoinType implements Constructable {
+    public enum JoinType implements MultiLex {
         JOIN(LEX_JOIN),
         INNER(LEX_INNER + LEX_SPACE + LEX_JOIN),
         LEFT(LEX_LEFT + LEX_SPACE + LEX_JOIN),
@@ -44,7 +44,7 @@ public class Join {
             this.fullLexeme = fullLexeme;
         }
 
-        public static final Map<String, JoinType> joinTypeFullLexemes = Constructable.createLexemeMap(JoinType.class);
+        public static final Map<String, JoinType> joinTypeFullLexemes = MultiLex.createLexemeMap(JoinType.class);
     }
 
 }

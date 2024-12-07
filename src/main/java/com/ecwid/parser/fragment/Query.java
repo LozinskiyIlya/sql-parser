@@ -1,5 +1,6 @@
 package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Source;
 import lombok.Data;
 import org.springframework.util.StringUtils;
@@ -12,7 +13,7 @@ import static com.ecwid.parser.Lexemes.*;
 
 @Data
 public class Query implements Source {
-    private List<Column> columns = new LinkedList<>();
+    private List<Fragment> columns = new LinkedList<>();
     private List<Source> sources = new LinkedList<>();
     private List<Join> joins = new LinkedList<>();
     private List<Condition> filters = new LinkedList<>();
@@ -21,6 +22,12 @@ public class Query implements Source {
     private Integer limit;
     private Integer offset;
     private String alias;
+
+    @Override
+    public String getValue() {
+        return toString();
+    }
+
     @Override
     public String toString() {
         return QueryPrinter.print(this).toLowerCase();
@@ -53,7 +60,7 @@ public class Query implements Source {
     }
 
     private static String printColumns(Query query) {
-        return query.getColumns().stream().map(Column::toString).collect(Collectors.joining(", "));
+        return query.getColumns().stream().map(Fragment::toString).collect(Collectors.joining(", "));
     }
 
     private static String printSources(Query query) {
@@ -63,7 +70,6 @@ public class Query implements Source {
                 String alias = source.getAlias();
 
                 if (StringUtils.hasText(alias)) {
-                    // Ensure the alias is not already part of the sourceAsString
                     if (sourceAsString.endsWith(LEX_SPACE + alias)) {
                         sourceAsString = sourceAsString.substring(0, sourceAsString.lastIndexOf(LEX_SPACE + alias));
                     }

@@ -11,6 +11,11 @@ public class ConstantListOperand implements Fragment {
     private List<String> values = new LinkedList<>();
 
     @Override
+    public List<String> getValue() {
+        return values;
+    }
+
+    @Override
     public String toString() {
         return String.join(", ", values);
     }

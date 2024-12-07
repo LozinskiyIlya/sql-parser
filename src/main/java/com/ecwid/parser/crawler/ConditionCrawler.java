@@ -72,7 +72,8 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
             canBeFunction.push(fragment);
             fragment = fragments.get();
             if (LEX_OPEN_BRACKET.equals(fragment)) {
-                operand = new Column(getFunctionSignature(canBeFunction, fragments), null);
+                //getFunctionSignature(canBeFunction, fragments)
+                operand = new Column(fragment, null);
                 fragment = fragments.get();
             } else {
                 operand = new Column(canBeFunction.getFirst(), null);

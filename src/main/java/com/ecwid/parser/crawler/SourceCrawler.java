@@ -57,9 +57,9 @@ public class SourceCrawler extends SectionAwareCrawler {
         final var source = sources.pop();
         if (source instanceof Table) {
             ((Table) source).setName(nameAliasPair.getFirst());
-            ((Table) source).setAlias(nameAliasPair.getSecond());
+            source.setAlias(nameAliasPair.getSecond());
         } else {
-            ((Query) source).setAlias(nameAliasPair.getFirst());
+            source.setAlias(nameAliasPair.getFirst());
         }
         query.getSources().add(source);
         nameAliasPair.reset();

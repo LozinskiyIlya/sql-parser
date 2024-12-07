@@ -74,7 +74,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertSourceEquals(Query.class, nested, null, source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
-            assertEquals("*", nestedQuery.getColumns().getFirst().getName());
+            assertEquals("*", nestedQuery.getColumns().getFirst().getValue());
             assertEquals(1, nestedQuery.getSources().size());
             assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
         }
@@ -90,7 +90,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertSourceEquals(Query.class, nested, "t", source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
-            assertEquals("*", nestedQuery.getColumns().getFirst().getName());
+            assertEquals("*", nestedQuery.getColumns().getFirst().getValue());
             assertEquals(1, nestedQuery.getSources().size());
             assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
         }
@@ -106,7 +106,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertSourceEquals(Query.class, nested, "t", source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
-            assertEquals("*", nestedQuery.getColumns().getFirst().getName());
+            assertEquals("*", nestedQuery.getColumns().getFirst().getValue());
             assertEquals(1, nestedQuery.getSources().size());
             assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
         }

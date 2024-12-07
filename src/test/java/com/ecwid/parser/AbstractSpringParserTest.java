@@ -7,13 +7,19 @@ import com.ecwid.parser.fragment.ConstantListOperand;
 import com.ecwid.parser.fragment.ConstantOperand;
 import com.ecwid.parser.fragment.Column;
 import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
+import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.service.SqlParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.util.StringUtils;
 
+import java.util.List;
+
+import static com.ecwid.parser.Lexemes.LEX_SPACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(classes = ParserApplicationConfig.class)
@@ -36,28 +42,39 @@ public abstract class AbstractSpringParserTest {
         assertEquals(operator, actual.getOperator(), "Operator mismatch");
         final var leftOperand = actual.getLeftOperand();
         final var rightOperand = actual.getRightOperand();
-        if (leftVal instanceof String) {
-            leftVal = ((String) leftVal).toLowerCase();
-        }
-        if (rightVal instanceof String) {
-            rightVal = ((String) rightVal).toLowerCase();
-        }
-        assertEquals(leftType, leftOperand.getClass(), "Left operand type mismatch");
-        assertEquals(leftVal, getOperandValue(leftOperand), "Left operand value mismatch");
-        assertEquals(rightType, rightOperand.getClass(), "Right operand type mismatch");
-        assertEquals(rightVal, getOperandValue(rightOperand), "Right operand value mismatch");
+        assertFragmentEquals(leftType, leftVal, null, leftOperand);
+        assertFragmentEquals(rightType, rightVal, null, rightOperand);
     }
 
+    @SuppressWarnings("unchecked")
+    protected void assertFragmentEquals(
+            Class<? extends Fragment> type,
+            Object value,
+            String alias,
+            Fragment actual
+    ) {
+        if (value instanceof String) {
+            value = ((String) value).toLowerCase();
+        }
+        if (actual instanceof Query && StringUtils.hasText(((Query) actual).getAlias())) {
+            value += LEX_SPACE + ((Query) actual).getAlias();
+        }
+        assertEquals(value, actual.getValue());
+        if (value instanceof List) {
+            assertEquals(type, actual.getClass());
+            return;
+        }
+        assertAliasableEquals((Aliasable) actual, (Class<? extends Aliasable>) type, alias);
+    }
 
-    protected Object getOperandValue(Fragment operand) {
-        return switch (operand) {
-            case Column o -> o.getName();
-            case ConstantOperand o -> o.getValue();
-            case Query o -> o.toString();
-            case ConstantListOperand o -> o.getValues();
-            default ->
-                    throw new IllegalArgumentException("Operand type not supported: " + operand.getClass().getSimpleName());
-        };
+    protected void assertNameableEquals(Nameable nameable, Class<? extends Nameable> type, String name, String alias) {
+        assertAliasableEquals(nameable, type, alias);
+        assertEquals(name, nameable.getName());
+    }
+
+    protected void assertAliasableEquals(Aliasable aliasable, Class<? extends Aliasable> type, String alias) {
+        assertEquals(type, aliasable.getClass());
+        assertEquals(alias, aliasable.getAlias());
     }
 
 }

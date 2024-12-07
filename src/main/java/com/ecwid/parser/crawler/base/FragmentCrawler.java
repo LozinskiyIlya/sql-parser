@@ -14,7 +14,7 @@ import static com.ecwid.parser.Lexemes.*;
 public abstract class FragmentCrawler extends SectionAwareCrawler {
     protected abstract void processFragment(Query query, Fragment fragment);
 
-    protected abstract String processCloseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
+    protected abstract String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
 
     protected boolean crawlsForSources() {
         return false;
@@ -23,7 +23,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     @Override
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;
-        var lex = processCloseAndReturnNextLex(query, currentSection, nextLex);
+        var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {

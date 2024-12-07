@@ -1,12 +1,9 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.Join;
+import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.Condition.ClauseType;
 import com.ecwid.parser.fragment.Condition.Operator;
-import com.ecwid.parser.fragment.ConstantList;
-import com.ecwid.parser.fragment.Constant;
-import com.ecwid.parser.fragment.Column;
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.domain.Source;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -31,7 +28,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table2", null, join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
             final var condition = join.getConditions().getFirst();
             assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", condition);
         }
@@ -43,7 +40,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table2", "t", join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", "t", join);
             final var condition = join.getConditions().getFirst();
             assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "t.id", condition);
         }
@@ -55,7 +52,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table2", "t", join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", "t", join);
             final var condition = join.getConditions().getFirst();
             assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "t.id", condition);
         }
@@ -67,7 +64,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table2", null, join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
             final var conditions = join.getConditions();
             assertEquals(2, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "table1.id1", Operator.EQUALS, Column.class, "table2.id1", conditions.get(0));
@@ -81,7 +78,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table2", "t", join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", "t", join);
             final var condition = join.getConditions().getFirst();
             assertConditionEquals(ClauseType.ON, Column.class, "count(table1.*)", Operator.EQUALS, Column.class, "t.some_counter", condition);
         }
@@ -93,7 +90,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.NATURAL_FULL_OUTER, "table2", null, join);
+            assertJoinEquals(JoinType.NATURAL_FULL_OUTER, Table.class, "table2", null, join);
         }
 
         @Test
@@ -108,7 +105,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "b", null, join);
+            assertJoinEquals(JoinType.JOIN, Query.class, nested, "b", join);
             final var conditions = join.getConditions();
             assertEquals(1, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.id", conditions.getFirst());
@@ -127,11 +124,10 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinTableEquals(JoinType.JOIN, "table_b", "b", join);
+            assertJoinEquals(JoinType.JOIN, Table.class, "table_b", "b", join);
             final var conditions = join.getConditions();
             assertEquals(1, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.IN, Query.class, nested, conditions.getFirst());
-
         }
 
         @Nested
@@ -154,12 +150,12 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(6, parsed.getJoins().size());
                 final var joins = parsed.getJoins();
-                assertJoinTableEquals(JoinType.JOIN, "b", null, joins.get(0));
-                assertJoinTableEquals(JoinType.JOIN, "c", "d", joins.get(1));
-                assertJoinTableEquals(JoinType.JOIN, "e", "f", joins.get(2));
-                assertJoinTableEquals(JoinType.JOIN, "g", "h", joins.get(3));
-                assertJoinTableEquals(JoinType.JOIN, "i", "j", joins.get(4));
-                assertJoinTableEquals(JoinType.JOIN, "k", null, joins.get(5));
+                assertJoinEquals(JoinType.JOIN, Table.class,"b", null, joins.get(0));
+                assertJoinEquals(JoinType.JOIN, Table.class,"c", "d", joins.get(1));
+                assertJoinEquals(JoinType.JOIN, Table.class,"e", "f", joins.get(2));
+                assertJoinEquals(JoinType.JOIN, Table.class,"g", "h", joins.get(3));
+                assertJoinEquals(JoinType.JOIN, Table.class,"i", "j", joins.get(4));
+                assertJoinEquals(JoinType.JOIN, Table.class,"k", null, joins.get(5));
             }
 
             @Test
@@ -174,10 +170,10 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(2, parsed.getJoins().size());
                 final var firstJoin = parsed.getJoins().getFirst();
-                assertJoinTableEquals(JoinType.NATURAL_FULL_OUTER, "table2", null, firstJoin);
+                assertJoinEquals(JoinType.NATURAL_FULL_OUTER, Table.class,"table2", null, firstJoin);
                 assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", firstJoin.getConditions().getFirst());
                 final var secondJoin = parsed.getJoins().getLast();
-                assertJoinTableEquals(JoinType.LEFT, "table3", null, secondJoin);
+                assertJoinEquals(JoinType.LEFT, Table.class,"table3", null, secondJoin);
                 assertConditionEquals(ClauseType.ON, Column.class, "table2.id", Operator.EQUALS, Column.class, "table3.id", secondJoin.getConditions().getFirst());
             }
 
@@ -195,9 +191,9 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(3, parsed.getJoins().size());
                 final var joins = parsed.getJoins();
-                assertJoinTableEquals(JoinType.JOIN, "b", null, joins.get(0));
-                assertJoinTableEquals(JoinType.JOIN, "c", null, joins.get(1));
-                assertJoinTableEquals(JoinType.JOIN, "d", null, joins.get(2));
+                assertJoinEquals(JoinType.JOIN, Table.class,"b", null, joins.get(0));
+                assertJoinEquals(JoinType.JOIN, Table.class,"c", null, joins.get(1));
+                assertJoinEquals(JoinType.JOIN, Table.class,"d", null, joins.get(2));
                 final var conditions = joins.get(0).getConditions();
                 assertEquals(1, conditions.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.id", conditions.getFirst());
@@ -229,8 +225,8 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var parsed = sqlParser.parse(sql);
                 final var joins = parsed.getJoins();
                 assertEquals(2, joins.size());
-                assertJoinTableEquals(JoinType.JOIN, "table_b", "b", joins.get(0));
-                assertJoinTableEquals(JoinType.JOIN, "table_c", "c", joins.get(1));
+                assertJoinEquals(JoinType.JOIN, Table.class,"table_b", "b", joins.get(0));
+                assertJoinEquals(JoinType.JOIN, Table.class,"table_c", "c", joins.get(1));
                 final var conditions = joins.get(0).getConditions();
                 assertEquals(2, conditions.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.a_id", conditions.get(0));
@@ -252,16 +248,15 @@ public class JoinParserIT extends AbstractSpringParserTest {
                     final var parsed = sqlParser.parse(sql);
                     assertEquals(1, parsed.getJoins().size());
                     final var join = parsed.getJoins().getFirst();
-                    assertJoinTableEquals(joinType, "table1", null, join);
+                    assertJoinEquals(joinType, Table.class,"table1", null, join);
                 });
             });
         }
 
-        private void assertJoinTableEquals(Join.JoinType type, String tableName, String tableAlias, Join join) {
-            assertEquals(type, join.getType());
-            final var table = join.getTable();
-//            assertEquals(tableName, table.name());
-            assertEquals(tableAlias, table.getAlias());
+        private void assertJoinEquals(Join.JoinType type, Class<? extends Source> sourceClass, String sourceValue, String tableAlias, Join actual) {
+            assertEquals(type, actual.getType());
+            final var source = actual.getSource();
+            assertFragmentEquals(sourceClass, sourceValue, tableAlias, source);
         }
     }
 }

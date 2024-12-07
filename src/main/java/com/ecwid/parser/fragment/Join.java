@@ -14,7 +14,7 @@ import static com.ecwid.parser.Lexemes.*;
 @Data
 public class Join {
     private JoinType type;
-    private Source table;
+    private Source source;
     private List<Condition> conditions = new LinkedList<>();
 
     @Getter

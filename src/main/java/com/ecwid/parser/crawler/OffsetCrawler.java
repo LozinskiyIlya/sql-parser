@@ -4,10 +4,12 @@ import com.ecwid.parser.crawler.base.IntegerCrawler;
 import com.ecwid.parser.fragment.Query;
 import org.springframework.stereotype.Component;
 
+import static com.ecwid.parser.Lexemes.LEX_OFFSET;
+
 @Component
 public class OffsetCrawler extends IntegerCrawler {
 
     public OffsetCrawler() {
-        super(Query::setOffset, "OFFSET");
+        super(Query::setOffset, LEX_OFFSET);
     }
 }

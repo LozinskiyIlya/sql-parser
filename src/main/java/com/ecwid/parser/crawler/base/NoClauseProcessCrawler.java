@@ -18,7 +18,7 @@ public abstract class NoClauseProcessCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected final String processCloseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex) {
+    protected final String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex) {
         return nextLex.get();
     }
 }

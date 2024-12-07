@@ -16,10 +16,6 @@ public abstract class SectionAwareCrawler implements Crawler {
     @Autowired
     private Map<String, Crawler> sectionAgainstCrawler;
 
-    protected final boolean shouldDelegate(String nextFragment) {
-        return sectionAgainstCrawler.containsKey(nextFragment);
-    }
-
     @Override
     public final void delegate(Query query, String currentSection, Supplier<String> fragments) {
         Crawler.super.delegate(query, currentSection, fragments);
@@ -30,8 +26,18 @@ public abstract class SectionAwareCrawler implements Crawler {
         return Optional.ofNullable(sectionAgainstCrawler.get(currentSection));
     }
 
-    @Override
-    public final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragments) {
-        return Crawler.super.crawlUntilAndReturnNext(fragmentIs, andDoAction, fragments);
+    protected final boolean shouldDelegate(String nextFragment) {
+        return sectionAgainstCrawler.containsKey(nextFragment);
+    }
+
+    protected final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragments) {
+        String fragment;
+        while ((fragment = fragments.get()) != null) {
+            if (fragmentIs.test(fragment)) {
+                break;
+            }
+            andDoAction.accept(fragment);
+        }
+        return fragment;
     }
 }

@@ -1,12 +1,12 @@
-package com.ecwid.parser.fragment.domain;
+package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.source.Source;
-import lombok.AllArgsConstructor;
+import com.ecwid.parser.fragment.domain.Nameable;
+import com.ecwid.parser.fragment.domain.Source;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 
-@Setter
+@Data
 @NoArgsConstructor
 public class Table implements Source, Nameable {
     private String alias;
@@ -18,17 +18,7 @@ public class Table implements Source, Nameable {
     }
 
     @Override
-    public String alias() {
-        return alias;
-    }
-
-    @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
     public String toString() {
-        return this.print();
+        return print();
     }
 }

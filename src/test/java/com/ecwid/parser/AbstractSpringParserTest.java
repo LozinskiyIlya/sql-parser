@@ -2,12 +2,12 @@ package com.ecwid.parser;
 
 
 import com.ecwid.parser.config.ParserApplicationConfig;
-import com.ecwid.parser.fragment.condition.Condition;
-import com.ecwid.parser.fragment.condition.ConstantListOperand;
-import com.ecwid.parser.fragment.condition.ConstantOperand;
-import com.ecwid.parser.fragment.condition.Operand;
-import com.ecwid.parser.fragment.domain.Column;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.Condition;
+import com.ecwid.parser.fragment.ConstantListOperand;
+import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.service.SqlParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +26,10 @@ public abstract class AbstractSpringParserTest {
 
     protected void assertConditionEquals(
             Condition.ClauseType type,
-            Class<? extends Operand> leftType,
+            Class<? extends Fragment> leftType,
             Object leftVal,
             Condition.Operator operator,
-            Class<? extends Operand> rightType,
+            Class<? extends Fragment> rightType,
             Object rightVal,
             Condition actual) {
         assertEquals(type, actual.getClauseType(), "Clause type mismatch");
@@ -49,9 +49,9 @@ public abstract class AbstractSpringParserTest {
     }
 
 
-    protected Object getOperandValue(Operand operand) {
+    protected Object getOperandValue(Fragment operand) {
         return switch (operand) {
-            case Column o -> o.name();
+            case Column o -> o.getName();
             case ConstantOperand o -> o.getValue();
             case Query o -> o.toString();
             case ConstantListOperand o -> o.getValues();

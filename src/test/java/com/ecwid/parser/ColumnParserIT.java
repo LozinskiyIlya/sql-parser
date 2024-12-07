@@ -114,7 +114,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
     }
 
     private void assertColumnEquals(Nameable column, String name, String alias) {
-        assertEquals(name, column.name());
-        assertEquals(alias, column.alias());
+        assertEquals(name, column.getName());
+        assertEquals(alias, column.getAlias());
     }
 }

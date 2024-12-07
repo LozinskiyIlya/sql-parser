@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.Query;
 
 import java.util.Optional;
 import java.util.function.Consumer;

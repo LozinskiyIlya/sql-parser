@@ -1,9 +1,9 @@
 package com.ecwid.parser.fragment.domain;
 
 public interface Nameable extends Aliasable {
-    String name();
+    String getName();
 
     default String print() {
-        return alias() == null ? name() : String.format("%s %s", name(), alias());
+        return Aliasable.super.print(getName());
     }
 }

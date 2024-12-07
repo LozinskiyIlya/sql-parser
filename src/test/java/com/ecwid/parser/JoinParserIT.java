@@ -1,12 +1,12 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Join;
-import com.ecwid.parser.fragment.condition.Condition.ClauseType;
-import com.ecwid.parser.fragment.condition.Condition.Operator;
-import com.ecwid.parser.fragment.condition.ConstantListOperand;
-import com.ecwid.parser.fragment.condition.ConstantOperand;
-import com.ecwid.parser.fragment.domain.Column;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.Condition.ClauseType;
+import com.ecwid.parser.fragment.Condition.Operator;
+import com.ecwid.parser.fragment.ConstantListOperand;
+import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -261,7 +261,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             assertEquals(type, join.getType());
             final var table = join.getTable();
 //            assertEquals(tableName, table.name());
-            assertEquals(tableAlias, table.alias());
+            assertEquals(tableAlias, table.getAlias());
         }
     }
 }

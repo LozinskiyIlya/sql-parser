@@ -1,8 +1,7 @@
 package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.condition.Condition;
 import com.ecwid.parser.fragment.domain.MultiLex;
-import com.ecwid.parser.fragment.source.Source;
+import com.ecwid.parser.fragment.domain.Source;
 import lombok.Data;
 import lombok.Getter;
 

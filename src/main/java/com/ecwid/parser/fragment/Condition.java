@@ -1,7 +1,7 @@
-package com.ecwid.parser.fragment.condition;
+package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.MultiLex;
-import com.ecwid.parser.fragment.domain.Query;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ import static com.ecwid.parser.Lexemes.*;
 @RequiredArgsConstructor
 public class Condition {
 
-    private Operand leftOperand;
-    private Operand rightOperand;
+    private Fragment leftOperand;
+    private Fragment rightOperand;
     private Operator operator;
     private final ClauseType clauseType;
 
-    public void setNextOperand(Operand operand) {
+    public void setNextOperand(Fragment operand) {
         if (leftOperand == null) {
             leftOperand = operand;
         } else {
@@ -39,7 +39,7 @@ public class Condition {
         return String.join(LEX_SPACE, builder);
     }
 
-    private static void printOperand(List<String> builder, Operand operand) {
+    private static void printOperand(List<String> builder, Fragment operand) {
         if (operand instanceof Query || operand instanceof ConstantListOperand) {
             builder.add(LEX_OPEN_BRACKET);
             builder.add(operand.toString());

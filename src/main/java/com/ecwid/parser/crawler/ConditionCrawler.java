@@ -1,12 +1,12 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.condition.Condition;
-import com.ecwid.parser.fragment.condition.ConstantListOperand;
-import com.ecwid.parser.fragment.condition.ConstantOperand;
-import com.ecwid.parser.fragment.condition.Operand;
-import com.ecwid.parser.fragment.domain.Column;
-import com.ecwid.parser.fragment.domain.NameAliasPair;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.Condition;
+import com.ecwid.parser.fragment.ConstantListOperand;
+import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.NameAliasPair;
+import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.fragment.domain.Fragment;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
-import static com.ecwid.parser.fragment.condition.Condition.Operator.operatorFullLexemes;
+import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class ConditionCrawler extends SectionAwareCrawler {
 
@@ -42,7 +42,7 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
             Supplier<String> fragments,
             Condition.Operator operator
     ) {
-        Operand operand;
+        Fragment operand;
         if (LEX_OPEN_BRACKET.equals(fragment)) {
             fragment = fragments.get();
         }
@@ -64,7 +64,7 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
                     },
                     fragments);
         } else if (isConstant(fragment)) {
-            operand = new ConstantOperand(fragment);
+            operand = new ConstantOperand(fragment, null);
             clause.setNextOperand(operand);
             fragment = fragments.get();
         } else {

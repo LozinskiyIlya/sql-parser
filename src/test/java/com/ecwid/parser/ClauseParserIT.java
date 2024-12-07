@@ -1,8 +1,10 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.condition.*;
-import com.ecwid.parser.fragment.domain.Column;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.Condition;
+import com.ecwid.parser.fragment.ConstantListOperand;
+import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -10,8 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.ecwid.parser.fragment.condition.Condition.ClauseType.*;
-import static com.ecwid.parser.fragment.condition.Condition.Operator.*;
+import static com.ecwid.parser.fragment.Condition.ClauseType.*;
+import static com.ecwid.parser.fragment.Condition.Operator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

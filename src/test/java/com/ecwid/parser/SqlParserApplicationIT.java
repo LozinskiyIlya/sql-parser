@@ -1,6 +1,6 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.domain.Table;
+import com.ecwid.parser.fragment.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
         final var parsed = sqlParser.parse(sql);
         assertEquals(1, parsed.getSources().size());
         final var onlySource = (Table) parsed.getSources().getFirst();
-        assertEquals("table", onlySource.name());
+        assertEquals("table", onlySource.getName());
     }
 
     @Test

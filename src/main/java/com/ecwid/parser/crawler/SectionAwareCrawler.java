@@ -1,7 +1,7 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.domain.NameAliasPair;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.NameAliasPair;
+import com.ecwid.parser.fragment.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.util.StringUtils;

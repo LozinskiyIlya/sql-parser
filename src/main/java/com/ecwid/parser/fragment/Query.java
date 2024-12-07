@@ -1,13 +1,7 @@
-package com.ecwid.parser.fragment.domain;
+package com.ecwid.parser.fragment;
 
-import com.ecwid.parser.fragment.Join;
-import com.ecwid.parser.fragment.Sort;
-import com.ecwid.parser.fragment.condition.Operand;
-import com.ecwid.parser.fragment.condition.Condition;
-import com.ecwid.parser.fragment.source.Source;
-import lombok.AccessLevel;
+import com.ecwid.parser.fragment.domain.Source;
 import lombok.Data;
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
@@ -17,7 +11,7 @@ import java.util.stream.Collectors;
 import static com.ecwid.parser.Lexemes.*;
 
 @Data
-public class Query implements Operand, Source {
+public class Query implements Source {
     private List<Column> columns = new LinkedList<>();
     private List<Source> sources = new LinkedList<>();
     private List<Join> joins = new LinkedList<>();
@@ -26,14 +20,7 @@ public class Query implements Operand, Source {
     private List<Sort> sorts = new LinkedList<>();
     private Integer limit;
     private Integer offset;
-    @Getter(AccessLevel.NONE)
     private String alias;
-
-    @Override
-    public String alias() {
-        return alias;
-    }
-
     @Override
     public String toString() {
         return QueryPrinter.print(this).toLowerCase();
@@ -58,8 +45,8 @@ public class Query implements Operand, Source {
                 builder.add(LEX_OFFSET);
                 builder.add(query.offset.toString());
             }
-            if (StringUtils.hasText(query.alias())) {
-                builder.add(query.alias());
+            if (StringUtils.hasText(query.getAlias())) {
+                builder.add(query.getAlias());
             }
             return String.join(LEX_SPACE, builder);
         }
@@ -73,7 +60,7 @@ public class Query implements Operand, Source {
         return query.getSources().stream().map(source -> {
             if (source instanceof Query) {
                 String sourceAsString = source.toString();
-                String alias = source.alias();
+                String alias = source.getAlias();
 
                 if (StringUtils.hasText(alias)) {
                     // Ensure the alias is not already part of the sourceAsString

@@ -1,8 +1,8 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.fragment.domain.NameAliasPair;
-import com.ecwid.parser.fragment.domain.Column;
-import com.ecwid.parser.fragment.domain.Query;
+import com.ecwid.parser.fragment.NameAliasPair;
+import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;

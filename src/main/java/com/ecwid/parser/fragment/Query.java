@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.ecwid.parser.Lexemes.*;
+import static java.util.stream.Collectors.toList;
 
 @Data
 public class Query implements Source {
@@ -37,9 +38,9 @@ public class Query implements Source {
         public static String print(Query query) {
             final var builder = new LinkedList<String>();
             builder.add(LEX_SELECT);
-            builder.add(printColumns(query));
+            builder.add(printFragmentsList(query.columns));
             builder.add(LEX_FROM);
-            builder.add(printSources(query));
+            builder.add(printSources(query.sources));
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
             // joins
             // groupings
@@ -59,15 +60,16 @@ public class Query implements Source {
         }
     }
 
-    private static String printColumns(Query query) {
-        return query.getColumns().stream().map(Fragment::toString).collect(Collectors.joining(", "));
+    private static String printSources(List<Source> sources) {
+        final var casted = sources.stream().map(Fragment.class::cast).toList();
+        return printFragmentsList(casted);
     }
 
-    private static String printSources(Query query) {
-        return query.getSources().stream().map(source -> {
-            if (source instanceof Query) {
-                String sourceAsString = source.toString();
-                String alias = source.getAlias();
+    private static String printFragmentsList(List<Fragment> fragments) {
+        return fragments.stream().map(fragment -> {
+            if (fragment instanceof Query) {
+                String sourceAsString = fragment.toString();
+                String alias = ((Query) fragment).getAlias();
 
                 if (StringUtils.hasText(alias)) {
                     if (sourceAsString.endsWith(LEX_SPACE + alias)) {
@@ -78,7 +80,7 @@ public class Query implements Source {
                 return LEX_OPEN_BRACKET + sourceAsString + LEX_CLOSE_BRACKET;
             }
 
-            return source.toString();
+            return fragment.toString();
         }).collect(Collectors.joining(", "));
     }
 }

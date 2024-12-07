@@ -40,7 +40,7 @@ public class Condition {
     }
 
     private static void printOperand(List<String> builder, Fragment operand) {
-        if (operand instanceof Query || operand instanceof ConstantListOperand) {
+        if (operand instanceof Query || operand instanceof ConstantList) {
             builder.add(LEX_OPEN_BRACKET);
             builder.add(operand.toString());
             builder.add(LEX_CLOSE_BRACKET);

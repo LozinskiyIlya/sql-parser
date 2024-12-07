@@ -3,9 +3,6 @@ package com.ecwid.parser;
 
 import com.ecwid.parser.config.ParserApplicationConfig;
 import com.ecwid.parser.fragment.Condition;
-import com.ecwid.parser.fragment.ConstantListOperand;
-import com.ecwid.parser.fragment.ConstantOperand;
-import com.ecwid.parser.fragment.Column;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
@@ -13,10 +10,12 @@ import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.service.SqlParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.ecwid.parser.Lexemes.LEX_SPACE;
@@ -29,6 +28,12 @@ public abstract class AbstractSpringParserTest {
 
     @Autowired
     protected SqlParser sqlParser;
+
+    @Test
+    @DisplayName("all that beauty")
+    void withAllThatBeauty() throws IOException {
+        throw new UnsupportedOperationException("Implement all possible cases test for: " + this.getClass().getSimpleName());
+    }
 
     protected void assertConditionEquals(
             Condition.ClauseType type,
@@ -77,4 +82,6 @@ public abstract class AbstractSpringParserTest {
         assertEquals(alias, aliasable.getAlias());
     }
 
+    public record TestCase(String displayName, String input, List<String> expected) {
+    }
 }

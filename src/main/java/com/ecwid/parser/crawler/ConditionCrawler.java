@@ -1,8 +1,8 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.fragment.Condition;
-import com.ecwid.parser.fragment.ConstantListOperand;
-import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.ConstantList;
+import com.ecwid.parser.fragment.Constant;
 import com.ecwid.parser.fragment.Column;
 import com.ecwid.parser.fragment.NameAliasPair;
 import com.ecwid.parser.fragment.Query;
@@ -51,8 +51,8 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
             nextCrawler(fragment).orElseThrow().crawl((Query) operand, fragment, fragments);
             fragment = fragments.get();
         } else if (operator != null && LEX_IN.equals(operator.getFullLexeme())) {
-            operand = new ConstantListOperand();
-            final var values = ((ConstantListOperand) operand).getValues();
+            operand = new ConstantList();
+            final var values = ((ConstantList) operand).getValues();
             values.add(fragment);
             fragment = crawlUntilAndReturnNext(
                     this::shouldDelegate,
@@ -64,7 +64,7 @@ public abstract class ConditionCrawler extends SectionAwareCrawler {
                     },
                     fragments);
         } else if (isConstant(fragment)) {
-            operand = new ConstantOperand(fragment, null);
+            operand = new Constant(fragment, null);
             clause.setNextOperand(operand);
             fragment = fragments.get();
         } else {

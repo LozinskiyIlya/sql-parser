@@ -3,8 +3,8 @@ package com.ecwid.parser;
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Condition.ClauseType;
 import com.ecwid.parser.fragment.Condition.Operator;
-import com.ecwid.parser.fragment.ConstantListOperand;
-import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.ConstantList;
+import com.ecwid.parser.fragment.Constant;
 import com.ecwid.parser.fragment.Column;
 import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.*;
@@ -71,7 +71,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var conditions = join.getConditions();
             assertEquals(2, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "table1.id1", Operator.EQUALS, Column.class, "table2.id1", conditions.get(0));
-            assertConditionEquals(ClauseType.AND, Column.class, "table1.id2", Operator.GREATER_THAN_OR_EQUALS, ConstantOperand.class, "2", conditions.get(1));
+            assertConditionEquals(ClauseType.AND, Column.class, "table1.id2", Operator.GREATER_THAN_OR_EQUALS, Constant.class, "2", conditions.get(1));
         }
 
         @Test
@@ -204,11 +204,11 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var conditions1 = joins.get(1).getConditions();
                 assertEquals(2, conditions1.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.id", conditions1.get(0));
-                assertConditionEquals(ClauseType.OR, Column.class, "a.id", Operator.IN, ConstantListOperand.class, List.of("1", "2"), conditions1.get(1));
+                assertConditionEquals(ClauseType.OR, Column.class, "a.id", Operator.IN, ConstantList.class, List.of("1", "2"), conditions1.get(1));
                 final var conditions2 = joins.get(2).getConditions();
                 assertEquals(2, conditions2.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.LIKE, Column.class, "b.id", conditions2.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "d.id", Operator.IS_NOT, ConstantOperand.class, "null", conditions2.get(1));
+                assertConditionEquals(ClauseType.AND, Column.class, "d.id", Operator.IS_NOT, Constant.class, "null", conditions2.get(1));
             }
 
             @Test
@@ -234,11 +234,11 @@ public class JoinParserIT extends AbstractSpringParserTest {
                 final var conditions = joins.get(0).getConditions();
                 assertEquals(2, conditions.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.a_id", conditions.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "b.date", Operator.GREATER_THAN, ConstantOperand.class, "'2023-01-01'", conditions.get(1));
+                assertConditionEquals(ClauseType.AND, Column.class, "b.date", Operator.GREATER_THAN, Constant.class, "'2023-01-01'", conditions.get(1));
                 final var conditions1 = joins.get(1).getConditions();
                 assertEquals(3, conditions1.size());
                 assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.b_id", conditions1.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "c.status", Operator.EQUALS, ConstantOperand.class, "'pending'", conditions1.get(1));
+                assertConditionEquals(ClauseType.AND, Column.class, "c.status", Operator.EQUALS, Constant.class, "'pending'", conditions1.get(1));
                 assertConditionEquals(ClauseType.AND, Column.class, "c.id", Operator.IN, Query.class, nested, conditions1.get(2));
             }
         }

@@ -43,14 +43,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     lex = getFunctionSignature(pair.getFirst(), lex, nextLex);
                     pair.reset();
                 }
-                pair.push(lex);
-                continue;
-            }
-
-            if (!StringUtils.hasText(pair.getFirst())) {
+            } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {
-                    fragment = new ConstantOperand(lex);
-                    continue;
+                    fragment = new Constant(lex);
                 } else if (this instanceof ParsingSource) {
                     fragment = new Table();
                 } else {
@@ -99,6 +94,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     }
 
     private boolean isConstantNumber(String fragment) {
-        return fragment.matches("\\d+");
+        return fragment.matches("^-?\\d+(\\.\\d+)?$");
     }
 }

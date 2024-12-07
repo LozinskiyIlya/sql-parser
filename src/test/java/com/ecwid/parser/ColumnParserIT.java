@@ -1,10 +1,12 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Column;
+import com.ecwid.parser.fragment.Constant;
 import com.ecwid.parser.fragment.Query;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
+import java.io.IOException;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -119,7 +121,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
     class NestedQuery {
 
         @Test
-        @DisplayName("one own column")
+        @DisplayName("one nested column")
         void nestedQuery() throws Exception {
             final var nested = "SELECT a FROM table";
             final var sql = "SELECT (%s) FROM table;".formatted(nested);
@@ -146,24 +148,159 @@ public class ColumnParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
             assertFragmentEquals(Query.class, nested, "t", parsed.getColumns().getFirst());
+            final var nestedQuery = (Query) parsed.getColumns().getFirst();
+            assertEquals(1, nestedQuery.getColumns().size());
+            assertFragmentEquals(Column.class, "a", null, nestedQuery.getColumns().getFirst());
         }
 
         @Test
-        @DisplayName("multiple own columns")
-        void nestedQueryWithMultipleColumns() throws Exception {
-
+        @DisplayName("multiple nested columns")
+        void nestedQueryWithMultipleNestedColumns() throws Exception {
+            final var nested = "SELECT a, b FROM table";
+            final var sql = "SELECT (%s) FROM table;".formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getColumns().size());
+            assertFragmentEquals(Query.class, nested, null, parsed.getColumns().getFirst());
+            final var nestedQuery = (Query) parsed.getColumns().getFirst();
+            assertEquals(2, nestedQuery.getColumns().size());
+            assertFragmentEquals(Column.class, "a", null, nestedQuery.getColumns().get(0));
+            assertFragmentEquals(Column.class, "b", null, nestedQuery.getColumns().get(1));
         }
 
         @Test
-        @DisplayName("multiple own columns their alias and own alias")
+        @DisplayName("multiple nested columns their alias and own alias")
         void nestedQueryWithMultipleColumnsAndAlias() throws Exception {
-
+            final var nested = "SELECT a b, c d FROM table";
+            final var sql = "SELECT (%s) AS T FROM table;".formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getColumns().size());
+            assertFragmentEquals(Query.class, nested, "t", parsed.getColumns().getFirst());
+            final var nestedQuery = (Query) parsed.getColumns().getFirst();
+            assertEquals(2, nestedQuery.getColumns().size());
+            assertFragmentEquals(Column.class, "a", "b", nestedQuery.getColumns().get(0));
+            assertFragmentEquals(Column.class, "c", "d", nestedQuery.getColumns().get(1));
         }
 
         @Test
         @DisplayName("several nested queries and column names")
         void severalNestedQueries() throws Exception {
+            final var nested1 = "SELECT a b, c d FROM table";
+            final var nested2 = "SELECT e, f FROM table";
+            final var sql = "SELECT x, (%s) AS T, (%s), y FROM table;".formatted(nested1, nested2);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(4, parsed.getColumns().size());
+            assertFragmentEquals(Column.class, "x", null, parsed.getColumns().get(0));
+            assertFragmentEquals(Query.class, nested1, "t", parsed.getColumns().get(1));
 
+            final var nestedQuery1 = (Query) parsed.getColumns().get(1);
+            assertEquals(2, nestedQuery1.getColumns().size());
+            assertFragmentEquals(Column.class, "a", "b", nestedQuery1.getColumns().get(0));
+            assertFragmentEquals(Column.class, "c", "d", nestedQuery1.getColumns().get(1));
+
+            assertFragmentEquals(Query.class, nested2, null, parsed.getColumns().get(2));
+
+            final var nestedQuery2 = (Query) parsed.getColumns().get(2);
+            assertEquals(2, nestedQuery2.getColumns().size());
+            assertFragmentEquals(Column.class, "e", null, nestedQuery2.getColumns().get(0));
+            assertFragmentEquals(Column.class, "f", null, nestedQuery2.getColumns().get(1));
+
+            assertFragmentEquals(Column.class, "y", null, parsed.getColumns().get(3));
         }
+
+        @Test
+        @DisplayName("2 levels of nested queries")
+        void twoLevelsOfNestedQueries() throws Exception {
+            final var nested1 = "SELECT a b, c d FROM table";
+            final var nested2 = "SELECT e, f FROM table";
+            final var sql = "SELECT x, (%s) AS T, (%s), y FROM table;".formatted(nested1, nested2);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(4, parsed.getColumns().size());
+            assertFragmentEquals(Column.class, "x", null, parsed.getColumns().get(0));
+            assertFragmentEquals(Query.class, nested1, "t", parsed.getColumns().get(1));
+            assertFragmentEquals(Query.class, nested2, null, parsed.getColumns().get(2));
+            assertFragmentEquals(Column.class, "y", null, parsed.getColumns().get(3));
+            final var nestedQuery1 = (Query) parsed.getColumns().get(1);
+            assertEquals(2, nestedQuery1.getColumns().size());
+            assertFragmentEquals(Column.class, "a", "b", nestedQuery1.getColumns().get(0));
+            assertFragmentEquals(Column.class, "c", "d", nestedQuery1.getColumns().get(1));
+            final var nestedQuery2 = (Query) parsed.getColumns().get(2);
+            assertEquals(2, nestedQuery2.getColumns().size());
+            assertFragmentEquals(Column.class, "e", null, nestedQuery2.getColumns().get(0));
+            assertFragmentEquals(Column.class, "f", null, nestedQuery2.getColumns().get(1));
+        }
+    }
+
+    @Nested
+    @DisplayName("constant with")
+    class ConstantCol {
+
+        @Test
+        @DisplayName("alias")
+        void constantWithAlias() throws Exception {
+            final var sql = "SELECT 1 a FROM table;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getColumns().size());
+            assertFragmentEquals(Constant.class, "1", "a", parsed.getColumns().getFirst());
+        }
+
+        @Test
+        @DisplayName("as alias")
+        void constantAsAlias() throws Exception {
+            final var sql = "SELECT 1 AS a FROM table;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getColumns().size());
+            assertFragmentEquals(Constant.class, "1", "a", parsed.getColumns().getFirst());
+        }
+
+        @Test
+        @DisplayName("other columns")
+        void constantWithOtherColumns() throws Exception {
+            final var sql = "SELECT 1, a, 2 as b, c FROM table;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(4, parsed.getColumns().size());
+            assertFragmentEquals(Constant.class, "1", null, parsed.getColumns().get(0));
+            assertFragmentEquals(Column.class, "a", null, parsed.getColumns().get(1));
+            assertFragmentEquals(Constant.class, "2", "b", parsed.getColumns().get(2));
+            assertFragmentEquals(Column.class, "c", null, parsed.getColumns().get(3));
+        }
+
+
+        @TestFactory
+        @DisplayName("various constant types")
+        Stream<DynamicTest> variousConstants() {
+            return Stream.of(1, 1.0, -1, -1.0, "'a'", "'a;();.,b'")
+                    .map(it -> DynamicTest.dynamicTest("type:" + it, () -> {
+                        final var sql = "SELECT %s AS t FROM table;".formatted(it);
+                        final var parsed = sqlParser.parse(sql);
+                        assertEquals(1, parsed.getColumns().size());
+                        assertFragmentEquals(Constant.class, String.valueOf(it), "t", parsed.getColumns().getFirst());
+                    }));
+        }
+    }
+
+    @Test
+    void withAllThatBeauty() throws IOException {
+        final var nested1 = "SELECT a b, '1' c, 2 d, count(a.id) e FROM table";
+        final var nested2 = "SELECT f g, 2, max(h), (%s), max(g) FROM table".formatted(nested1);
+        final var sql = "SELECT x, (%s), (%s) t, y z FROM table;".formatted(nested1, nested2);
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(4, parsed.getColumns().size());
+        assertFragmentEquals(Column.class, "x", null, parsed.getColumns().get(0));
+        assertFragmentEquals(Query.class, nested1, null, parsed.getColumns().get(1));
+        assertFragmentEquals(Query.class, nested2, "t", parsed.getColumns().get(2));
+        assertFragmentEquals(Column.class, "y", "z", parsed.getColumns().get(3));
+        final var nestedQuery1 = (Query) parsed.getColumns().get(1);
+        assertEquals(4, nestedQuery1.getColumns().size());
+        assertFragmentEquals(Column.class, "a", "b", nestedQuery1.getColumns().get(0));
+        assertFragmentEquals(Constant.class, "'1'", "c", nestedQuery1.getColumns().get(1));
+        assertFragmentEquals(Constant.class, "2", "d", nestedQuery1.getColumns().get(2));
+        assertFragmentEquals(Column.class, "count(a.id)", "e", nestedQuery1.getColumns().get(3));
+        final var nestedQuery2 = (Query) parsed.getColumns().get(2);
+        assertEquals(5, nestedQuery2.getColumns().size());
+        assertFragmentEquals(Column.class, "f", "g", nestedQuery2.getColumns().get(0));
+        assertFragmentEquals(Constant.class, "2", null, nestedQuery2.getColumns().get(1));
+        assertFragmentEquals(Column.class, "max(h)", null, nestedQuery2.getColumns().get(2));
+        assertFragmentEquals(Query.class, nested1, null, nestedQuery2.getColumns().get(3));
+        assertFragmentEquals(Column.class, "max(g)", null, nestedQuery2.getColumns().get(4));
     }
 }

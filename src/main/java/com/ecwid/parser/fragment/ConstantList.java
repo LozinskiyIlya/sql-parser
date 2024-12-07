@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Data
-public class ConstantListOperand implements Fragment {
+public class ConstantList implements Fragment {
     private List<String> values = new LinkedList<>();
 
     @Override

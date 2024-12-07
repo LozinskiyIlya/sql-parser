@@ -1,8 +1,8 @@
 package com.ecwid.parser;
 
 import com.ecwid.parser.fragment.Condition;
-import com.ecwid.parser.fragment.ConstantListOperand;
-import com.ecwid.parser.fragment.ConstantOperand;
+import com.ecwid.parser.fragment.ConstantList;
+import com.ecwid.parser.fragment.Constant;
 import com.ecwid.parser.fragment.Column;
 import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.*;
@@ -30,7 +30,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", LESS_THAN, ConstantOperand.class, "1", clause);
+            assertConditionEquals(WHERE, Column.class, "id", LESS_THAN, Constant.class, "1", clause);
         }
 
         @Test
@@ -40,7 +40,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(HAVING, Column.class, "id", GREATER_THAN_OR_EQUALS, ConstantOperand.class, "1", clause);
+            assertConditionEquals(HAVING, Column.class, "id", GREATER_THAN_OR_EQUALS, Constant.class, "1", clause);
         }
 
         @Test
@@ -50,7 +50,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "'special;chars(,)in.string'", clause);
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "'special;chars(,)in.string'", clause);
         }
 
         @Test
@@ -60,7 +60,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(HAVING, Column.class, "COUNT(*)", GREATER_THAN, ConstantOperand.class, "10", clause);
+            assertConditionEquals(HAVING, Column.class, "COUNT(*)", GREATER_THAN, Constant.class, "10", clause);
         }
     }
 
@@ -74,7 +74,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", IN, ConstantListOperand.class, List.of("'1'", "'2'", "'3'"), clause);
+            assertConditionEquals(WHERE, Column.class, "id", IN, ConstantList.class, List.of("'1'", "'2'", "'3'"), clause);
         }
 
         @Test
@@ -84,7 +84,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", IN, ConstantListOperand.class, List.of("1", "2", "3"), clause);
+            assertConditionEquals(WHERE, Column.class, "id", IN, ConstantList.class, List.of("1", "2", "3"), clause);
         }
     }
 
@@ -124,7 +124,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var nestedClause = (Query) clause.getRightOperand();
             assertEquals(1, nestedClause.getFilters().size());
             final var nestedWhere = nestedClause.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "'a'", nestedWhere);
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "'a'", nestedWhere);
         }
 
         @Test
@@ -142,7 +142,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var firstClause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Column.class, "id", IN, Query.class, nested, firstClause);
             final var secondClause = parsed.getFilters().getLast();
-            assertConditionEquals(OR, Column.class, "id", EQUALS, ConstantOperand.class, "2", secondClause);
+            assertConditionEquals(OR, Column.class, "id", EQUALS, Constant.class, "2", secondClause);
         }
 
         @Test
@@ -158,7 +158,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(2, parsed.getFilters().size());
             final var firstClause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", EQUALS, ConstantOperand.class, "2", firstClause);
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "2", firstClause);
             final var secondClause = parsed.getFilters().getLast();
             assertConditionEquals(AND, Column.class, "id", IN, Query.class, nested, secondClause);
         }
@@ -175,7 +175,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, ConstantOperand.class, "3", clause);
+            assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, Constant.class, "3", clause);
         }
 
         @Test
@@ -241,7 +241,7 @@ public class ClauseParserIT extends AbstractSpringParserTest {
     Stream<DynamicTest> variousOperators() {
         return Arrays.stream(Condition.Operator.values()).map(operator -> {
             final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
-            final var rightType = operator.equals(Condition.Operator.IN) ? ConstantListOperand.class : ConstantOperand.class;
+            final var rightType = operator.equals(Condition.Operator.IN) ? ConstantList.class : Constant.class;
             final var rightValue = operator.equals(Condition.Operator.IN) ? List.of("1") : "1";
             return DynamicTest.dynamicTest(operator.name(), () -> {
                 final var parsed = sqlParser.parse(sql);

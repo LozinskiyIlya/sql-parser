@@ -2,10 +2,12 @@ package com.ecwid.parser.service;
 
 import com.ecwid.parser.AbstractSpringParserTest;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.DynamicTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -38,17 +40,22 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("has open bracket", "a(b", List.of("a", "(", "b")),
                 new TestCase("is close bracket", ")", List.of(")")),
                 new TestCase("has close bracket", "a)b", List.of("a", ")", "b")),
-                new TestCase("has open and close brackets", "count(*) b, a", List.of("count","(", "*", ")", "b", ",", "a")),
+                new TestCase("has open and close brackets", "count(*) b, a", List.of("count", "(", "*", ")", "b", ",", "a")),
                 new TestCase("is a list of values", "a b c", List.of("a", "b", "c")),
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),
                 new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'")),
                 new TestCase("is a list of mixed values", "a, (a, 'b', c(a.d), e), 'e'",
                         List.of("a", ",", "(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")", ",", "'e'"))
-                ).map(testCase -> DynamicTest.dynamicTest(
+        ).map(testCase -> DynamicTest.dynamicTest(
                 "when input " + testCase.displayName(),
                 () -> assertInputProduces(testCase.input(), testCase.expected())
         ));
+    }
+
+    @Test
+    @DisplayName("all that beauty")
+    void withAllThatBeauty() {
     }
 
     private void assertInputProduces(String input, List<String> expected) {
@@ -61,8 +68,5 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
         }
 
         assertEquals(expected, lexemes);
-    }
-
-    private record TestCase(String displayName, String input, List<String> expected) {
     }
 }

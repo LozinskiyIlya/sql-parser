@@ -35,7 +35,7 @@ public class ParserApplicationConfig {
         sectionCrawlerMap.put(LEX_FULL, joinCrawler);
         sectionCrawlerMap.put(LEX_CROSS, joinCrawler);
         sectionCrawlerMap.put(LEX_NATURAL, joinCrawler);
-        sectionCrawlerMap.put(LEX_ON, getByClass(JoinConditionCrawler.class));
+        sectionCrawlerMap.put(LEX_ON, getByClass(OnCrawler.class));
 
         final var whereCrawler = getByClass(WhereCrawler.class);
         sectionCrawlerMap.put(LEX_WHERE, whereCrawler);

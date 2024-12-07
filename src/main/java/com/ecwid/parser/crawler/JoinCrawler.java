@@ -36,21 +36,21 @@ public class JoinCrawler extends FragmentCrawler {
         return crawlForJoinType(join, currentSection, nextLex);
     }
 
-    private String crawlForJoinType(Join join, String joinFirstLexeme, Supplier<String> fragments) {
+    private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {
         final var joinTypeParts = new LinkedList<String>();
-        joinTypeParts.add(joinFirstLexeme);
-        final var nextFragment = crawlUntilAndReturnNext(
-                fragment -> {
+        joinTypeParts.add(joinFirstLex);
+        final var lexAfterJoin = crawlUntilAndReturnNext(
+                lex -> {
                     if (joinTypeParts.contains(LEX_JOIN)) {
                         return true;
                     }
-                    joinTypeParts.add(fragment);
+                    joinTypeParts.add(lex);
                     return false;
                 },
-                fragment -> {
+                lex -> {
                 },
-                fragments);
+                nextLex);
         join.setType(joinTypeFullLexemes.get(String.join(LEX_SPACE, joinTypeParts)));
-        return nextFragment;
+        return lexAfterJoin;
     }
 }

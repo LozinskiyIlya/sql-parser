@@ -17,8 +17,8 @@ import static com.ecwid.parser.fragment.Condition.Operator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-@DisplayName("When clause include")
-public class ClauseParserIT extends AbstractSpringParserTest {
+@DisplayName("When conditions include")
+public class ConditionParserIT extends AbstractSpringParserTest {
 
     @Nested
     @DisplayName("basic clause")
@@ -241,13 +241,11 @@ public class ClauseParserIT extends AbstractSpringParserTest {
     Stream<DynamicTest> variousOperators() {
         return Arrays.stream(Condition.Operator.values()).map(operator -> {
             final var sql = "SELECT * FROM table WHERE id " + operator.getFullLexeme() + " 1;";
-            final var rightType = operator.equals(Condition.Operator.IN) ? ConstantList.class : Constant.class;
-            final var rightValue = operator.equals(Condition.Operator.IN) ? List.of("1") : "1";
             return DynamicTest.dynamicTest(operator.name(), () -> {
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(1, parsed.getFilters().size());
                 final var clause = parsed.getFilters().getFirst();
-                assertConditionEquals(WHERE, Column.class, "id", operator, rightType, rightValue, clause);
+                assertConditionEquals(WHERE, Column.class, "id", operator, Constant.class, "1", clause);
             });
         });
     }

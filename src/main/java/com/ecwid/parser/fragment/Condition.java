@@ -2,9 +2,7 @@ package com.ecwid.parser.fragment;
 
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.MultiLex;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,12 +14,14 @@ import static com.ecwid.parser.Lexemes.*;
 @RequiredArgsConstructor
 public class Condition {
 
+    @Setter(AccessLevel.NONE)
     private Fragment leftOperand;
+    @Setter(AccessLevel.NONE)
     private Fragment rightOperand;
     private Operator operator;
     private final ClauseType clauseType;
 
-    public void setNextOperand(Fragment operand) {
+    public void addOperand(Fragment operand) {
         if (leftOperand == null) {
             leftOperand = operand;
         } else {

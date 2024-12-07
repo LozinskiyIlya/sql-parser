@@ -17,27 +17,27 @@ public abstract class SectionAwareCrawler implements Crawler {
     private Map<String, Crawler> sectionAgainstCrawler;
 
     @Override
-    public final void delegate(Query query, String currentSection, Supplier<String> fragments) {
-        Crawler.super.delegate(query, currentSection, fragments);
+    public final void delegate(Query query, String currentSection, Supplier<String> nextLex) {
+        Crawler.super.delegate(query, currentSection, nextLex);
     }
 
     @Override
-    public final Optional<Crawler> nextCrawler(String currentSection) {
+    public Optional<Crawler> nextCrawler(String currentSection) {
         return Optional.ofNullable(sectionAgainstCrawler.get(currentSection));
     }
 
-    protected final boolean shouldDelegate(String nextFragment) {
-        return sectionAgainstCrawler.containsKey(nextFragment);
+    protected boolean shouldDelegate(String nextSection) {
+        return sectionAgainstCrawler.containsKey(nextSection);
     }
 
-    protected final String crawlUntilAndReturnNext(Predicate<String> fragmentIs, Consumer<String> andDoAction, Supplier<String> fragments) {
-        String fragment;
-        while ((fragment = fragments.get()) != null) {
-            if (fragmentIs.test(fragment)) {
+    protected final String crawlUntilAndReturnNext(Predicate<String> lexIs, Consumer<String> andDoAction, Supplier<String> nextLex) {
+        String lex;
+        while ((lex = nextLex.get()) != null) {
+            if (lexIs.test(lex)) {
                 break;
             }
-            andDoAction.accept(fragment);
+            andDoAction.accept(lex);
         }
-        return fragment;
+        return lex;
     }
 }

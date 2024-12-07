@@ -12,11 +12,16 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
-    protected abstract void processFragment(Query query, Fragment fragment);
 
     protected abstract String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
 
+    protected abstract void processFragment(Query query, Fragment fragment);
+
     protected boolean crawlsForSources() {
+        return false;
+    }
+
+    protected boolean crawlOnce() {
         return false;
     }
 
@@ -25,6 +30,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         Fragment fragment = null;
         var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
         final var pair = new NameAliasPair();
+        if (lex == null) {
+            return;
+        }
         do {
             if (SKIP_LEX.contains(lex)) {
                 continue;
@@ -37,11 +45,13 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 break;
             }
             if (LEX_OPEN_BRACKET.equals(lex)) {
-                // either a function argument or a sub query select or a list of values
                 lex = nextLex.get();
                 if (LEX_SELECT.equals(lex)) {
                     fragment = new Query();
                     nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex);
+                } else if (isConstant(lex)) {
+                    fragment = new ConstantList();
+                    lex = crawlForList((ConstantList) fragment, lex, nextLex);
                 } else {
                     fragment = new Column();
                     lex = getFunctionSignature(pair.getFirst(), lex, nextLex);
@@ -59,6 +69,10 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
 
             pair.push(lex);
 
+            if (crawlOnce()) {
+                flush(query, fragment, pair);
+                return;
+            }
         } while ((lex = nextLex.get()) != null && !shouldDelegate(lex));
 
         flush(query, fragment, pair);
@@ -76,13 +90,27 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         pair.reset();
     }
 
-    private String getFunctionSignature(String functionName, String firstArg, Supplier<String> fragments) {
+    private String getFunctionSignature(String functionName, String firstArg, Supplier<String> nextLex) {
         final var functionBuilder = new StringBuilder(functionName);
         functionBuilder.append(LEX_OPEN_BRACKET);
         functionBuilder.append(firstArg);
-        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, fragments);
+        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextLex);
         functionBuilder.append(LEX_CLOSE_BRACKET);
         return functionBuilder.toString();
+    }
+
+    private String crawlForList(ConstantList list, String firstItem, Supplier<String> nextLex) {
+        final var values = list.getValues();
+        values.add(firstItem);
+        return crawlUntilAndReturnNext(
+                LEX_CLOSE_BRACKET::equals,
+                lex -> {
+                    if (LEX_COMMA.equals(lex)) {
+                        return;
+                    }
+                    values.add(lex);
+                },
+                nextLex);
     }
 
     private boolean isConstant(String fragment) {
@@ -101,5 +129,5 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         return fragment.matches("^-?\\d+(\\.\\d+)?$");
     }
 
-    private static final List<String> SKIP_LEX = List.of(LEX_AS, LEX_ROWS);
+    private static final List<String> SKIP_LEX = List.of(LEX_AS, LEX_ROWS, LEX_SEMICOLON);
 }

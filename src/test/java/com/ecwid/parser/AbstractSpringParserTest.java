@@ -63,9 +63,9 @@ public abstract class AbstractSpringParserTest {
         if (actual instanceof Query && StringUtils.hasText(((Query) actual).getAlias())) {
             value += LEX_SPACE + ((Query) actual).getAlias();
         }
-        assertEquals(value, actual.getValue());
+        assertEquals(value, actual.getValue(), actual.getClass().getSimpleName() + " value mismatch");
         if (value instanceof List) {
-            assertEquals(type, actual.getClass());
+            assertEquals(type, actual.getClass(), "Fragment type mismatch");
             return;
         }
         assertAliasableEquals((Aliasable) actual, (Class<? extends Aliasable>) type, alias);
@@ -73,12 +73,12 @@ public abstract class AbstractSpringParserTest {
 
     protected void assertNameableEquals(Nameable nameable, Class<? extends Nameable> type, String name, String alias) {
         assertAliasableEquals(nameable, type, alias);
-        assertEquals(name, nameable.getName());
+        assertEquals(name, nameable.getName(), "Name mismatch");
     }
 
     protected void assertAliasableEquals(Aliasable aliasable, Class<? extends Aliasable> type, String alias) {
-        assertEquals(type, aliasable.getClass());
-        assertEquals(alias, aliasable.getAlias());
+        assertEquals(type, aliasable.getClass(), "Aliasable type mismatch");
+        assertEquals(alias, aliasable.getAlias(), "Alias mismatch");
     }
 
     public record TestCase(String displayName, String input, List<String> expected) {

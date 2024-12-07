@@ -38,11 +38,7 @@ public class SqlParser {
             throw new IllegalStateException("Query should start with SELECT keyword");
         }
         final var query = new Query();
-        firstCrawler.crawl(query, section, () -> {
-                    final var lex = lexemeReader.nextLex(reader);
-                    return LEX_SEMICOLON.equals(lex) ? null : lex;
-                }
-        );
+        firstCrawler.crawl(query, section, () -> lexemeReader.nextLex(reader));
         return query;
     }
 

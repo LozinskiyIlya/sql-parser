@@ -237,7 +237,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("alias")
         void constantWithAlias() throws Exception {
-            final var sql = "SELECT 1 a FROM table;";
+            final var sql = "SELECT 1 a FROM table";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getColumns().size());
             assertFragmentEquals(Constant.class, "1", "a", parsed.getColumns().getFirst());

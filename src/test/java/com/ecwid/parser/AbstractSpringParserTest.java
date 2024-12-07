@@ -30,7 +30,6 @@ public abstract class AbstractSpringParserTest {
     protected SqlParser sqlParser;
 
     @Test
-    @DisplayName("all that beauty")
     void withAllThatBeauty() throws IOException {
         throw new UnsupportedOperationException("Implement all possible cases test for: " + this.getClass().getSimpleName());
     }

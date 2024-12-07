@@ -122,43 +122,38 @@ public class SourceParserIT extends AbstractSpringParserTest {
             assertSourceEquals(Query.class, nested, null, parsed.getSources().get(1));
             assertSourceEquals(Table.class, "b", null, parsed.getSources().get(2));
         }
+    }
 
-        @Test
-        @DisplayName("mixed sources and multiple level nesting")
-        void mixedSources() throws IOException {
-            final var sql = """
-                    SELECT * FROM a, b as c, d,
-                        (SELECT * FROM
-                                (SELECT * FROM e) AS f, g
-                        ) h, i j, k as l,
-                        (SELECT * FROM m) as n, o;
-                    """;
-            final var parsed = sqlParser.parse(sql);
-            assertEquals(8, parsed.getSources().size());
-            assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
-            assertSourceEquals(Table.class, "b", "c", parsed.getSources().get(1));
-            assertSourceEquals(Table.class, "d", null, parsed.getSources().get(2));
-            assertSourceIsQuery("h", parsed.getSources().get(3));
-
-            final var nestedFirst = (Query) parsed.getSources().get(3);
-            assertEquals(2, nestedFirst.getSources().size());
-            assertSourceIsQuery("f", nestedFirst.getSources().getFirst());
-            assertSourceEquals(Table.class, "g", null, nestedFirst.getSources().getLast());
-
-            final var nestedNested = (Query) nestedFirst.getSources().getFirst();
-            assertEquals(1, nestedNested.getSources().size());
-            assertSourceEquals(Table.class, "e", null, nestedNested.getSources().getFirst());
-
-            assertSourceEquals(Table.class, "i", "j", parsed.getSources().get(4));
-            assertSourceEquals(Table.class, "k", "l", parsed.getSources().get(5));
-            assertSourceIsQuery("n", parsed.getSources().get(6));
-
-            final var nestedSecond = (Query) parsed.getSources().get(6);
-            assertEquals(1, nestedSecond.getSources().size());
-            assertSourceEquals(Table.class, "m", null, nestedSecond.getSources().getFirst());
-
-            assertSourceEquals(Table.class, "o", null, parsed.getSources().get(7));
-        }
+    @Test
+    @DisplayName("all that beauty")
+    void withAllThatBeauty() throws IOException {
+        final var sql = """
+                SELECT * FROM a, b as c, d,
+                    (SELECT * FROM
+                            (SELECT * FROM e) AS f, g
+                    ) h, i j, k as l,
+                    (SELECT * FROM m) as n, o;
+                """;
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(8, parsed.getSources().size());
+        assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
+        assertSourceEquals(Table.class, "b", "c", parsed.getSources().get(1));
+        assertSourceEquals(Table.class, "d", null, parsed.getSources().get(2));
+        assertSourceIsQuery("h", parsed.getSources().get(3));
+        final var nestedFirst = (Query) parsed.getSources().get(3);
+        assertEquals(2, nestedFirst.getSources().size());
+        assertSourceIsQuery("f", nestedFirst.getSources().getFirst());
+        assertSourceEquals(Table.class, "g", null, nestedFirst.getSources().getLast());
+        final var nestedNested = (Query) nestedFirst.getSources().getFirst();
+        assertEquals(1, nestedNested.getSources().size());
+        assertSourceEquals(Table.class, "e", null, nestedNested.getSources().getFirst());
+        assertSourceEquals(Table.class, "i", "j", parsed.getSources().get(4));
+        assertSourceEquals(Table.class, "k", "l", parsed.getSources().get(5));
+        assertSourceIsQuery("n", parsed.getSources().get(6));
+        final var nestedSecond = (Query) parsed.getSources().get(6);
+        assertEquals(1, nestedSecond.getSources().size());
+        assertSourceEquals(Table.class, "m", null, nestedSecond.getSources().getFirst());
+        assertSourceEquals(Table.class, "o", null, parsed.getSources().get(7));
     }
 
     private void assertSourceEquals(Class<? extends Source> expectedClass, String expectedVal, String expectedAlias, Source actual) {

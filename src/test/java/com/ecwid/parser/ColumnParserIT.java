@@ -279,6 +279,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
     }
 
     @Test
+    @DisplayName("all that beauty")
     void withAllThatBeauty() throws IOException {
         final var nested1 = "SELECT a b, '1' c, 2 d, count(a.id) e FROM table";
         final var nested2 = "SELECT f g, 2, max(h), (%s), max(g) FROM table".formatted(nested1);

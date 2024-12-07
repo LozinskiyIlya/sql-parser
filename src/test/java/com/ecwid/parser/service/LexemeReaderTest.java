@@ -15,13 +15,14 @@ import java.util.stream.Stream;
 import static com.ecwid.parser.service.SqlParser.readerFromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayName("Should extract lexemes")
 public class LexemeReaderTest extends AbstractSpringParserTest {
 
     @Autowired
     private LexemeReader lexemeReader;
 
     @TestFactory
-    @DisplayName("Should extract lexemes")
+    @DisplayName("when input")
     Stream<DynamicTest> shouldHandleVariousInputs() {
         return Stream.of(
                 new TestCase("is empty", "", List.of()),
@@ -44,18 +45,19 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("is a list of values", "a b c", List.of("a", "b", "c")),
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),
-                new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'")),
-                new TestCase("is a list of mixed values", "a, (a, 'b', c(a.d), e), 'e'",
-                        List.of("a", ",", "(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")", ",", "'e'"))
+                new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'"))
         ).map(testCase -> DynamicTest.dynamicTest(
-                "when input " + testCase.displayName(),
+                testCase.displayName(),
                 () -> assertInputProduces(testCase.input(), testCase.expected())
         ));
     }
 
     @Test
-    @DisplayName("all that beauty")
+    @DisplayName("has all that beauty")
     void withAllThatBeauty() {
+        final var complexInputWithAllCases = "a, (a, 'b', c(a.d), e), 'e'";
+        final var expected = List.of("a", ",", "(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")", ",", "'e'");
+        assertInputProduces(complexInputWithAllCases, expected);
     }
 
     private void assertInputProduces(String input, List<String> expected) {

@@ -4,25 +4,23 @@ import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Nameable;
-import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-@RequiredArgsConstructor
 public abstract class FragmentCrawler extends SectionAwareCrawler {
-
-    protected final BiConsumer<Query, Fragment> onFragment;
-
-    protected abstract String crawlClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
+    protected abstract void addFragmentToQuery(Query query, Fragment fragment);
+    protected abstract String addClauseToQueryAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
+    protected boolean isCrawlingForSources() {
+        return false;
+    }
 
     @Override
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;
-        var lex = crawlClauseAndReturnNextLex(query, currentSection, nextLex);
+        var lex = addClauseToQueryAndReturnNextLex(query, currentSection, nextLex);
         final var pair = new NameAliasPair();
         do {
             if (LEX_COMMA.equals(lex)) {
@@ -46,7 +44,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {
                     fragment = new Constant(lex);
-                } else if (this instanceof ParsingSource) {
+                } else if (isCrawlingForSources()) {
                     fragment = new Table();
                 } else {
                     fragment = new Column();
@@ -68,7 +66,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         if (fragment instanceof Aliasable) {
             ((Aliasable) fragment).setAlias(pair.getSecond());
         }
-        onFragment.accept(query, fragment);
+        addFragmentToQuery(query, fragment);
         pair.reset();
     }
 

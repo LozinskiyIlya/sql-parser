@@ -36,6 +36,7 @@ public class Lexemes {
     public static final String LEX_FIRST = "first";
     public static final String LEX_LIMIT = "limit";
     public static final String LEX_OFFSET = "offset";
+    public static final String LEX_ROWS = "rows";
     public static final String LEX_COUNT = "count";
     public static final String LEX_SUM = "sum";
     public static final String LEX_AVG = "avg";

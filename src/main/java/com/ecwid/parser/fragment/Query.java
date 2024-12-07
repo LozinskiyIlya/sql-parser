@@ -10,18 +10,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.ecwid.parser.Lexemes.*;
-import static java.util.stream.Collectors.toList;
 
 @Data
 public class Query implements Source {
+    private static final int LIMIT_ALL = -1;
+    private static final int NO_OFFSET = 0;
+
     private List<Fragment> columns = new LinkedList<>();
     private List<Source> sources = new LinkedList<>();
     private List<Join> joins = new LinkedList<>();
     private List<Condition> filters = new LinkedList<>();
     private List<Column> groupings = new LinkedList<>();
     private List<Sort> sorts = new LinkedList<>();
-    private Integer limit;
-    private Integer offset;
+    private Integer limit = LIMIT_ALL;
+    private Integer offset = NO_OFFSET;
     private String alias;
 
     @Override
@@ -45,11 +47,11 @@ public class Query implements Source {
             // joins
             // groupings
             // sorts
-            if (query.limit != null) {
+            if (query.limit != LIMIT_ALL) {
                 builder.add(LEX_LIMIT);
                 builder.add(query.limit.toString());
             }
-            if (query.offset != null) {
+            if (query.offset != NO_OFFSET) {
                 builder.add(LEX_OFFSET);
                 builder.add(query.offset.toString());
             }

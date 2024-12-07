@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler.base;
 
 import com.ecwid.parser.fragment.Query;
 import lombok.extern.slf4j.Slf4j;

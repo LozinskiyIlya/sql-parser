@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.crawler.base.SectionAwareCrawler;
 import com.ecwid.parser.fragment.Condition;
 import com.ecwid.parser.fragment.ConstantList;
 import com.ecwid.parser.fragment.Constant;

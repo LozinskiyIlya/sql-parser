@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler.base;
 
 import com.ecwid.parser.fragment.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-abstract class SectionAwareCrawler implements Crawler {
+public abstract class SectionAwareCrawler implements Crawler {
 
     @Lazy
     @Autowired

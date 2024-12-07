@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.crawler.base.SectionAwareCrawler;
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.NameAliasPair;
 import com.ecwid.parser.fragment.Query;

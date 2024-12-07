@@ -1,4 +1,4 @@
-package com.ecwid.parser.crawler;
+package com.ecwid.parser.crawler.base;
 
 import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.domain.Aliasable;
@@ -12,18 +12,18 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
-    protected abstract void addFragmentToQuery(Query query, Fragment fragment);
+    protected abstract void processFragment(Query query, Fragment fragment);
 
-    protected abstract String addClauseToQueryAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
+    protected abstract String processCloseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
 
-    protected boolean isCrawlingForSources() {
+    protected boolean crawlsForSources() {
         return false;
     }
 
     @Override
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;
-        var lex = addClauseToQueryAndReturnNextLex(query, currentSection, nextLex);
+        var lex = processCloseAndReturnNextLex(query, currentSection, nextLex);
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -50,7 +50,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {
                     fragment = new Constant(lex);
-                } else if (isCrawlingForSources()) {
+                } else if (crawlsForSources()) {
                     fragment = new Table();
                 } else {
                     fragment = new Column();
@@ -72,7 +72,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         if (fragment instanceof Aliasable) {
             ((Aliasable) fragment).setAlias(pair.getSecond());
         }
-        addFragmentToQuery(query, fragment);
+        processFragment(query, fragment);
         pair.reset();
     }
 

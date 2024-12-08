@@ -64,4 +64,28 @@ public class Lexemes {
             LEX_COMMA,
             LEX_SEMICOLON
     );
+
+    public static final Set<String> OPERATORS = Set.of(
+            LEX_EQUALS,
+            LEX_NOT_EQUALS,
+            LEX_GREATER_THAN,
+            LEX_LESS_THAN,
+            LEX_GREATER_THAN_OR_EQUALS,
+            LEX_LESS_THAN_OR_EQUALS,
+            LEX_LIKE,
+            LEX_IN,
+            LEX_IS,
+            LEX_NOT
+    );
+
+    public static final Set<String> CONDITION_SEPARATORS = Set.of(
+            LEX_AND,
+            LEX_OR
+    );
+
+    public static final Set<String> SKIP_LEX = Set.of(
+            LEX_AS,
+            LEX_ROWS,
+            LEX_SEMICOLON
+    );
 }

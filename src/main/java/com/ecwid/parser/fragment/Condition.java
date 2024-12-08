@@ -34,18 +34,27 @@ public class Condition {
         final var builder = new LinkedList<String>();
         builder.add(clauseType.name());
         printOperand(builder, leftOperand);
-        builder.add(operator.getFullLexeme());
+        printOperator(builder);
         printOperand(builder, rightOperand);
         return String.join(LEX_SPACE, builder);
     }
 
     private static void printOperand(List<String> builder, Fragment operand) {
+        if (operand == null) {
+            return;
+        }
         if (operand instanceof Query || operand instanceof ConstantList) {
             builder.add(LEX_OPEN_BRACKET);
             builder.add(operand.toString());
             builder.add(LEX_CLOSE_BRACKET);
         } else {
             builder.add(operand.toString());
+        }
+    }
+
+    private void printOperator(List<String> builder) {
+        if (operator != null) {
+            builder.add(operator.getFullLexeme());
         }
     }
 

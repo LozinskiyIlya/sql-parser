@@ -6,7 +6,8 @@ import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Nameable;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -21,18 +22,11 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         return false;
     }
 
-    protected boolean crawlOnce() {
-        return false;
-    }
 
     @Override
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;
         var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
-        if (shouldDelegate(lex)) {
-            delegate(query, lex, nextLex);
-            return;
-        }
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -69,11 +63,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             }
 
             pair.push(lex);
-
-            if (crawlOnce()) {
-                flush(query, fragment, pair);
-                return;
-            }
         } while (!shouldDelegate(lex = nextLex.get()));
 
         flush(query, fragment, pair);
@@ -114,6 +103,17 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 nextLex);
     }
 
+    protected final String crawlUntilAndReturnNext(Predicate<String> lexIs, Consumer<String> andDoAction, Supplier<String> nextLex) {
+        String lex;
+        while ((lex = nextLex.get()) != null) {
+            if (lexIs.test(lex)) {
+                break;
+            }
+            andDoAction.accept(lex);
+        }
+        return lex;
+    }
+
     private boolean isConstant(String fragment) {
         return isQuotedString(fragment) || isConstantNumber(fragment) || isNullConstant(fragment);
     }
@@ -129,6 +129,4 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     private boolean isConstantNumber(String fragment) {
         return fragment.matches("^-?\\d+(\\.\\d+)?$");
     }
-
-    private static final List<String> SKIP_LEX = List.of(LEX_AS, LEX_ROWS, LEX_SEMICOLON);
 }

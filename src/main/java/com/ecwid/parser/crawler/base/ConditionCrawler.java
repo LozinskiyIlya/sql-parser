@@ -20,7 +20,11 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected String processClauseAndReturnNextLex(Query query, String clauseType, Supplier<String> nextLex) {
         final var condition = new Condition(Condition.ClauseType.valueOf(clauseType.toUpperCase()));
         onCondition.accept(query, condition);
-        return nextLex.get();
+        final var next = nextLex.get();
+        if (next == null) {
+            throw new IllegalStateException("Unexpected end of query after " + clauseType);
+        }
+        return next;
     }
 
     @Override

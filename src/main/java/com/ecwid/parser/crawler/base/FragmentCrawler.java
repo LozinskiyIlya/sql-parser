@@ -29,10 +29,11 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;
         var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
-        final var pair = new NameAliasPair();
-        if (lex == null) {
+        if (shouldDelegate(lex)) {
+            delegate(query, lex, nextLex);
             return;
         }
+        final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
                 continue;
@@ -73,7 +74,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 flush(query, fragment, pair);
                 return;
             }
-        } while ((lex = nextLex.get()) != null && !shouldDelegate(lex));
+        } while (!shouldDelegate(lex = nextLex.get()));
 
         flush(query, fragment, pair);
         delegate(query, lex, nextLex);

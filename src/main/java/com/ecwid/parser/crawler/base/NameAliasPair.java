@@ -1,4 +1,4 @@
-package com.ecwid.parser.fragment;
+package com.ecwid.parser.crawler.base;
 
 import lombok.Getter;
 

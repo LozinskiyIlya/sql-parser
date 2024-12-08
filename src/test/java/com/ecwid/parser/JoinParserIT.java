@@ -58,6 +58,30 @@ public class JoinParserIT extends AbstractSpringParserTest {
         }
 
         @Test
+        @DisplayName("condition in brackets")
+        void joinWithConditionInBrackets() throws Exception {
+            final var sql = "SELECT * FROM table1 JOIN table2 ON (table1.id = table2.id);";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getJoins().size());
+            final var join = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
+            final var condition = join.getConditions().getFirst();
+            assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", condition);
+        }
+
+        @Test
+        @DisplayName("condition with function in brackets")
+        void joinWithConditionWithFunctionInBrackets() throws Exception {
+            final var sql = "SELECT * FROM table1 JOIN table2 ON (count(*) <= table2.id);";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getJoins().size());
+            final var join = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
+            final var condition = join.getConditions().getFirst();
+            assertConditionEquals(ClauseType.ON, Column.class, "count(*)", Operator.LESS_THAN_OR_EQUALS, Column.class, "table2.id", condition);
+        }
+
+        @Test
         @DisplayName("multiple conditions")
         void joinWithMultipleConditions() throws Exception {
             final var sql = "SELECT * FROM table1 JOIN table2 ON table1.id1 = table2.id1 AND table1.id2 >= 2;";
@@ -185,8 +209,8 @@ public class JoinParserIT extends AbstractSpringParserTest {
                         SELECT *
                         FROM a
                         JOIN b ON a.id = b.id
-                        JOIN c ON b.id = c.id OR a.id IN (1, 2)
-                        JOIN d ON a.id LIKE b.id AND d.id IS NOT NULL;
+                        JOIN c ON b.id = c.id OR (a.id IN (1, 2))
+                        JOIN d ON (a.id LIKE b.id) AND d.id IS NOT NULL;
                         """;
                 final var parsed = sqlParser.parse(sql);
                 assertEquals(3, parsed.getJoins().size());

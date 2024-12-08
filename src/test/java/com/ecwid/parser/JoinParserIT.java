@@ -154,114 +154,6 @@ public class JoinParserIT extends AbstractSpringParserTest {
             assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.IN, Query.class, nested, conditions.getFirst());
         }
 
-        @Nested
-        @DisplayName("multiple JOINs with")
-        class MultipleJoins {
-
-            @Test
-            @DisplayName("different alias")
-            void differentJAlias() throws Exception {
-                final var sql = """
-                        SELECT *
-                        FROM a
-                        JOIN b ON a.id = b.id
-                        JOIN c d ON b.id = c.id
-                        JOIN e as f ON c.id = f.id
-                        JOIN g as h ON e.id = h.id
-                        JOIN i j ON g.id = j.id
-                        JOIN k ON j.id = k.id
-                        """;
-                final var parsed = sqlParser.parse(sql);
-                assertEquals(6, parsed.getJoins().size());
-                final var joins = parsed.getJoins();
-                assertJoinEquals(JoinType.JOIN, Table.class,"b", null, joins.get(0));
-                assertJoinEquals(JoinType.JOIN, Table.class,"c", "d", joins.get(1));
-                assertJoinEquals(JoinType.JOIN, Table.class,"e", "f", joins.get(2));
-                assertJoinEquals(JoinType.JOIN, Table.class,"g", "h", joins.get(3));
-                assertJoinEquals(JoinType.JOIN, Table.class,"i", "j", joins.get(4));
-                assertJoinEquals(JoinType.JOIN, Table.class,"k", null, joins.get(5));
-            }
-
-            @Test
-            @DisplayName("different join type")
-            void differentJoinType() throws Exception {
-                final var sql = """
-                        SELECT *
-                        FROM table1
-                        NATURAL FULL OUTER JOIN table2 ON table1.id = table2.id
-                        LEFT JOIN table3 ON table2.id = table3.id;
-                        """;
-                final var parsed = sqlParser.parse(sql);
-                assertEquals(2, parsed.getJoins().size());
-                final var firstJoin = parsed.getJoins().getFirst();
-                assertJoinEquals(JoinType.NATURAL_FULL_OUTER, Table.class,"table2", null, firstJoin);
-                assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", firstJoin.getConditions().getFirst());
-                final var secondJoin = parsed.getJoins().getLast();
-                assertJoinEquals(JoinType.LEFT, Table.class,"table3", null, secondJoin);
-                assertConditionEquals(ClauseType.ON, Column.class, "table2.id", Operator.EQUALS, Column.class, "table3.id", secondJoin.getConditions().getFirst());
-            }
-
-
-            @Test
-            @DisplayName("different conditions")
-            void differentConditions() throws Exception {
-                final var sql = """
-                        SELECT *
-                        FROM a
-                        JOIN b ON a.id = b.id
-                        JOIN c ON b.id = c.id OR (a.id IN (1, 2))
-                        JOIN d ON (a.id LIKE b.id) AND d.id IS NOT NULL;
-                        """;
-                final var parsed = sqlParser.parse(sql);
-                assertEquals(3, parsed.getJoins().size());
-                final var joins = parsed.getJoins();
-                assertJoinEquals(JoinType.JOIN, Table.class,"b", null, joins.get(0));
-                assertJoinEquals(JoinType.JOIN, Table.class,"c", null, joins.get(1));
-                assertJoinEquals(JoinType.JOIN, Table.class,"d", null, joins.get(2));
-                final var conditions = joins.get(0).getConditions();
-                assertEquals(1, conditions.size());
-                assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.id", conditions.getFirst());
-                final var conditions1 = joins.get(1).getConditions();
-                assertEquals(2, conditions1.size());
-                assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.id", conditions1.get(0));
-                assertConditionEquals(ClauseType.OR, Column.class, "a.id", Operator.IN, ConstantList.class, List.of("1", "2"), conditions1.get(1));
-                final var conditions2 = joins.get(2).getConditions();
-                assertEquals(2, conditions2.size());
-                assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.LIKE, Column.class, "b.id", conditions2.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "d.id", Operator.IS_NOT, Constant.class, "null", conditions2.get(1));
-            }
-
-            @Test
-            @DisplayName("nested queries")
-            void nestedQueries() throws IOException {
-                final var nested = "SELECT id FROM table_c WHERE status = 'completed' AND amount > 50";
-                final var sql = """
-                        SELECT a.id, b.name, c.status
-                        FROM table_a a
-                        JOIN table_b b
-                        ON a.id = b.a_id
-                        AND b.date > '2023-01-01'
-                        JOIN table_c c
-                        ON b.id = c.b_id
-                        AND c.status = 'pending'
-                        AND c.id IN (%s)
-                        """.formatted(nested);
-                final var parsed = sqlParser.parse(sql);
-                final var joins = parsed.getJoins();
-                assertEquals(2, joins.size());
-                assertJoinEquals(JoinType.JOIN, Table.class,"table_b", "b", joins.get(0));
-                assertJoinEquals(JoinType.JOIN, Table.class,"table_c", "c", joins.get(1));
-                final var conditions = joins.get(0).getConditions();
-                assertEquals(2, conditions.size());
-                assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.a_id", conditions.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "b.date", Operator.GREATER_THAN, Constant.class, "'2023-01-01'", conditions.get(1));
-                final var conditions1 = joins.get(1).getConditions();
-                assertEquals(3, conditions1.size());
-                assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.b_id", conditions1.get(0));
-                assertConditionEquals(ClauseType.AND, Column.class, "c.status", Operator.EQUALS, Constant.class, "'pending'", conditions1.get(1));
-                assertConditionEquals(ClauseType.AND, Column.class, "c.id", Operator.IN, Query.class, nested, conditions1.get(2));
-            }
-        }
 
         @TestFactory
         @DisplayName("various join types")
@@ -272,15 +164,121 @@ public class JoinParserIT extends AbstractSpringParserTest {
                     final var parsed = sqlParser.parse(sql);
                     assertEquals(1, parsed.getJoins().size());
                     final var join = parsed.getJoins().getFirst();
-                    assertJoinEquals(joinType, Table.class,"table1", null, join);
+                    assertJoinEquals(joinType, Table.class, "table1", null, join);
                 });
             });
         }
+    }
 
-        private void assertJoinEquals(Join.JoinType type, Class<? extends Source> sourceClass, String sourceValue, String tableAlias, Join actual) {
-            assertEquals(type, actual.getType());
-            final var source = actual.getSource();
-            assertFragmentEquals(sourceClass, sourceValue, tableAlias, source);
+    @Nested
+    @DisplayName("multiple JOINs with")
+    class MultipleJoins {
+
+        @Test
+        @DisplayName("different alias")
+        void differentJAlias() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM a
+                    JOIN b ON a.id = b.id
+                    JOIN c d ON b.id = c.id
+                    JOIN e as f ON c.id = f.id
+                    JOIN g as h ON e.id = h.id
+                    JOIN i j ON g.id = j.id
+                    JOIN k ON j.id = k.id
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(6, parsed.getJoins().size());
+            final var joins = parsed.getJoins();
+            assertJoinEquals(JoinType.JOIN, Table.class, "b", null, joins.get(0));
+            assertJoinEquals(JoinType.JOIN, Table.class, "c", "d", joins.get(1));
+            assertJoinEquals(JoinType.JOIN, Table.class, "e", "f", joins.get(2));
+            assertJoinEquals(JoinType.JOIN, Table.class, "g", "h", joins.get(3));
+            assertJoinEquals(JoinType.JOIN, Table.class, "i", "j", joins.get(4));
+            assertJoinEquals(JoinType.JOIN, Table.class, "k", null, joins.get(5));
         }
+
+        @Test
+        @DisplayName("different join type")
+        void differentJoinType() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM table1
+                    NATURAL FULL OUTER JOIN table2 ON table1.id = table2.id
+                    LEFT JOIN table3 ON table2.id = table3.id;
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getJoins().size());
+            final var firstJoin = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.NATURAL_FULL_OUTER, Table.class, "table2", null, firstJoin);
+            assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", firstJoin.getConditions().getFirst());
+            final var secondJoin = parsed.getJoins().getLast();
+            assertJoinEquals(JoinType.LEFT, Table.class, "table3", null, secondJoin);
+            assertConditionEquals(ClauseType.ON, Column.class, "table2.id", Operator.EQUALS, Column.class, "table3.id", secondJoin.getConditions().getFirst());
+        }
+
+
+        @Test
+        @DisplayName("different conditions")
+        void differentConditions() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM a
+                    JOIN c ON b.id = c.id OR (a.id IN (1, 2))
+                    LEFT JOIN d ON (a.id LIKE b.id) AND d.id IS NOT NULL
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getJoins().size());
+            final var joins = parsed.getJoins();
+            final var firstJoin = joins.getFirst();
+            assertJoinEquals(JoinType.JOIN, Table.class, "c", null, firstJoin);
+            final var firstConditions = firstJoin.getConditions();
+            assertEquals(2, firstConditions.size());
+            assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.id", firstConditions.get(0));
+            assertConditionEquals(ClauseType.OR, Column.class, "a.id", Operator.IN, ConstantList.class, List.of("1", "2"), firstConditions.get(1));
+            final var secondJoin = joins.getLast();
+            assertJoinEquals(JoinType.LEFT, Table.class, "d", null, secondJoin);
+            final var secondConditions = secondJoin.getConditions();
+            assertEquals(2, secondConditions.size());
+            assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.LIKE, Column.class, "b.id", secondConditions.get(0));
+            assertConditionEquals(ClauseType.AND, Column.class, "d.id", Operator.IS_NOT, Constant.class, "null", secondConditions.get(1));
+        }
+
+        @Test
+        @DisplayName("nested queries")
+        void nestedQueries() throws IOException {
+            final var nested = "SELECT id FROM table_c WHERE status = 'completed' AND amount > 50";
+            final var sql = """
+                    SELECT a.id, b.name, c.status
+                    FROM table_a a
+                    JOIN table_b b
+                    ON a.id = b.a_id
+                    AND b.date > '2023-01-01'
+                    JOIN table_c c
+                    ON b.id = c.b_id
+                    AND c.status = 'pending'
+                    AND c.id IN (%s)
+                    """.formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            final var joins = parsed.getJoins();
+            assertEquals(2, joins.size());
+            assertJoinEquals(JoinType.JOIN, Table.class, "table_b", "b", joins.get(0));
+            assertJoinEquals(JoinType.JOIN, Table.class, "table_c", "c", joins.get(1));
+            final var conditions = joins.get(0).getConditions();
+            assertEquals(2, conditions.size());
+            assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "b.a_id", conditions.get(0));
+            assertConditionEquals(ClauseType.AND, Column.class, "b.date", Operator.GREATER_THAN, Constant.class, "'2023-01-01'", conditions.get(1));
+            final var conditions1 = joins.get(1).getConditions();
+            assertEquals(3, conditions1.size());
+            assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.b_id", conditions1.get(0));
+            assertConditionEquals(ClauseType.AND, Column.class, "c.status", Operator.EQUALS, Constant.class, "'pending'", conditions1.get(1));
+            assertConditionEquals(ClauseType.AND, Column.class, "c.id", Operator.IN, Query.class, nested, conditions1.get(2));
+        }
+    }
+
+    private void assertJoinEquals(Join.JoinType type, Class<? extends Source> sourceClass, String sourceValue, String tableAlias, Join actual) {
+        assertEquals(type, actual.getType());
+        final var source = actual.getSource();
+        assertFragmentEquals(sourceClass, sourceValue, tableAlias, source);
     }
 }

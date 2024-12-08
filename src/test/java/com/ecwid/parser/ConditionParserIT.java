@@ -65,6 +65,92 @@ public class ConditionParserIT extends AbstractSpringParserTest {
     }
 
     @Nested
+    @DisplayName("multiple clauses with")
+    class MultipleClauses {
+
+        @Test
+        @DisplayName("AND")
+        void withAnd() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 1 AND name = 'john';";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().getLast();
+            assertConditionEquals(AND, Column.class, "name", EQUALS, Constant.class, "'john'", secondClause);
+        }
+
+        @Test
+        @DisplayName("OR")
+        void withOr() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 1 OR name = 'john';";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().getLast();
+            assertConditionEquals(OR, Column.class, "name", EQUALS, Constant.class, "'john'", secondClause);
+        }
+
+        @Test
+        @DisplayName("AND & OR")
+        void withAndOr() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 1 AND name = 'john' OR age = 30;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "name", EQUALS, Constant.class, "'john'", secondClause);
+            final var thirdClause = parsed.getFilters().getLast();
+            assertConditionEquals(OR, Column.class, "age", EQUALS, Constant.class, "30", thirdClause);
+        }
+
+        @Test
+        @DisplayName("OR & AND")
+        void withOrAnd() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 1 OR name = 'john' AND age = 30;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(OR, Column.class, "name", EQUALS, Constant.class, "'john'", secondClause);
+            final var thirdClause = parsed.getFilters().getLast();
+            assertConditionEquals(AND, Column.class, "age", EQUALS, Constant.class, "30", thirdClause);
+        }
+
+        @Test
+        @DisplayName("mixed AND & OR")
+        void mixed() throws Exception {
+            final var sql = "SELECT * FROM table WHERE id = 1 OR name = 'john' AND age = 30 OR last_name = 'doe' AND status LIKE '%_active_%' ;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(5, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(OR, Column.class, "name", EQUALS, Constant.class, "'john'", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(AND, Column.class, "age", EQUALS, Constant.class, "30", thirdClause);
+            final var fourthClause = parsed.getFilters().get(3);
+            assertConditionEquals(OR, Column.class, "last_name", EQUALS, Constant.class, "'doe'", fourthClause);
+            final var fifthClause = parsed.getFilters().get(4);
+            assertConditionEquals(AND, Column.class, "status", LIKE, Constant.class, "'%_active_%'", fifthClause);
+        }
+
+        @Test
+        @DisplayName("AND & OR with brackets")
+        void withAndOrBrackets() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (department = 'Engineering' AND salary > 50000)
+                    OR (department = 'Sales' AND salary > 40000)""";
+
+        }
+    }
+
+    @Nested
     @DisplayName("list clause")
     class ListClause {
         @Test
@@ -87,7 +173,6 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             assertConditionEquals(WHERE, Column.class, "id", IN, ConstantList.class, List.of("1", "2", "3"), clause);
         }
     }
-
 
     @Nested
     @DisplayName("nested one level query")

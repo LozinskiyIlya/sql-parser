@@ -17,6 +17,6 @@ public class Finisher implements Crawler {
 
     @Override
     public void crawl(Query query, String currentSection, Supplier<String> nextLex) {
-        log.info("Query finished with '{}'", currentSection);
+        log.info("Query {} finished with '{}'", query, currentSection);
     }
 }

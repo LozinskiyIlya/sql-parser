@@ -144,9 +144,19 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             final var sql = """
                     SELECT *
                     FROM employees
-                    WHERE (department = 'Engineering' AND salary > 50000)
-                    OR (department = 'Sales' AND salary > 40000)""";
-
+                    WHERE (department = 'engineering' AND salary > 50000)
+                    OR (department = 'sales' AND salary > 40000)""";
+            final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed.getFilters());
+            assertEquals(4, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "50000", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(OR, Column.class, "department", EQUALS, Constant.class, "'sales'", thirdClause);
+            final var fourthClause = parsed.getFilters().get(3);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "40000", fourthClause);
         }
     }
 
@@ -171,6 +181,20 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Column.class, "id", IN, ConstantList.class, List.of("1", "2", "3"), clause);
+        }
+
+        @Test
+        @DisplayName("between other conditions")
+        void betweenOtherConditions() throws Exception {
+            final var sql = "SELECT * FROM table WHERE (id = 1 OR id in (1, 2, 3)) AND name = 'john';";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "id", EQUALS, Constant.class, "1", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(OR, Column.class, "id", IN, ConstantList.class, List.of("1", "2", "3"), secondClause);
+            final var thirdClause = parsed.getFilters().getLast();
+            assertConditionEquals(AND, Column.class, "name", EQUALS, Constant.class, "'john'", thirdClause);
         }
     }
 

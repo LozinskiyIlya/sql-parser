@@ -1,16 +1,19 @@
 package com.ecwid.parser.crawler.base;
 
 import com.ecwid.parser.fragment.*;
+import com.ecwid.parser.fragment.Condition.Operator;
 import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Nameable;
 import org.springframework.util.StringUtils;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
+import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
 
@@ -39,6 +42,15 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             if (LEX_CLOSE_BRACKET.equals(lex)) {
                 break;
             }
+
+            if (OPERATORS.contains(lex)) {
+                flush(query, fragment, pair); // flush left operand
+                final var operator = new AtomicReference<Operator>();
+                lex = crawlForOperator(operator, lex, nextLex); // first lexeme of right operand
+                fragment = operator.get();
+                flush(query, fragment, pair); // flush operator
+            }
+
             if (LEX_OPEN_BRACKET.equals(lex)) {
                 lex = nextLex.get();
                 if (LEX_SELECT.equals(lex)) {
@@ -103,15 +115,24 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 nextLex);
     }
 
-    protected final String crawlUntilAndReturnNext(Predicate<String> lexIs, Consumer<String> andDoAction, Supplier<String> nextLex) {
-        String lex;
-        while ((lex = nextLex.get()) != null) {
-            if (lexIs.test(lex)) {
-                break;
-            }
-            andDoAction.accept(lex);
-        }
-        return lex;
+    private String crawlForOperator(AtomicReference<Operator> operator, String operatorFirstLex, Supplier<String> nextLex) {
+        final var operatorParts = new LinkedList<String>();
+        operatorParts.add(operatorFirstLex);
+        crawlUntilAndReturnNext(
+                fragment -> {
+                    operatorParts.add(fragment);
+                    return !isOperator(operatorParts);
+                },
+                fragment -> {
+                },
+                nextLex);
+        final var nextFragment = operatorParts.removeLast();
+        operator.set(operatorFullLexemes.get(String.join(LEX_SPACE, operatorParts)));
+        return nextFragment;
+    }
+
+    private boolean isOperator(List<String> parts) {
+        return operatorFullLexemes.containsKey(String.join(LEX_SPACE, parts));
     }
 
     private boolean isConstant(String fragment) {

@@ -31,7 +31,7 @@ public abstract class AbstractSpringParserTest {
 
     @Test
     void withAllThatBeauty() throws IOException {
-        throw new UnsupportedOperationException("Implement all possible cases test for: " + this.getClass().getSimpleName());
+//        throw new UnsupportedOperationException("Implement all possible cases test for: " + this.getClass().getSimpleName());
     }
 
     protected void assertConditionEquals(

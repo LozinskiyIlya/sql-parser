@@ -9,7 +9,7 @@ public class OnCrawler extends ConditionCrawler {
     public OnCrawler() {
         super(
                 (query, condition) -> query.getJoins().getLast().getConditions().add(condition),
-                (query, fragment) -> query.getJoins().getLast().getConditions().getLast().addOperand(fragment)
+                (query, fragment) -> query.getJoins().getLast().getConditions().getLast().addNextPart(fragment)
         );
     }
 }

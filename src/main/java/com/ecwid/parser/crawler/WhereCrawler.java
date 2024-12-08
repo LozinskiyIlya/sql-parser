@@ -8,7 +8,7 @@ public class WhereCrawler extends ConditionCrawler {
     public WhereCrawler() {
         super(
                 (query, condition) -> query.getFilters().add(condition),
-                (query, fragment) -> query.getFilters().getLast().addOperand(fragment)
+                (query, fragment) -> query.getFilters().getLast().addNextPart(fragment)
         );
     }
 }

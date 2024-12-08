@@ -26,11 +26,11 @@ public class ConditionParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("WHERE with constant")
         void simpleWhere() throws Exception {
-            final var sql = "SELECT * FROM table WHERE id < 1;";
+            final var sql = "SELECT * FROM table WHERE id != 1;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(WHERE, Column.class, "id", LESS_THAN, Constant.class, "1", clause);
+            assertConditionEquals(WHERE, Column.class, "id", NOT_EQUALS, Constant.class, "1", clause);
         }
 
         @Test

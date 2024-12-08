@@ -21,11 +21,13 @@ public class Condition {
     private Operator operator;
     private final ClauseType clauseType;
 
-    public void addOperand(Fragment operand) {
+    public void addNextPart(Fragment part) {
         if (leftOperand == null) {
-            leftOperand = operand;
+            leftOperand = part;
+        } else if (operator == null) {
+            operator = (Operator) part;
         } else {
-            rightOperand = operand;
+            rightOperand = part;
         }
     }
 
@@ -59,9 +61,9 @@ public class Condition {
     }
 
     @Getter
-    public enum Operator implements MultiLex {
+    public enum Operator implements MultiLex, Fragment {
         EQUALS(LEX_EQUALS),
-        NOT_EQUALS(LEX_NOT + LEX_EQUALS),
+        NOT_EQUALS(LEX_NOT_EQUALS),
         GREATER_THAN(LEX_GREATER_THAN),
         LESS_THAN(LEX_LESS_THAN),
         GREATER_THAN_OR_EQUALS(LEX_GREATER_THAN_OR_EQUALS),
@@ -73,7 +75,6 @@ public class Condition {
         IS(LEX_IS),
         IS_NOT(LEX_IS + LEX_SPACE + LEX_NOT);
 
-
         private final String fullLexeme;
 
         Operator(String fullLexeme) {
@@ -82,6 +83,10 @@ public class Condition {
 
         public static final Map<String, Operator> operatorFullLexemes = MultiLex.createLexemeMap(Operator.class);
 
+        @Override
+        public Operator getValue() {
+            return this;
+        }
     }
 
     public enum ClauseType {

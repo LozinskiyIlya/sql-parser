@@ -60,7 +60,7 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
-            assertConditionEquals(HAVING, Column.class, "COUNT(*)", GREATER_THAN, Constant.class, "10", clause);
+            assertConditionEquals(HAVING, Column.class, "count(*)", GREATER_THAN, Constant.class, "10", clause);
         }
     }
 

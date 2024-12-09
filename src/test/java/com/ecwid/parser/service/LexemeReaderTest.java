@@ -38,10 +38,11 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("is escaped char", "\\", List.of("\\")),
                 new TestCase("has escaped char", "ab\\cd", List.of("ab\\cd")),
                 new TestCase("is open bracket", "(", List.of("(")),
-                new TestCase("has open bracket", "a(b", List.of("a", "(", "b")),
+                new TestCase("has open bracket", "a (b", List.of("a", "(", "b")),
                 new TestCase("is close bracket", ")", List.of(")")),
                 new TestCase("has close bracket", "a)b", List.of("a", ")", "b")),
-                new TestCase("has open and close brackets", "count(*) b, a", List.of("count", "(", "*", ")", "b", ",", "a")),
+                new TestCase("has function", "count(*) b, a", List.of("count(*)", "b", ",", "a")),
+                new TestCase("has nested function", "count(max(*)) b, a", List.of("count(max(*))", "b", ",", "a")),
                 new TestCase("is a list of values", "a b c", List.of("a", "b", "c")),
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),
@@ -56,7 +57,7 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
     @DisplayName("has all that beauty")
     void withAllThatBeauty() {
         final var complexInputWithAllCases = "a, (a, 'b', c(a.d), e), 'e'";
-        final var expected = List.of("a", ",", "(", "a", ",", "'b'", ",", "c", "(", "a.d", ")", ",", "e", ")", ",", "'e'");
+        final var expected = List.of("a", ",", "(", "a", ",", "'b'", ",", "c(a.d)", ",", "e", ")", ",", "'e'");
         assertInputProduces(complexInputWithAllCases, expected);
     }
 

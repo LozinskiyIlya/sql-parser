@@ -60,11 +60,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     // constant list
                     fragment = new ConstantList();
                     lex = crawlForList((ConstantList) fragment, lex, nextLex);
-                } else if (StringUtils.hasText(pair.getFirst())) {
-                    // function name
-                    fragment = new Column();
-                    lex = getFunctionSignature(pair.getFirst(), lex, nextLex);
-                    pair.reset();
                 } else {
                     // condition in brackets
                     fragment = new Column();
@@ -95,15 +90,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         }
         processFragment(query, fragment);
         pair.reset();
-    }
-
-    private String getFunctionSignature(String functionName, String firstArg, Supplier<String> nextLex) {
-        final var functionBuilder = new StringBuilder(functionName);
-        functionBuilder.append(LEX_OPEN_BRACKET);
-        functionBuilder.append(firstArg);
-        crawlUntilAndReturnNext(LEX_CLOSE_BRACKET::equals, functionBuilder::append, nextLex);
-        functionBuilder.append(LEX_CLOSE_BRACKET);
-        return functionBuilder.toString();
     }
 
     private String crawlForList(ConstantList list, String firstItem, Supplier<String> nextLex) {

@@ -21,9 +21,11 @@ public class LexemeReader {
                 if (SEPARATORS.contains(currentCharAsString)) {
                     if (lex.isEmpty()) {
                         if (LEX_SINGLE_QUOTE.equals(currentCharAsString)) {
-                            return readStringToTheEnd(reader);
+                            return readStringToTheEnd(lex, reader);
                         }
                         return currentCharAsString;
+                    } else if (LEX_OPEN_BRACKET.equals(currentCharAsString)) {
+                        return readFunctionToTheEnd(lex, reader);
                     }
                     reader.unread(c);
                     break;
@@ -42,16 +44,36 @@ public class LexemeReader {
         return lex.isEmpty() ? null : lex.toString().toLowerCase();
     }
 
-    private String readStringToTheEnd(PushbackReader reader) throws IOException, IllegalStateException {
+    private String readStringToTheEnd(StringBuilder quotedString, PushbackReader reader) throws IOException, IllegalStateException {
         int character;
-        final var lex = new StringBuilder(LEX_SINGLE_QUOTE);
+        quotedString.append(LEX_SINGLE_QUOTE);
         while ((character = reader.read()) != -1) {
             char c = (char) character;
-            lex.append(c);
+            quotedString.append(c);
             if (LEX_SINGLE_QUOTE.equals(String.valueOf(c))) {
-                return lex.toString();
+                return quotedString.toString();
             }
         }
         throw new IllegalStateException("String is not closed");
+    }
+
+    private String readFunctionToTheEnd(StringBuilder signature, PushbackReader reader) throws IOException, IllegalStateException {
+        int character;
+        int brackets = 1;
+        signature.append(LEX_OPEN_BRACKET);
+        while ((character = reader.read()) != -1) {
+            char c = (char) character;
+            signature.append(c);
+            if (LEX_CLOSE_BRACKET.equals(String.valueOf(c))) {
+                brackets--;
+                if (brackets == 0) {
+                    return signature.toString().toLowerCase();
+                }
+            }
+            if (LEX_OPEN_BRACKET.equals(String.valueOf(c))) {
+                brackets++;
+            }
+        }
+        throw new IllegalStateException("Function is not closed");
     }
 }

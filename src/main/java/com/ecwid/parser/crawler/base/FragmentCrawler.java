@@ -25,7 +25,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         return false;
     }
 
-
     @Override
     public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
         Fragment fragment = null;

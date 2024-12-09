@@ -70,6 +70,36 @@ public class JoinParserIT extends AbstractSpringParserTest {
         }
 
         @Test
+        @DisplayName("condition in brackets is not last")
+        void joinWithConditionInBracketsIsNotLast() throws Exception {
+            final var sql = "SELECT * FROM table1 JOIN table2 ON (table1.id = table2.id) or a = b;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getJoins().size());
+            final var join = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
+            assertEquals(2, join.getConditions().size());
+            final var condition = join.getConditions().getFirst();
+            assertConditionEquals(ClauseType.ON, Column.class, "table1.id", Operator.EQUALS, Column.class, "table2.id", condition);
+            final var condition1 = join.getConditions().getLast();
+            assertConditionEquals(ClauseType.OR, Column.class, "a", Operator.EQUALS, Column.class, "b", condition1);
+        }
+
+        @Test
+        @DisplayName("conditions in excessive brackets")
+        void joinWithConditionsInExcessiveBrackets() throws Exception {
+            final var sql = "SELECT * FROM table1 JOIN table2 ON ((a = b) or c != d);";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getJoins().size());
+            final var join = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
+            assertEquals(2, join.getConditions().size());
+            final var condition = join.getConditions().getFirst();
+            assertConditionEquals(ClauseType.ON, Column.class, "a", Operator.EQUALS, Column.class, "b", condition);
+            final var condition1 = join.getConditions().getLast();
+            assertConditionEquals(ClauseType.OR, Column.class, "c", Operator.NOT_EQUALS, Column.class, "d", condition1);
+        }
+
+        @Test
         @DisplayName("condition with function in brackets")
         void joinWithConditionWithFunctionInBrackets() throws Exception {
             final var sql = "SELECT * FROM table1 JOIN table2 ON (count(*) <= table2.id);";

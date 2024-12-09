@@ -147,7 +147,6 @@ public class ConditionParserIT extends AbstractSpringParserTest {
                     WHERE (department = 'engineering' AND salary > 50000)
                     OR (department = 'sales' AND salary > 40000)""";
             final var parsed = sqlParser.parse(sql);
-            System.out.println(parsed.getFilters());
             assertEquals(4, parsed.getFilters().size());
             final var firstClause = parsed.getFilters().get(0);
             assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
@@ -282,6 +281,22 @@ public class ConditionParserIT extends AbstractSpringParserTest {
                     WHERE (%s) > 3;
                     """.formatted(nested);
             final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, Constant.class, "3", clause);
+        }
+
+        @Test
+        @DisplayName("as a first operand in brackets")
+        void oneLevelNestedConditionAsFirstOperandInBrackets() throws Exception {
+            final var nested = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE ((%s) > 3);
+                    """.formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, Constant.class, "3", clause);

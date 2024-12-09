@@ -1,8 +1,8 @@
 package com.ecwid.parser;
 
-import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.Table;
+import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.fragment.domain.Source;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 @DisplayName("When sources include")
@@ -112,6 +111,23 @@ public class SourceParserIT extends AbstractSpringParserTest {
         }
 
         @Test
+        @DisplayName("one level nested source with own condition in brackets and alias")
+        void oneLevelNestedSourceWithOwnConditionAndAlias() throws Exception {
+            final var nested = "SELECT * FROM some_table where (a = b)";
+            final var sql = "SELECT * FROM (%s) AS t".formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getSources().size());
+            final var source = parsed.getSources().getFirst();
+            assertSourceEquals(Query.class, nested, "t", source);
+            final var nestedQuery = (Query) source;
+            assertEquals(1, nestedQuery.getColumns().size());
+            assertEquals("*", nestedQuery.getColumns().getFirst().getValue());
+            assertEquals(1, nestedQuery.getSources().size());
+            assertSourceEquals(Table.class, "some_table", null, nestedQuery.getSources().getFirst());
+            assertEquals(1, nestedQuery.getFilters().size());
+        }
+
+        @Test
         @DisplayName("one level nested surrounded by tables")
         void oneLevelNestedSourceSurroundedByTables() throws Exception {
             final var nested = "SELECT * FROM some_table";
@@ -132,7 +148,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
                     (SELECT * FROM
                             (SELECT * FROM e) AS f, g
                     ) h, i j, k as l,
-                    (SELECT * FROM m) as n, o;
+                    (SELECT * FROM m where n = o and (p = q or r = s)) as t, u;
                 """;
         final var parsed = sqlParser.parse(sql);
         assertEquals(8, parsed.getSources().size());
@@ -149,11 +165,11 @@ public class SourceParserIT extends AbstractSpringParserTest {
         assertSourceEquals(Table.class, "e", null, nestedNested.getSources().getFirst());
         assertSourceEquals(Table.class, "i", "j", parsed.getSources().get(4));
         assertSourceEquals(Table.class, "k", "l", parsed.getSources().get(5));
-        assertSourceIsQuery("n", parsed.getSources().get(6));
+        assertSourceIsQuery("t", parsed.getSources().get(6));
         final var nestedSecond = (Query) parsed.getSources().get(6);
         assertEquals(1, nestedSecond.getSources().size());
         assertSourceEquals(Table.class, "m", null, nestedSecond.getSources().getFirst());
-        assertSourceEquals(Table.class, "o", null, parsed.getSources().get(7));
+        assertSourceEquals(Table.class, "u", null, parsed.getSources().get(7));
     }
 
     private void assertSourceEquals(Class<? extends Source> expectedClass, String expectedVal, String expectedAlias, Source actual) {

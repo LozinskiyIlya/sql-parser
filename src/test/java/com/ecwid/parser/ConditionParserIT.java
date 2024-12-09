@@ -287,7 +287,7 @@ public class ConditionParserIT extends AbstractSpringParserTest {
         }
 
         @Test
-        @DisplayName("as a first operand in brackets")
+        @DisplayName("as first operand in brackets")
         void oneLevelNestedConditionAsFirstOperandInBrackets() throws Exception {
             final var nested = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
             final var sql = """
@@ -300,6 +300,22 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Query.class, nested, GREATER_THAN, Constant.class, "3", clause);
+        }
+
+        @Test
+        @DisplayName("as last operand in brackets")
+        void oneLevelNestedConditionAsLastOperandInBrackets() throws Exception {
+            final var nested = "SELECT id FROM projects WHERE projects.employee_id = employees.id";
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (a in (%s));
+                    """.formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            System.out.println(parsed);
+            assertEquals(1, parsed.getFilters().size());
+            final var clause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Column.class, "a", IN, Query.class, nested, clause);
         }
 
         @Test

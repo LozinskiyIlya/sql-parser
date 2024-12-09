@@ -137,10 +137,94 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             final var fifthClause = parsed.getFilters().get(4);
             assertConditionEquals(AND, Column.class, "status", LIKE, Constant.class, "'%_active_%'", fifthClause);
         }
+    }
+
+    @Nested
+    @DisplayName("brackets")
+    class Brackets {
+        @Test
+        @DisplayName("priority")
+        void mandatory() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (department = 'engineering' AND salary > 50000)
+                    OR department = 'sales'
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "50000", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(OR, Column.class, "department", EQUALS, Constant.class, "'sales'", thirdClause);
+        }
 
         @Test
-        @DisplayName("AND & OR with brackets")
-        void withAndOrBrackets() throws Exception {
+        @DisplayName("excessive")
+        void excessive() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE ((department = 'engineering' AND salary > 50000)
+                    OR department = 'sales')
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "50000", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(OR, Column.class, "department", EQUALS, Constant.class, "'sales'", thirdClause);
+        }
+
+        @Test
+        @DisplayName("excessive before other clauses")
+        void excessiveBeforeClauses() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE ((department = 'engineering' AND salary > 50000)
+                    OR department = 'sales')
+                    LIMIT 10
+                    OFFSET 5
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "50000", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(OR, Column.class, "department", EQUALS, Constant.class, "'sales'", thirdClause);
+            assertEquals(10, parsed.getLimit());
+            assertEquals(5, parsed.getOffset());
+        }
+
+        @Test
+        @DisplayName("priority inside excessive")
+        void mandatoryAndExcessive() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE ((department = 'engineering' AND salary > 50000)
+                    OR department = 'sales')
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().get(0);
+            assertConditionEquals(WHERE, Column.class, "department", EQUALS, Constant.class, "'engineering'", firstClause);
+            final var secondClause = parsed.getFilters().get(1);
+            assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "50000", secondClause);
+            final var thirdClause = parsed.getFilters().get(2);
+            assertConditionEquals(OR, Column.class, "department", EQUALS, Constant.class, "'sales'", thirdClause);
+        }
+
+        @Test
+        @DisplayName("symmetric priority brackets")
+        void symmetricBrackets() throws Exception {
             final var sql = """
                     SELECT *
                     FROM employees

@@ -99,7 +99,6 @@ public class JoinParserIT extends AbstractSpringParserTest {
             assertConditionEquals(ClauseType.OR, Column.class, "c", Operator.NOT_EQUALS, Column.class, "d", condition1);
             final var condition2 = join.getConditions().getLast();
             assertConditionEquals(ClauseType.AND, Column.class, "e", Operator.NOT_LIKE, Constant.class, "'%f'", condition2);
-
         }
 
         @Test

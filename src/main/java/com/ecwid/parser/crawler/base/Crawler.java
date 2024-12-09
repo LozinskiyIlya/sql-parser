@@ -9,9 +9,9 @@ public interface Crawler {
 
     Optional<Crawler> nextCrawler(String nextSection);
 
-    void crawl(Query query, String currentSection, Supplier<String> nextLex);
+    void crawl(Query query, String currentSection, Supplier<String> nextLex, int openBrackets);
 
-    default void delegate(Query query, String nextSection, Supplier<String> nextLex) {
-        nextCrawler(nextSection).ifPresent(crawler -> crawler.crawl(query, nextSection, nextLex));
+    default void delegate(Query query, String nextSection, Supplier<String> nextLex, int openBrackets) {
+        nextCrawler(nextSection).ifPresent(crawler -> crawler.crawl(query, nextSection, nextLex, openBrackets));
     }
 }

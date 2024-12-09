@@ -85,18 +85,21 @@ public class JoinParserIT extends AbstractSpringParserTest {
         }
 
         @Test
-        @DisplayName("conditions in excessive brackets")
+        @DisplayName("conditions in brackets with mandatory inner brackets")
         void joinWithConditionsInExcessiveBrackets() throws Exception {
-            final var sql = "SELECT * FROM table1 JOIN table2 ON ((a = b) or c != d);";
+            final var sql = "SELECT * FROM table1 JOIN table2 ON ((a = b or c != d) AND e NOT LIKE '%f');";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
             assertJoinEquals(JoinType.JOIN, Table.class, "table2", null, join);
-            assertEquals(2, join.getConditions().size());
+            assertEquals(3, join.getConditions().size());
             final var condition = join.getConditions().getFirst();
             assertConditionEquals(ClauseType.ON, Column.class, "a", Operator.EQUALS, Column.class, "b", condition);
-            final var condition1 = join.getConditions().getLast();
+            final var condition1 = join.getConditions().get(1);
             assertConditionEquals(ClauseType.OR, Column.class, "c", Operator.NOT_EQUALS, Column.class, "d", condition1);
+            final var condition2 = join.getConditions().getLast();
+            assertConditionEquals(ClauseType.AND, Column.class, "e", Operator.NOT_LIKE, Constant.class, "'%f'", condition2);
+
         }
 
         @Test

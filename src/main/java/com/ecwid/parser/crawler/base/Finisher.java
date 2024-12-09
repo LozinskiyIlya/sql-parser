@@ -16,7 +16,10 @@ public class Finisher implements Crawler {
     }
 
     @Override
-    public void crawl(Query query, String currentSection, Supplier<String> nextLex) {
+    public void crawl(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
+        if (openBrackets != 0) {
+            throw new IllegalStateException("Not balanced brackets in query: " + query);
+        }
         log.info("Query {} finished with '{}'", query, currentSection);
     }
 }

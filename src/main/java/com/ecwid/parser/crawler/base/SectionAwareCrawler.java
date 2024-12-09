@@ -17,8 +17,8 @@ public abstract class SectionAwareCrawler implements Crawler {
     private Map<String, Crawler> sectionAgainstCrawler;
 
     @Override
-    public final void delegate(Query query, String currentSection, Supplier<String> nextLex) {
-        Crawler.super.delegate(query, currentSection, nextLex);
+    public final void delegate(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
+        Crawler.super.delegate(query, currentSection, nextLex, openBrackets);
     }
 
     @Override

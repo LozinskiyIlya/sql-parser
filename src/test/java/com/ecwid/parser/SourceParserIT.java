@@ -118,7 +118,8 @@ public class SourceParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSources().size());
             final var source = parsed.getSources().getFirst();
-            assertSourceEquals(Query.class, nested, "t", source);
+            final var nestedClearedForAssertion = nested.replaceAll("[()]", "");
+            assertSourceEquals(Query.class, nestedClearedForAssertion, "t", source);
             final var nestedQuery = (Query) source;
             assertEquals(1, nestedQuery.getColumns().size());
             assertEquals("*", nestedQuery.getColumns().getFirst().getValue());

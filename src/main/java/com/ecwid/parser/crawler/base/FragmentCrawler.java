@@ -26,8 +26,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     }
 
     @Override
-    public final void crawl(Query query, String currentSection, Supplier<String> nextLex) {
+    public final void crawl(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
         Fragment fragment = null;
+        int brackets = openBrackets;
         var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
         final var pair = new NameAliasPair();
         do {
@@ -39,6 +40,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 continue;
             }
             if (LEX_CLOSE_BRACKET.equals(lex)) {
+                if (--brackets == 0) {
+                    continue;
+                }
                 break;
             }
 
@@ -51,15 +55,19 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             }
 
             if (LEX_OPEN_BRACKET.equals(lex)) {
-                lex = nextLex.get();
+                do {
+                    brackets++;
+                } while (LEX_OPEN_BRACKET.equals(lex = nextLex.get()));
                 if (LEX_SELECT.equals(lex)) {
                     // nested query
                     fragment = new Query();
-                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex);
+                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 0);
+                    brackets--; // consumed by nested query;
                 } else if (isConstant(lex)) {
                     // constant list
                     fragment = new ConstantList();
                     lex = crawlForList((ConstantList) fragment, lex, nextLex);
+                    brackets--; // consumed by crawlForList
                 } else {
                     // condition in brackets
                     fragment = new Column();
@@ -78,7 +86,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         } while (!shouldDelegate(lex = nextLex.get()));
 
         flush(query, fragment, pair);
-        delegate(query, lex, nextLex);
+        delegate(query, lex, nextLex, brackets);
     }
 
     private void flush(Query query, Fragment fragment, NameAliasPair pair) {

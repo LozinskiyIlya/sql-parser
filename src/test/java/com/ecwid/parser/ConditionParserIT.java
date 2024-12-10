@@ -241,6 +241,39 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             final var fourthClause = parsed.getFilters().get(3);
             assertConditionEquals(AND, Column.class, "salary", GREATER_THAN, Constant.class, "40000", fourthClause);
         }
+
+        @Test
+        @DisplayName("nested madness")
+        void nestedMadness() throws IOException {
+            final var sql = """
+                    SELECT a
+                    FROM b
+                    WHERE ((a = 1 AND (b = 2 OR c = 3))
+                    OR (d = 4 AND (e = 5 OR f = 6)))
+                    AND ((g = 7 AND h = 8)
+                    OR (i = 9 AND (j = 10 OR k = 11)))
+                    OR ((l = 12 AND m = 13)
+                    OR (n = 14 AND (o = 15 OR p = 16)))
+                    """;
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(16, parsed.getFilters().size());
+            assertConditionEquals(WHERE, Column.class, "a", EQUALS, Constant.class, "1", parsed.getFilters().get(0));
+            assertConditionEquals(AND, Column.class, "b", EQUALS, Constant.class, "2", parsed.getFilters().get(1));
+            assertConditionEquals(OR, Column.class, "c", EQUALS, Constant.class, "3", parsed.getFilters().get(2));
+            assertConditionEquals(OR, Column.class, "d", EQUALS, Constant.class, "4", parsed.getFilters().get(3));
+            assertConditionEquals(AND, Column.class, "e", EQUALS, Constant.class, "5", parsed.getFilters().get(4));
+            assertConditionEquals(OR, Column.class, "f", EQUALS, Constant.class, "6", parsed.getFilters().get(5));
+            assertConditionEquals(AND, Column.class, "g", EQUALS, Constant.class, "7", parsed.getFilters().get(6));
+            assertConditionEquals(AND, Column.class, "h", EQUALS, Constant.class, "8", parsed.getFilters().get(7));
+            assertConditionEquals(OR, Column.class, "i", EQUALS, Constant.class, "9", parsed.getFilters().get(8));
+            assertConditionEquals(AND, Column.class, "j", EQUALS, Constant.class, "10", parsed.getFilters().get(9));
+            assertConditionEquals(OR, Column.class, "k", EQUALS, Constant.class, "11", parsed.getFilters().get(10));
+            assertConditionEquals(OR, Column.class, "l", EQUALS, Constant.class, "12", parsed.getFilters().get(11));
+            assertConditionEquals(AND, Column.class, "m", EQUALS, Constant.class, "13", parsed.getFilters().get(12));
+            assertConditionEquals(OR, Column.class, "n", EQUALS, Constant.class, "14", parsed.getFilters().get(13));
+            assertConditionEquals(AND, Column.class, "o", EQUALS, Constant.class, "15", parsed.getFilters().get(14));
+            assertConditionEquals(OR, Column.class, "p", EQUALS, Constant.class, "16", parsed.getFilters().get(15));
+        }
     }
 
     @Nested
@@ -282,8 +315,8 @@ public class ConditionParserIT extends AbstractSpringParserTest {
     }
 
     @Nested
-    @DisplayName("nested one level query")
-    class NestedOneLevelQuery {
+    @DisplayName("nested query")
+    class NestedQuery {
 
         @Test
         @DisplayName("with basic select")
@@ -436,11 +469,25 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             final var secondClause = parsed.getFilters().getLast();
             assertConditionEquals(AND, Query.class, nestedRight, LESS_THAN, Query.class, nestedLeft, secondClause);
         }
-    }
 
-    @Nested
-    @DisplayName("deep nesting with")
-    class DeepNesting {
+        @Test
+        @DisplayName("as both operands with different operators with brackets")
+        void asBothOperandsWithBrackets() throws Exception {
+            final var nestedLeft = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
+            final var nestedRight = "SELECT COUNT(*) FROM projects WHERE projects.employee_id = employees.id";
+            final var sql = """
+                    SELECT *
+                    FROM employees
+                    WHERE (((%s) > (%s)) AND
+                    ((%s) < (%s)));
+                    """.formatted(nestedLeft, nestedRight, nestedRight, nestedLeft);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getFilters().size());
+            final var firstClause = parsed.getFilters().getFirst();
+            assertConditionEquals(WHERE, Query.class, nestedLeft, GREATER_THAN, Query.class, nestedRight, firstClause);
+            final var secondClause = parsed.getFilters().getLast();
+            assertConditionEquals(AND, Query.class, nestedRight, LESS_THAN, Query.class, nestedLeft, secondClause);
+        }
 
         @Test
         @DisplayName("2 levels and a function comparison")
@@ -456,8 +503,42 @@ public class ConditionParserIT extends AbstractSpringParserTest {
             assertEquals(1, parsed.getFilters().size());
             final var clause = parsed.getFilters().getFirst();
             assertConditionEquals(WHERE, Column.class, "count(*)", GREATER_THAN, Query.class, nested, clause);
-
         }
+    }
+
+    @Test
+    @DisplayName("all that beauty")
+    void withAllThatBeauty() throws IOException {
+        final var nested = "SELECT a FROM b WHERE c = 'd' AND e = f OR g IN ( 'h', 'i', 'j' )";
+        final var sql = """
+                SELECT *
+                FROM k
+                WHERE ((l <= m AND n NOT IN (1, 2, 3)) OR (p IN (%s)
+                AND ((%s) > 3 OR q = NULL))) AND (%s) IN (1, 2, 3);
+                """.formatted(nested, nested, nested);
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(6, parsed.getFilters().size());
+        final var firstClause = parsed.getFilters().get(0);
+        assertConditionEquals(WHERE, Column.class, "l", LESS_THAN_OR_EQUALS, Column.class, "m", firstClause);
+        final var secondClause = parsed.getFilters().get(1);
+        assertConditionEquals(AND, Column.class, "n", NOT_IN, ConstantList.class, List.of("1", "2", "3"), secondClause);
+        final var thirdClause = parsed.getFilters().get(2);
+        assertConditionEquals(OR, Column.class, "p", IN, Query.class, nested, thirdClause);
+        final var fourthClause = parsed.getFilters().get(3);
+        assertConditionEquals(AND, Query.class, nested, GREATER_THAN, Constant.class, "3", fourthClause);
+        final var fifthClause = parsed.getFilters().get(4);
+        assertConditionEquals(OR, Column.class, "q", EQUALS, Constant.class, "null", fifthClause);
+        final var sixthClause = parsed.getFilters().getLast();
+        assertConditionEquals(AND, Query.class, nested, IN, ConstantList.class, List.of("1", "2", "3"), sixthClause);
+
+        final var nestedQuery = (Query) sixthClause.getLeftOperand();
+        assertEquals(3, nestedQuery.getFilters().size());
+        final var nestedFirstClause = nestedQuery.getFilters().get(0);
+        assertConditionEquals(WHERE, Column.class, "c", EQUALS, Constant.class, "'d'", nestedFirstClause);
+        final var nestedSecondClause = nestedQuery.getFilters().get(1);
+        assertConditionEquals(AND, Column.class, "e", EQUALS, Column.class, "f", nestedSecondClause);
+        final var nestedThirdClause = nestedQuery.getFilters().getLast();
+        assertConditionEquals(OR, Column.class, "g", IN, ConstantList.class, List.of("'h'", "'i'", "'j'"), nestedThirdClause);
     }
 
     @TestFactory

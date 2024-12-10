@@ -55,23 +55,18 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             }
 
             if (LEX_OPEN_BRACKET.equals(lex)) {
-                do {
-                    brackets++;
-                } while (LEX_OPEN_BRACKET.equals(lex = nextLex.get()));
+                lex = nextLex.get();
                 if (LEX_SELECT.equals(lex)) {
                     // nested query
                     fragment = new Query();
                     nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 1);
-                    brackets--; // consumed by nested query;
                 } else if (isConstant(lex)) {
                     // constant list
                     fragment = new ConstantList();
                     lex = crawlForList((ConstantList) fragment, lex, nextLex);
-                    brackets--; // consumed by crawlForList
                 } else {
                     // condition in brackets
                     this.crawl(query, lex, nextLex, 1);
-                    brackets--; // consumed by crawl
                 }
             } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {

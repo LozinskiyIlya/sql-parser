@@ -70,7 +70,8 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     brackets--; // consumed by crawlForList
                 } else {
                     // condition in brackets
-                    fragment = new Column();
+                    this.crawl(query, lex, nextLex, 1);
+                    brackets--; // consumed by crawl
                 }
             } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {
@@ -90,6 +91,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     }
 
     private void flush(Query query, Fragment fragment, NameAliasPair pair) {
+        if (fragment == null) {
+            return;
+        }
         if (fragment instanceof Nameable) {
             ((Nameable) fragment).setName(pair.getFirst());
         }

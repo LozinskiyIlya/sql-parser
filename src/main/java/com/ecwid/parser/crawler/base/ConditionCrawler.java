@@ -6,6 +6,7 @@ import com.ecwid.parser.fragment.domain.Fragment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -19,14 +20,18 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected String processClauseAndReturnNextLex(Query query, String clauseType, Supplier<String> nextLex) {
-        final var condition = new Condition(Condition.ClauseType.valueOf(clauseType.toUpperCase()));
-        onCondition.accept(query, condition);
-        final var next = nextLex.get();
-        if (next == null) {
-            throw new IllegalStateException("Unexpected end of query after " + clauseType);
-        }
-        return next;
+    protected String processClauseAndReturnNextLex(Query query, String curLex, Supplier<String> nextLex) {
+        return Arrays.stream(Condition.ClauseType.values())
+                .map(Enum::name)
+                .filter(curLex::equalsIgnoreCase)
+                .findFirst()
+                .map(Condition.ClauseType::valueOf)
+                .map(Condition::new)
+                .map(condition -> {
+                    onCondition.accept(query, condition);
+                    return nextLex.get();
+                })
+                .orElse(curLex);
     }
 
     @Override

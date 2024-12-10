@@ -65,7 +65,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     fragment = new ConstantList();
                     lex = crawlForList((ConstantList) fragment, lex, nextLex);
                 } else {
-                    // condition in brackets
+                    // nested condition or join
                     this.crawl(query, lex, nextLex, 1);
                 }
             } else if (!StringUtils.hasText(pair.getFirst())) {

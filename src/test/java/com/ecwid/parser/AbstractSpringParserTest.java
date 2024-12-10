@@ -8,7 +8,6 @@ import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.service.SqlParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringJUnitConfig(classes = ParserApplicationConfig.class)
 @DisplayName("Should parse SQL")
 public abstract class AbstractSpringParserTest {
-    protected final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     protected SqlParser sqlParser;

@@ -4,6 +4,8 @@ import com.ecwid.parser.fragment.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -22,7 +24,7 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
 
     @Test
     @DisplayName("with all that beauty")
-    void selectWithAllThatBeauty() throws Exception {
+    void withAllThatBeauty() throws IOException {
         final var sql = """
                 SELECT author.name, count(book.id), sum(book.cost) AS total_cost
                 FROM author, (select * from old_books where title like '%$ecur1ty 1s our pri0r1ty%') as old_books

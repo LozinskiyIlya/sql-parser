@@ -46,4 +46,13 @@ public class Join {
         public static final Map<String, JoinType> joinTypeFullLexemes = MultiLex.createLexemeMap(JoinType.class);
     }
 
+    @Override
+    public String toString() {
+        final var builder = new LinkedList<String>();
+        builder.add(type.getFullLexeme());
+        builder.add(source.toString());
+        builder.add(LEX_ON);
+        conditions.stream().map(Condition::toString).forEach(builder::add);
+        return String.join(LEX_SPACE, builder);
+    }
 }

@@ -53,7 +53,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT * FROM some_table, one_more_t, even_third_t;";
             final var parsed = sqlParser.parse(sql);
             assertEquals(3, parsed.getSources().size());
-            assertSourceEquals(Table.class, "some_table", null, parsed.getSources().get(0));
+            assertSourceEquals(Table.class, "some_table", null, parsed.getSources().getFirst());
             assertSourceEquals(Table.class, "one_more_t", null, parsed.getSources().get(1));
             assertSourceEquals(Table.class, "even_third_t", null, parsed.getSources().get(2));
         }
@@ -135,7 +135,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT * FROM a, (%s), b".formatted(nested);
             final var parsed = sqlParser.parse(sql);
             assertEquals(3, parsed.getSources().size());
-            assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
+            assertSourceEquals(Table.class, "a", null, parsed.getSources().getFirst());
             assertSourceEquals(Query.class, nested, null, parsed.getSources().get(1));
             assertSourceEquals(Table.class, "b", null, parsed.getSources().get(2));
         }
@@ -153,7 +153,7 @@ public class SourceParserIT extends AbstractSpringParserTest {
                 """;
         final var parsed = sqlParser.parse(sql);
         assertEquals(8, parsed.getSources().size());
-        assertSourceEquals(Table.class, "a", null, parsed.getSources().get(0));
+        assertSourceEquals(Table.class, "a", null, parsed.getSources().getFirst());
         assertSourceEquals(Table.class, "b", "c", parsed.getSources().get(1));
         assertSourceEquals(Table.class, "d", null, parsed.getSources().get(2));
         assertSourceIsQuery("h", parsed.getSources().get(3));

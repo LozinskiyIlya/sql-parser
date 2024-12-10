@@ -41,7 +41,7 @@ public class ParserApplicationConfig {
         sectionCrawlerMap.put(LEX_WHERE, whereCrawler);
         sectionCrawlerMap.put(LEX_HAVING, whereCrawler);
 
-        sectionCrawlerMap.put(LEX_GROUP, null);
+        sectionCrawlerMap.put(LEX_GROUP, getByClass(GroupCrawler.class));
         sectionCrawlerMap.put(LEX_ORDER, null);
         sectionCrawlerMap.put(LEX_LIMIT, getByClass(LimitCrawler.class));
         sectionCrawlerMap.put(LEX_OFFSET, getByClass(OffsetCrawler.class));

@@ -326,6 +326,25 @@ public class JoinParserIT extends AbstractSpringParserTest {
         }
 
         @Test
+        @DisplayName("nested join with query as source table")
+        void nestedJoinWithQuery() throws IOException {
+            final var nested = "SELECT * FROM a";
+            final var sql = """
+                    SELECT *
+                    FROM table
+                    JOIN ((%s) JOIN b
+                    ON a.id = b.id) c
+                    ON c.id = table.id;""".formatted(nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getJoins().size());
+            final var join = parsed.getJoins().getFirst();
+            assertJoinEquals(JoinType.JOIN, NestedJoin.class, "(%s) JOIN b ON a.id = b.id".formatted(nested), "c", join);
+            final var conditions = join.getConditions();
+            assertEquals(1, conditions.size());
+            assertConditionEquals(ClauseType.ON, Column.class, "c.id", Operator.EQUALS, Column.class, "table.id", conditions.getFirst());
+        }
+
+        @Test
         @DisplayName("2 levels of nested joins")
         void twoLevelsOfNestedJoins() throws Exception {
             final var nestedSelectY = "SELECT * FROM y";
@@ -361,17 +380,17 @@ public class JoinParserIT extends AbstractSpringParserTest {
         final var nestedJoinX = "SELECT x.id, x.some_value FROM x JOIN (%s) z ON x.id = z.id".formatted(nestedSelectY);
         final var nestedQuery = "SELECT id FROM table_c WHERE status = 'completed' AND amount > 50";
         final var sql = """
-            SELECT a.id, a.name, b.name, c.status, e.some_value
-            FROM table_a a
-            JOIN table_b b
-                ON a.id = b.a_id AND b.date > '2023-01-01'
-            JOIN table_c c
-                ON b.id = c.b_id AND c.status = 'pending' AND c.id IN (%s)
-            FULL OUTER JOIN (table_d LEFT JOIN (%s) f ON table_d.id = f.id) d
-                ON a.id = d.id
-            NATURAL RIGHT JOIN (%s) e
-                ON d.id = e.id
-            """.formatted(nestedQuery, nestedSelectY, nestedJoinX);
+                SELECT a.id, a.name, b.name, c.status, e.some_value
+                FROM table_a a
+                JOIN table_b b
+                    ON a.id = b.a_id AND b.date > '2023-01-01'
+                JOIN table_c c
+                    ON b.id = c.b_id AND c.status = 'pending' AND c.id IN (%s)
+                FULL OUTER JOIN (table_d LEFT JOIN (%s) f ON table_d.id = f.id) d
+                    ON a.id = d.id
+                NATURAL RIGHT JOIN (%s) e
+                    ON d.id = e.id
+                """.formatted(nestedQuery, nestedSelectY, nestedJoinX);
 
         final var parsed = sqlParser.parse(sql);
 

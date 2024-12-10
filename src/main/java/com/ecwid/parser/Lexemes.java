@@ -84,8 +84,20 @@ public class Lexemes {
     );
 
     public static final Set<String> SKIP_LEX = Set.of(
+            LEX_BY,
             LEX_AS,
             LEX_ROWS,
             LEX_SEMICOLON
+    );
+
+    public static final Set<String> JOIN_PARTS = Set.of(
+            LEX_INNER,
+            LEX_OUTER,
+            LEX_LEFT,
+            LEX_RIGHT,
+            LEX_FULL,
+            LEX_CROSS,
+            LEX_NATURAL,
+            LEX_JOIN
     );
 }

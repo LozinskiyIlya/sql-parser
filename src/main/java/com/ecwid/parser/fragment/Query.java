@@ -20,7 +20,7 @@ public class Query implements Source {
     private List<Source> sources = new LinkedList<>();
     private List<Join> joins = new LinkedList<>();
     private List<Condition> filters = new LinkedList<>();
-    private List<Column> groupings = new LinkedList<>();
+    private List<Fragment> groupings = new LinkedList<>();
     private List<Sort> sorts = new LinkedList<>();
     private Integer limit = LIMIT_ALL;
     private Integer offset = NO_OFFSET;
@@ -43,7 +43,7 @@ public class Query implements Source {
             builder.add(printFragmentsList(query.columns));
             builder.add(printSources(query.sources));
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
-            // joins
+            query.getJoins().stream().map(Join::toString).forEach(builder::add);
             // groupings
             // sorts
             if (query.limit != LIMIT_ALL) {

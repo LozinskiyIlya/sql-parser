@@ -41,9 +41,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             }
             if (LEX_CLOSE_BRACKET.equals(lex)) {
                 if (--brackets == 0) {
-                    continue;
+                    break;
                 }
-                break;
+                continue;
             }
 
             if (OPERATORS.contains(lex)) {
@@ -61,7 +61,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 if (LEX_SELECT.equals(lex)) {
                     // nested query
                     fragment = new Query();
-                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 0);
+                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 1);
                     brackets--; // consumed by nested query;
                 } else if (isConstant(lex)) {
                     // constant list

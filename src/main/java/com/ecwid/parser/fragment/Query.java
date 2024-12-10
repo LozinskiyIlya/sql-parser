@@ -63,7 +63,7 @@ public class Query implements Source {
 
     private static String printSources(List<Source> sources) {
         if (sources.isEmpty()) {
-            return "";
+            return LEX_EMPTY;
         }
         final var casted = sources.stream().map(Fragment.class::cast).toList();
         return LEX_FROM + LEX_SPACE + printFragmentsList(casted);

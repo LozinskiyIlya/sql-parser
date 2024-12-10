@@ -1,21 +1,29 @@
 package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.config.TriggerMeOn;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Source;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
-import static com.ecwid.parser.Lexemes.LEX_JOIN;
-import static com.ecwid.parser.Lexemes.LEX_SPACE;
+import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.Join.JoinType.joinTypeFullLexemes;
 
-@Component
+@TriggerMeOn(lexemes = {
+        LEX_INNER,
+        LEX_OUTER,
+        LEX_LEFT,
+        LEX_RIGHT,
+        LEX_FULL,
+        LEX_CROSS,
+        LEX_NATURAL,
+        LEX_JOIN
+})
 @RequiredArgsConstructor
 public class JoinCrawler extends FragmentCrawler {
 

@@ -56,6 +56,7 @@ public class Lexemes {
     public static final String LEX_CLOSE_BRACKET = ")";
     public static final String LEX_SINGLE_QUOTE = "'";
     public static final String LEX_SPACE = " ";
+    public static final String LEX_EMPTY = "";
 
     public static final Set<String> SEPARATORS = Set.of(
             LEX_OPEN_BRACKET,

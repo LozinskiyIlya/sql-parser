@@ -15,6 +15,45 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ColumnParserIT extends AbstractSpringParserTest {
 
     @Nested
+    @DisplayName("no source")
+    class NoSource {
+        @Test
+        @DisplayName("no from")
+        void noFrom() throws Exception {
+            final var sql = "SELECT 1";
+            final var parsed = sqlParser.parse(sql);
+            assertEqualsIgnoreCaseTrimmed(sql, parsed.getValue());
+        }
+
+        @Test
+        @DisplayName("no from with alias")
+        void noFromWithAlias() throws Exception {
+            final var sql = "SELECT '1' b, 2 as C;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(2, parsed.getColumns().size());
+            assertFragmentEquals(Constant.class, "'1'", "b", parsed.getColumns().get(0));
+            assertFragmentEquals(Constant.class, "2", "c", parsed.getColumns().get(1));
+        }
+
+        @Test
+        @DisplayName("with nested queries")
+        void nestedQuery() throws Exception {
+            final var nested = "SELECT a b, c d FROM table";
+            final var sql = "SELECT (%s) T, 1, (%s), 2".formatted(nested, nested);
+            final var parsed = sqlParser.parse(sql);
+            assertEqualsIgnoreCaseTrimmed(sql, parsed.getValue());
+        }
+
+        @Test
+        @DisplayName("with other clauses")
+        void withOtherClauses() throws Exception {
+            final var sql = "SELECT 1, 2, 3  WHERE a = 1 LIMIT 1 OFFSET 2";
+            final var parsed = sqlParser.parse(sql);
+            assertEqualsIgnoreCaseTrimmed(sql, parsed.getValue());
+        }
+    }
+
+    @Nested
     @DisplayName("column names with")
     class ColumnNames {
 
@@ -283,12 +322,12 @@ public class ColumnParserIT extends AbstractSpringParserTest {
     void withAllThatBeauty() throws IOException {
         final var nested1 = "SELECT a b, '1' c, 2 d, count(a.id) e FROM table";
         final var nested2 = "SELECT f g, 2, max(h), (%s), max(g) FROM table".formatted(nested1);
-        final var sql = "SELECT x, (%s), (%s) t, y z FROM table;".formatted(nested1, nested2);
+        final var sql = "SELECT x, (%s), (%s) 'i', y z FROM table;".formatted(nested1, nested2);
         final var parsed = sqlParser.parse(sql);
         assertEquals(4, parsed.getColumns().size());
         assertFragmentEquals(Column.class, "x", null, parsed.getColumns().get(0));
         assertFragmentEquals(Query.class, nested1, null, parsed.getColumns().get(1));
-        assertFragmentEquals(Query.class, nested2, "t", parsed.getColumns().get(2));
+        assertFragmentEquals(Query.class, nested2, "'i'", parsed.getColumns().get(2));
         assertFragmentEquals(Column.class, "y", "z", parsed.getColumns().get(3));
         final var nestedQuery1 = (Query) parsed.getColumns().get(1);
         assertEquals(4, nestedQuery1.getColumns().size());

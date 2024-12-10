@@ -306,6 +306,17 @@ public class JoinParserIT extends AbstractSpringParserTest {
             assertConditionEquals(ClauseType.AND, Column.class, "c.status", Operator.EQUALS, Constant.class, "'pending'", conditions1.get(1));
             assertConditionEquals(ClauseType.AND, Column.class, "c.id", Operator.IN, Query.class, nested, conditions1.get(2));
         }
+
+        @Test
+        @DisplayName("nested join")
+        void nestedJoin() throws Exception {
+            final var sql = """
+                    SELECT *
+                    FROM a
+                    JOIN (b JOIN c ON b.id = c.id) d
+                    ON a.id = d.id;
+                    """;
+            }
     }
 
     private void assertJoinEquals(Join.JoinType type, Class<? extends Source> sourceClass, String sourceValue, String tableAlias, Join actual) {

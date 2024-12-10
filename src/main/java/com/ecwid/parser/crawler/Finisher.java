@@ -1,5 +1,6 @@
-package com.ecwid.parser.crawler.base;
+package com.ecwid.parser.crawler;
 
+import com.ecwid.parser.crawler.base.Crawler;
 import com.ecwid.parser.fragment.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

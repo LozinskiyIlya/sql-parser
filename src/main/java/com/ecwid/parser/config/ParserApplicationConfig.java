@@ -2,7 +2,7 @@ package com.ecwid.parser.config;
 
 import com.ecwid.parser.crawler.*;
 import com.ecwid.parser.crawler.base.Crawler;
-import com.ecwid.parser.crawler.base.Finisher;
+import com.ecwid.parser.crawler.Finisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

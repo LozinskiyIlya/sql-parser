@@ -81,6 +81,10 @@ public abstract class AbstractSpringParserTest {
         assertEquals(alias, aliasable.getAlias(), "Alias mismatch");
     }
 
+    protected void assertEqualsIgnoreCaseTrimmed(String expected, String actual) {
+        assertEquals(expected.toLowerCase().trim(), actual.toLowerCase().trim());
+    }
+
     public record TestCase(String displayName, String input, List<String> expected) {
     }
 }

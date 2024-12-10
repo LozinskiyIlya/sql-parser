@@ -41,7 +41,6 @@ public class Query implements Source {
             final var builder = new LinkedList<String>();
             builder.add(LEX_SELECT);
             builder.add(printFragmentsList(query.columns));
-            builder.add(LEX_FROM);
             builder.add(printSources(query.sources));
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
             // joins
@@ -63,8 +62,11 @@ public class Query implements Source {
     }
 
     private static String printSources(List<Source> sources) {
+        if (sources.isEmpty()) {
+            return "";
+        }
         final var casted = sources.stream().map(Fragment.class::cast).toList();
-        return printFragmentsList(casted);
+        return LEX_FROM + LEX_SPACE + printFragmentsList(casted);
     }
 
     private static String printFragmentsList(List<Fragment> fragments) {
@@ -83,6 +85,6 @@ public class Query implements Source {
             }
 
             return fragment.toString();
-        }).collect(Collectors.joining(", "));
+        }).collect(Collectors.joining(", ")).trim();
     }
 }

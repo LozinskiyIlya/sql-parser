@@ -70,7 +70,7 @@ public class OrderParserIT extends AbstractSpringParserTest {
             final var sql = "SELECT * FROM employees ORDER BY LOWER(employee_name);";
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSorts().size());
-            assertSortEquals(Column.class, " LOWER(employee_name)", ASC, LAST, parsed.getSorts().getFirst());
+            assertSortEquals(Column.class, "LOWER(employee_name)", ASC, LAST, parsed.getSorts().getFirst());
         }
 
         @Test
@@ -154,6 +154,27 @@ public class OrderParserIT extends AbstractSpringParserTest {
             assertSortEquals(Column.class, "department_id", DESC, LAST, parsed.getSorts().getFirst());
             assertSortEquals(Column.class, "salary", ASC, FIRST, parsed.getSorts().getLast());
         }
+        @Test
+        @DisplayName("multiple columns without config in between")
+        void multipleColumnsWithoutConfigInBetween() throws IOException {
+            final var sql = "SELECT * FROM employees ORDER BY department_id NULLS FIRST, salary, age DESC;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getSorts().size());
+            assertSortEquals(Column.class, "department_id", ASC, FIRST, parsed.getSorts().get(0));
+            assertSortEquals(Column.class, "salary", ASC, LAST, parsed.getSorts().get(1));
+            assertSortEquals(Column.class, "age", DESC, LAST, parsed.getSorts().get(2));
+        }
+
+        @Test
+        @DisplayName("multiple columns with config in between")
+        void multipleColumnsWithConfigInBetween() throws IOException {
+            final var sql = "SELECT * FROM employees ORDER BY department_id, salary DESC NULLS FIRST, age;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(3, parsed.getSorts().size());
+            assertSortEquals(Column.class, "department_id", ASC, LAST, parsed.getSorts().get(0));
+            assertSortEquals(Column.class, "salary", DESC, FIRST, parsed.getSorts().get(1));
+            assertSortEquals(Column.class, "age", ASC, LAST, parsed.getSorts().get(2));
+        }
     }
 
 
@@ -171,13 +192,13 @@ public class OrderParserIT extends AbstractSpringParserTest {
         assertEquals(5, parsed.getSorts().size());
         assertSortEquals(Column.class, "department_id", ASC, LAST, parsed.getSorts().get(0));
         assertSortEquals(Constant.class, "4", ASC, FIRST, parsed.getSorts().get(1));
-        assertSortEquals(Column.class, "employee_name", ASC, LAST, parsed.getSorts().get(2));
+        assertSortEquals(Column.class, "lower(employee_name)", ASC, LAST, parsed.getSorts().get(2));
         assertSortEquals(Query.class, nested, ASC, LAST, parsed.getSorts().get(3));
         assertSortEquals(Column.class, "hire_date", DESC, LAST, parsed.getSorts().get(4));
     }
 
     private void assertSortEquals(Class<? extends Fragment> type, String value, Direction direction, Nulls nulls, Sort actual) {
-        assertFragmentEquals(type, value, null, actual.getFragment());
+        assertFragmentEquals(type, value, null, actual.getSortBy());
         assertEquals(direction, actual.getDirection(), "Direction mismatch");
         assertEquals(nulls, actual.getNulls(), "Nulls mismatch");
     }

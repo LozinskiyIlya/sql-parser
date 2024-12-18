@@ -12,7 +12,7 @@ public class Sort {
 
     private Direction direction = Direction.ASC;
     private Nulls nulls = Nulls.LAST;
-    private Fragment fragment;
+    private Fragment sortBy;
 
     public enum Direction {
         ASC,
@@ -27,11 +27,9 @@ public class Sort {
     @Override
     public String toString() {
         final var builder = new LinkedList<String>();
-        builder.add(LEX_ORDER);
-        builder.add(LEX_BY);
-        builder.add(fragment.toString());
+        builder.add(sortBy.toString());
         builder.add(direction.name());
-        builder.add(LEX_NULLS);
+        builder.add(LEX_NULLS.toUpperCase());
         builder.add(nulls.name());
         return String.join(LEX_SPACE, builder);
     }

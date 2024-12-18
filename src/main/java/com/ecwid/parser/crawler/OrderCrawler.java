@@ -12,7 +12,7 @@ public class OrderCrawler extends NoClauseProcessCrawler {
     public OrderCrawler() {
         super((query, fragment) -> {
             final var sort = new Sort();
-            sort.setFragment(fragment);
+            sort.setSortBy(fragment);
             query.getSorts().add(sort);
         });
     }

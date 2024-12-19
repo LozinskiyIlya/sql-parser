@@ -9,21 +9,25 @@ import java.util.function.Supplier;
 
 @Getter
 public class CrawlContext {
-    private String currentSection;
+    private String currentLex;
     private final Query query;
-    private final Supplier<String> nextLex;
+    private final Supplier<String> nextLexSupplier;
     @Getter(AccessLevel.NONE)
     private final AtomicInteger openBrackets;
 
-    public CrawlContext(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
+    public CrawlContext(Query query, String currentLex, Supplier<String> nextLexSupplier, int openBrackets) {
         this.query = query;
-        this.currentSection = currentSection;
-        this.nextLex = nextLex;
+        this.currentLex = currentLex;
+        this.nextLexSupplier = nextLexSupplier;
         this.openBrackets = new AtomicInteger(openBrackets);
     }
 
-    public CrawlContext moveTo(String nextSection) {
-        this.currentSection = nextSection;
+    public CrawlContext move() {
+        return moveTo(nextLexSupplier.get());
+    }
+
+    public CrawlContext moveTo(String nextLex) {
+        this.currentLex = nextLex;
         return this;
     }
 

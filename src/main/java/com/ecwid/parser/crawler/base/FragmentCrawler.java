@@ -22,16 +22,16 @@ import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
 
-    protected abstract String lexAfterClause(CrawlContext context);
+    protected abstract String onClause(CrawlContext context);
 
     protected abstract void onFragment(Query query, Fragment fragment);
 
     @Override
     public final void crawl(CrawlContext context) {
         Fragment fragment = null;
-        var lex = lexAfterClause(context);
+        var lex = onClause(context);
         final var query = context.getQuery();
-        final var nextLex = context.getNextLex();
+        final var nextLex = context.getNextLexSupplier();
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {

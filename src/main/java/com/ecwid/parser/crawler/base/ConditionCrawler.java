@@ -18,10 +18,10 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected String lexAfterClause(CrawlContext context) {
+    protected String onClause(CrawlContext context) {
         final var query = context.getQuery();
-        final var curLex = context.getCurrentSection();
-        final var nextLex = context.getNextLex();
+        final var curLex = context.getCurrentLex();
+        final var nextLex = context.getNextLexSupplier();
         return ClauseType.fromString(curLex)
                 .map(Condition::new)
                 .map(condition -> {

@@ -23,6 +23,6 @@ public class Finisher implements Crawler {
         if (context.getOpenBrackets() != 0) {
             throw new IllegalStateException("Not balanced brackets in query: " + context.getQuery());
         }
-        log.info("Query {} finished with '{}'", context.getQuery(), context.getCurrentSection());
+        log.info("Query {} finished with '{}'", context.getQuery(), context.getCurrentLex());
     }
 }

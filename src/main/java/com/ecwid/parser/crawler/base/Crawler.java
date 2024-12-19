@@ -11,7 +11,7 @@ public interface Crawler {
     void crawl(CrawlContext context);
 
     default void delegate(CrawlContext context) {
-        nextCrawler(context.getCurrentSection()).ifPresent(crawler -> crawler.crawl(context));
+        nextCrawler(context.getCurrentLex()).ifPresent(crawler -> crawler.crawl(context));
     }
 
 

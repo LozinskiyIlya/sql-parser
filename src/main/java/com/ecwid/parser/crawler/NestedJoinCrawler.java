@@ -14,8 +14,8 @@ public class NestedJoinCrawler extends FragmentCrawler {
 
 
     @Override
-    protected String lexAfterClause(CrawlContext context) {
-        return context.getCurrentSection();
+    protected String onClause(CrawlContext context) {
+        return context.getCurrentLex();
     }
 
     @Override

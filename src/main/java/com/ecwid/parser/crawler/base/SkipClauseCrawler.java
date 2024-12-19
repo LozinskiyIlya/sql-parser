@@ -18,7 +18,7 @@ public abstract class SkipClauseCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected final String lexAfterClause(CrawlContext context) {
-        return context.getNextLex().get();
+    protected final String onClause(CrawlContext context) {
+        return context.getNextLexSupplier().get();
     }
 }

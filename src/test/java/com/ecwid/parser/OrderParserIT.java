@@ -80,11 +80,21 @@ public class OrderParserIT extends AbstractSpringParserTest {
             final var sql = """
                     SELECT employee_id
                     FROM employees
-                    ORDER BY (%s) DESC;
+                    ORDER BY (%s);
                     """.formatted(nested);
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getSorts().size());
-            assertSortEquals(Query.class, nested, DESC, LAST, parsed.getSorts().getFirst());
+            assertSortEquals(Query.class, nested, ASC, LAST, parsed.getSorts().getFirst());
+        }
+
+        @Test
+        @DisplayName("followed by other clauses")
+        void followedByClauses() throws IOException {
+            final var sql = "SELECT * FROM employees ORDER BY department_id LIMIT 10;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getSorts().size());
+            assertSortEquals(Column.class, "department_id", ASC, LAST, parsed.getSorts().getFirst());
+            assertEquals(10, parsed.getLimit());
         }
     }
 
@@ -154,6 +164,7 @@ public class OrderParserIT extends AbstractSpringParserTest {
             assertSortEquals(Column.class, "department_id", DESC, LAST, parsed.getSorts().getFirst());
             assertSortEquals(Column.class, "salary", ASC, FIRST, parsed.getSorts().getLast());
         }
+
         @Test
         @DisplayName("multiple columns without config in between")
         void multipleColumnsWithoutConfigInBetween() throws IOException {
@@ -174,6 +185,17 @@ public class OrderParserIT extends AbstractSpringParserTest {
             assertSortEquals(Column.class, "department_id", ASC, LAST, parsed.getSorts().get(0));
             assertSortEquals(Column.class, "salary", DESC, FIRST, parsed.getSorts().get(1));
             assertSortEquals(Column.class, "age", ASC, LAST, parsed.getSorts().get(2));
+        }
+
+        @Test
+        @DisplayName("followed by other clauses")
+        void followedByOtherClauses() throws IOException {
+            final var sql = "SELECT * FROM employees ORDER BY department_id ASC NULLS LAST LIMIT 10 OFFSET 5;";
+            final var parsed = sqlParser.parse(sql);
+            assertEquals(1, parsed.getSorts().size());
+            assertSortEquals(Column.class, "department_id", ASC, LAST, parsed.getSorts().getFirst());
+            assertEquals(10, parsed.getLimit());
+            assertEquals(5, parsed.getOffset());
         }
     }
 

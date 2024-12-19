@@ -32,6 +32,10 @@ public class OrderConfigCrawler extends FragmentCrawler {
             query.getSorts().add(sort);
             return nextLex.get();
         }
+        if (shouldDelegate(lex)) {
+            delegate(new CrawlContext(query, lex, nextLex, context.openBrackets()));
+            return LEX_SEMICOLON;
+        }
         return lex;
     }
 

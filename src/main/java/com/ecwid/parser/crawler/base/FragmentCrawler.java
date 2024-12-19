@@ -32,11 +32,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         var lex = processClauseAndReturnNextLex(context);
         final var query = context.query();
         final var nextLex = context.nextLex();
-        if (shouldDelegate(lex)) {
-            delegate(new CrawlContext(query, lex, nextLex, brackets));
-            return;
-        }
-
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {

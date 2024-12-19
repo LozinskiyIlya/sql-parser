@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler.base;
 
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Fragment;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,6 @@ public abstract class SkipClauseCrawler extends FragmentCrawler {
 
     @Override
     protected final String lexAfterClause(CrawlContext context) {
-        return context.nextLexSupplier().get();
+        return context.getNextLexSupplier().get();
     }
 }

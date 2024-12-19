@@ -2,6 +2,7 @@ package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.Sort;
 import com.ecwid.parser.fragment.domain.Fragment;
@@ -15,9 +16,9 @@ public class OrderConfigCrawler extends FragmentCrawler {
 
     @Override
     protected String lexAfterClause(CrawlContext context) {
-        final var currentSection = context.currentSection();
-        final var query = context.query();
-        final var nextLex = context.nextLexSupplier();
+        final var currentSection = context.getCurrentSection();
+        final var query = context.getQuery();
+        final var nextLex = context.getNextLexSupplier();
         String lex;
         if (LEX_NULLS.equals(currentSection)) {
             lex = setNullsAndReturnNext(query, nextLex);
@@ -33,7 +34,7 @@ public class OrderConfigCrawler extends FragmentCrawler {
             return nextLex.get();
         }
         if (shouldDelegate(lex)) {
-            delegate(new CrawlContext(query, lex, nextLex, context.openBrackets()));
+            delegate(new CrawlContext(query, lex, nextLex, context.getOpenBrackets()));
             return LEX_SEMICOLON;
         }
         return lex;

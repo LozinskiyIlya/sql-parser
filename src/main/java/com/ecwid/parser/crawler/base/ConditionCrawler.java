@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler.base;
 
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Condition;
 import com.ecwid.parser.fragment.Condition.ClauseType;
 import com.ecwid.parser.fragment.Query;
@@ -18,9 +19,9 @@ public abstract class ConditionCrawler extends FragmentCrawler {
 
     @Override
     protected String lexAfterClause(CrawlContext context) {
-        final var query = context.query();
-        final var curLex = context.currentSection();
-        final var nextLex = context.nextLexSupplier();
+        final var query = context.getQuery();
+        final var curLex = context.getCurrentSection();
+        final var nextLex = context.getNextLexSupplier();
         return ClauseType.fromString(curLex)
                 .map(Condition::new)
                 .map(condition -> {

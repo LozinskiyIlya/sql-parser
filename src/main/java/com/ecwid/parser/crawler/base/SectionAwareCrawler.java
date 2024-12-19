@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler.base;
 
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 

@@ -2,7 +2,7 @@ package com.ecwid.parser.service;
 
 
 import com.ecwid.parser.crawler.ColumnCrawler;
-import com.ecwid.parser.crawler.base.Crawler.CrawlContext;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

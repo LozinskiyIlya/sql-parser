@@ -1,6 +1,7 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.crawler.base.FragmentCrawler;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Source;
@@ -14,7 +15,7 @@ public class NestedJoinCrawler extends FragmentCrawler {
 
     @Override
     protected String lexAfterClause(CrawlContext context) {
-        return context.currentSection();
+        return context.getCurrentSection();
     }
 
     @Override

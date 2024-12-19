@@ -3,6 +3,7 @@ package com.ecwid.parser.crawler;
 import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.Crawler;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Fragment;
@@ -44,8 +45,8 @@ public class JoinCrawler extends FragmentCrawler {
     @Override
     protected String lexAfterClause(CrawlContext context) {
         final var join = new Join();
-        context.query().getJoins().add(join);
-        return crawlForJoinType(join, context.currentSection(), context.nextLexSupplier());
+        context.getQuery().getJoins().add(join);
+        return crawlForJoinType(join, context.getCurrentSection(), context.getNextLexSupplier());
     }
 
     private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {

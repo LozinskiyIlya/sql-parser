@@ -1,9 +1,8 @@
 package com.ecwid.parser.crawler.base;
 
-import com.ecwid.parser.fragment.Query;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public interface Crawler {
 
@@ -12,9 +11,8 @@ public interface Crawler {
     void crawl(CrawlContext context);
 
     default void delegate(CrawlContext context) {
-        nextCrawler(context.currentSection()).ifPresent(crawler -> crawler.crawl(context));
+        nextCrawler(context.getCurrentSection()).ifPresent(crawler -> crawler.crawl(context));
     }
 
-    record CrawlContext(Query query, String currentSection, Supplier<String> nextLexSupplier, int openBrackets) {
-    }
+
 }

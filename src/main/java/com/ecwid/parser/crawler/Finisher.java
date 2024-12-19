@@ -2,6 +2,7 @@ package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.Crawler;
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -19,9 +20,9 @@ public class Finisher implements Crawler {
 
     @Override
     public void crawl(CrawlContext context) {
-        if (context.openBrackets() != 0) {
-            throw new IllegalStateException("Not balanced brackets in query: " + context.query());
+        if (context.getOpenBrackets() != 0) {
+            throw new IllegalStateException("Not balanced brackets in query: " + context.getQuery());
         }
-        log.info("Query {} finished with '{}'", context.query(), context.currentSection());
+        log.info("Query {} finished with '{}'", context.getQuery(), context.getCurrentSection());
     }
 }

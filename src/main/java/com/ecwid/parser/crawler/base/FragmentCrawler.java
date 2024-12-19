@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler.base;
 
+import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.crawler.base.helper.NameAliasPair;
 import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.Condition.Operator;
@@ -29,9 +30,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     public final void crawl(CrawlContext context) {
         Fragment fragment = null;
         var lex = lexAfterClause(context);
-        int brackets = context.openBrackets();
-        final var query = context.query();
-        final var nextLex = context.nextLexSupplier();
+        int brackets = context.getOpenBrackets();
+        final var query = context.getQuery();
+        final var nextLex = context.getNextLexSupplier();
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {

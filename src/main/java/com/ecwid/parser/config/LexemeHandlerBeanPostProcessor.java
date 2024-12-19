@@ -26,8 +26,9 @@ public class LexemeHandlerBeanPostProcessor implements BeanPostProcessor {
         if (annotation != null) {
             for (String lex : annotation.lexemes()) {
                 crawlersMap.put(lex, (Crawler) bean);
-                // additional case for Finisher.class
+
                 if (lex.equals(LEX_EMPTY)) {
+                    // additional case for Finisher.class
                     crawlersMap.put(null, (Crawler) bean);
                 }
             }

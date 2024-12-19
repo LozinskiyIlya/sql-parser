@@ -19,17 +19,14 @@ public abstract class ConditionCrawler extends FragmentCrawler {
 
     @Override
     protected String processClauseAndReturnNextLex(Query query, String curLex, Supplier<String> nextLex) {
-        return Arrays.stream(Condition.ClauseType.values())
-                .map(Enum::name)
-                .filter(curLex::equalsIgnoreCase)
-                .findFirst()
-                .map(Condition.ClauseType::valueOf)
-                .map(Condition::new)
-                .map(condition -> {
-                    onCondition.accept(query, condition);
-                    return nextLex.get();
-                })
-                .orElse(curLex);
+        for (Condition.ClauseType clauseType : Condition.ClauseType.values()) {
+            if (clauseType.name().equalsIgnoreCase(curLex)) {
+                Condition condition = new Condition(clauseType);
+                onCondition.accept(query, condition);
+                return nextLex.get();
+            }
+        }
+        return curLex;
     }
 
     @Override

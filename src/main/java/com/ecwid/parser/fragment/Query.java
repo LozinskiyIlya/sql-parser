@@ -58,8 +58,8 @@ public class Query implements Source {
             printSources(query, builder);
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
             query.getJoins().stream().map(Join::toString).forEach(builder::add);
-            // groupings
-            // sorts
+            //todo groupings
+            //todo sorts
             if (query.limit != LIMIT_ALL) {
                 builder.add(LEX_LIMIT);
                 builder.add(query.limit.toString());

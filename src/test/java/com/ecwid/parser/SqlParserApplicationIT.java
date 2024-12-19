@@ -38,6 +38,13 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
                 OFFSET 5;
                 """;
         final var parsed = sqlParser.parse(sql);
-        System.out.println(parsed);
+        assertEquals(3, parsed.getColumns().size());
+        assertEquals(2, parsed.getSources().size());
+        assertEquals(1, parsed.getJoins().size());
+        assertEquals(2, parsed.getGroupings().size());
+        assertEquals(3, parsed.getFilters().size());
+        assertEquals(1, parsed.getSorts().size());
+        assertEquals(10, parsed.getLimit());
+        assertEquals(5, parsed.getOffset());
     }
 }

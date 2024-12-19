@@ -30,6 +30,10 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         Fragment fragment = null;
         int brackets = openBrackets;
         var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
+        if (shouldDelegate(lex)) {
+            delegate(query, lex, nextLex, openBrackets);
+            return;
+        }
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {

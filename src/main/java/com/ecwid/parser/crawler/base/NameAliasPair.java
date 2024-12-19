@@ -5,25 +5,22 @@ import lombok.Getter;
 import static com.ecwid.parser.Lexemes.LEX_AS;
 
 @Getter
-public class NameAliasPair {
+class NameAliasPair {
 
-    private String first;
+    private String name;
 
-    private String second;
+    private String alias;
 
     public void push(String part) {
-        if (LEX_AS.equals(part)) {
-            return;
-        }
-        if (first == null) {
-            first = part;
+        if (name == null) {
+            name = part;
         } else {
-            second = part;
+            alias = part;
         }
     }
 
     public void reset() {
-        first = null;
-        second = null;
+        name = null;
+        alias = null;
     }
 }

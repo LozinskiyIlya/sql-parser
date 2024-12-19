@@ -15,6 +15,6 @@ public interface Crawler {
         nextCrawler(context.currentSection()).ifPresent(crawler -> crawler.crawl(context));
     }
 
-    record CrawlContext(Query query, String currentSection, Supplier<String> lexSupplier, int openBrackets) {
+    record CrawlContext(Query query, String currentSection, Supplier<String> nextLexSupplier, int openBrackets) {
     }
 }

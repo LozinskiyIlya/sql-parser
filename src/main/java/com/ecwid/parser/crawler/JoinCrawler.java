@@ -37,15 +37,15 @@ public class JoinCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected void processFragment(Query query, Fragment fragment) {
+    protected void onFragment(Query query, Fragment fragment) {
         query.getJoins().getLast().setSource((Source) fragment);
     }
 
     @Override
-    protected String processClauseAndReturnNextLex(CrawlContext context) {
+    protected String lexAfterClause(CrawlContext context) {
         final var join = new Join();
         context.query().getJoins().add(join);
-        return crawlForJoinType(join, context.currentSection(), context.lexSupplier());
+        return crawlForJoinType(join, context.currentSection(), context.nextLexSupplier());
     }
 
     private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {

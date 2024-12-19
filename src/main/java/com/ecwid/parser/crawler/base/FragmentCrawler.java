@@ -17,9 +17,9 @@ import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
 
-    protected abstract String processClauseAndReturnNextLex(CrawlContext context);
+    protected abstract String lexAfterClause(CrawlContext context);
 
-    protected abstract void processFragment(Query query, Fragment fragment);
+    protected abstract void onFragment(Query query, Fragment fragment);
 
     protected boolean crawlsForSources() {
         return false;
@@ -28,10 +28,10 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     @Override
     public final void crawl(CrawlContext context) {
         Fragment fragment = null;
+        var lex = lexAfterClause(context);
         int brackets = context.openBrackets();
-        var lex = processClauseAndReturnNextLex(context);
         final var query = context.query();
-        final var nextLex = context.lexSupplier();
+        final var nextLex = context.nextLexSupplier();
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -70,7 +70,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     // nested condition
                     this.crawl(new CrawlContext(query, lex, nextLex, 1));
                 }
-            } else if (!StringUtils.hasText(pair.getFirst())) {
+            } else if (!StringUtils.hasText(pair.getName())) {
                 if (isConstant(lex)) {
                     fragment = new Constant(lex);
                 } else if (crawlsForSources()) {
@@ -92,12 +92,12 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
             return;
         }
         if (fragment instanceof Nameable) {
-            ((Nameable) fragment).setName(pair.getFirst());
+            ((Nameable) fragment).setName(pair.getName());
         }
         if (fragment instanceof Aliasable) {
-            ((Aliasable) fragment).setAlias(pair.getSecond());
+            ((Aliasable) fragment).setAlias(pair.getAlias());
         }
-        processFragment(query, fragment);
+        onFragment(query, fragment);
         pair.reset();
     }
 

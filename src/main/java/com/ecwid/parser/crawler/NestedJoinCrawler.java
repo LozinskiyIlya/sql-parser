@@ -13,12 +13,12 @@ public class NestedJoinCrawler extends FragmentCrawler {
 
 
     @Override
-    protected String processClauseAndReturnNextLex(CrawlContext context) {
+    protected String lexAfterClause(CrawlContext context) {
         return context.currentSection();
     }
 
     @Override
-    protected void processFragment(Query query, Fragment fragment) {
+    protected void onFragment(Query query, Fragment fragment) {
         query.getSources().add((Source) fragment);
     }
 

@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.function.BiConsumer;
 
-public abstract class IntegerCrawler extends NoClauseProcessCrawler {
+public abstract class IntegerCrawler extends SkipClauseCrawler {
 
     public IntegerCrawler(BiConsumer<Query, Integer> onInteger, String clause) {
         super((query, fragment) -> {

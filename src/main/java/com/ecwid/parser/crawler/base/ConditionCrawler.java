@@ -17,10 +17,10 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected String processClauseAndReturnNextLex(CrawlContext context) {
+    protected String lexAfterClause(CrawlContext context) {
         final var query = context.query();
         final var curLex = context.currentSection();
-        final var nextLex = context.lexSupplier();
+        final var nextLex = context.nextLexSupplier();
         return ClauseType.fromString(curLex)
                 .map(Condition::new)
                 .map(condition -> {
@@ -31,7 +31,7 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected void processFragment(Query query, Fragment fragment) {
+    protected void onFragment(Query query, Fragment fragment) {
         onFragment.accept(query, fragment);
     }
 

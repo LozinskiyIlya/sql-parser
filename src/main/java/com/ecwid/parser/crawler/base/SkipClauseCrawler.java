@@ -7,17 +7,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
-public abstract class NoClauseProcessCrawler extends FragmentCrawler {
+public abstract class SkipClauseCrawler extends FragmentCrawler {
 
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected final void processFragment(Query query, Fragment fragment) {
+    protected final void onFragment(Query query, Fragment fragment) {
         onFragment.accept(query, fragment);
     }
 
     @Override
-    protected final String processClauseAndReturnNextLex(CrawlContext context) {
-        return context.lexSupplier().get();
+    protected final String lexAfterClause(CrawlContext context) {
+        return context.nextLexSupplier().get();
     }
 }

@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.config.TriggerMeOn;
+import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.Crawler;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
 import com.ecwid.parser.fragment.Join;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 import static com.ecwid.parser.fragment.Join.JoinType.joinTypeFullLexemes;
 
-@TriggerMeOn(lexemes = {
+@LexemeHandler(lexemes = {
         LEX_INNER,
         LEX_OUTER,
         LEX_LEFT,

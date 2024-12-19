@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.config.TriggerMeOn;
+import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.Sort;
@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
 
-@TriggerMeOn(lexemes = {LEX_ASC, LEX_DESC, LEX_NULLS})
+@LexemeHandler(lexemes = {LEX_ASC, LEX_DESC, LEX_NULLS})
 public class OrderConfigCrawler extends FragmentCrawler {
 
     @Override

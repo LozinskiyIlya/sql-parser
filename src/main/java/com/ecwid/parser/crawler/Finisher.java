@@ -1,6 +1,6 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.config.TriggerMeOn;
+import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.Crawler;
 import com.ecwid.parser.fragment.Query;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import static com.ecwid.parser.Lexemes.*;
 
 @Slf4j
-@TriggerMeOn(lexemes = {LEX_SEMICOLON, LEX_EMPTY})
+@LexemeHandler(lexemes = {LEX_SEMICOLON, LEX_EMPTY})
 public class Finisher implements Crawler {
     @Override
     public Optional<Crawler> nextCrawler(String nextSection) {

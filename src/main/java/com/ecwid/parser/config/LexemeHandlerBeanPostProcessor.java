@@ -13,7 +13,7 @@ import static com.ecwid.parser.Lexemes.LEX_EMPTY;
 
 @Getter
 @Component
-public class TriggerMeOnPostProcessor implements BeanPostProcessor {
+public class LexemeHandlerBeanPostProcessor implements BeanPostProcessor {
 
     private final Map<String, Crawler> crawlersMap = new HashMap<>();
 
@@ -22,7 +22,7 @@ public class TriggerMeOnPostProcessor implements BeanPostProcessor {
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        TriggerMeOn annotation = bean.getClass().getAnnotation(TriggerMeOn.class);
+        LexemeHandler annotation = bean.getClass().getAnnotation(LexemeHandler.class);
         if (annotation != null) {
             for (String lex : annotation.lexemes()) {
                 crawlersMap.put(lex, (Crawler) bean);

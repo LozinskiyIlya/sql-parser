@@ -1,11 +1,11 @@
 package com.ecwid.parser.crawler;
 
-import com.ecwid.parser.config.TriggerMeOn;
+import com.ecwid.parser.config.LexemeHandler;
 import com.ecwid.parser.crawler.base.ConditionCrawler;
 
 import static com.ecwid.parser.Lexemes.LEX_ON;
 
-@TriggerMeOn(lexemes = LEX_ON)
+@LexemeHandler(lexemes = LEX_ON)
 public class OnCrawler extends ConditionCrawler {
 
     public OnCrawler() {

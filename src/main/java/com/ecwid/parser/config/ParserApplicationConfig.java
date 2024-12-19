@@ -13,11 +13,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ParserApplicationConfig {
 
-    private final TriggerMeOnPostProcessor triggerMeOnPostProcessor;
+    private final LexemeHandlerBeanPostProcessor lexemeHandlerBeanPostProcessor;
 
     @Bean
     public Map<String, Crawler> sectionAgainstCrawler() {
-        return triggerMeOnPostProcessor.getCrawlersMap();
+        return lexemeHandlerBeanPostProcessor.getCrawlersMap();
     }
 
 }

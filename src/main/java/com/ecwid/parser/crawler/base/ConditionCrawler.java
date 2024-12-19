@@ -1,11 +1,11 @@
 package com.ecwid.parser.crawler.base;
 
 import com.ecwid.parser.fragment.Condition;
+import com.ecwid.parser.fragment.Condition.ClauseType;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Fragment;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -19,14 +19,13 @@ public abstract class ConditionCrawler extends FragmentCrawler {
 
     @Override
     protected String processClauseAndReturnNextLex(Query query, String curLex, Supplier<String> nextLex) {
-        for (Condition.ClauseType clauseType : Condition.ClauseType.values()) {
-            if (clauseType.name().equalsIgnoreCase(curLex)) {
-                Condition condition = new Condition(clauseType);
-                onCondition.accept(query, condition);
-                return nextLex.get();
-            }
-        }
-        return curLex;
+        return ClauseType.fromString(curLex)
+                .map(Condition::new)
+                .map(condition -> {
+                    onCondition.accept(query, condition);
+                    return nextLex.get();
+                })
+                .orElse(curLex);
     }
 
     @Override

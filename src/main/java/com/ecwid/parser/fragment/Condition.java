@@ -5,28 +5,43 @@ import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.MultiLex;
 import lombok.*;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.ecwid.parser.Lexemes.*;
 
-@Data
+@Getter
 @RequiredArgsConstructor
 public class Condition {
 
-    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private BuildStep buildStep = BuildStep.EXPECTING_LEFT;
+
     private Fragment leftOperand;
-    @Setter(AccessLevel.NONE)
+
     private Fragment rightOperand;
+
     private Operator operator;
+
     private final ClauseType clauseType;
 
     public void addNextPart(Fragment part) {
-        if (leftOperand == null) {
-            leftOperand = part;
-        } else if (operator == null) {
-            operator = (Operator) part;
-        } else {
-            rightOperand = part;
+        switch (buildStep) {
+            case EXPECTING_LEFT:
+                leftOperand = part;
+                buildStep = BuildStep.EXPECTING_OPERATOR;
+                break;
+            case EXPECTING_OPERATOR:
+                operator = (Operator) part;
+                buildStep = BuildStep.EXPECTING_RIGHT;
+                break;
+            case EXPECTING_RIGHT:
+                rightOperand = part;
+                buildStep = BuildStep.DONE;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected fragment: " + part);
         }
     }
 
@@ -69,6 +84,19 @@ public class Condition {
         AND,
         OR,
         WHERE,
-        HAVING
+        HAVING;
+
+        public static Optional<ClauseType> fromString(String name) {
+            return Arrays.stream(values())
+                    .filter(type -> type.name().equalsIgnoreCase(name))
+                    .findFirst();
+        }
+    }
+
+    private enum BuildStep {
+        EXPECTING_LEFT,
+        EXPECTING_OPERATOR,
+        EXPECTING_RIGHT,
+        DONE
     }
 }

@@ -1,6 +1,7 @@
 package com.ecwid.parser.crawler;
 
 import com.ecwid.parser.config.TriggerMeOn;
+import com.ecwid.parser.crawler.base.Crawler;
 import com.ecwid.parser.crawler.base.FragmentCrawler;
 import com.ecwid.parser.fragment.Join;
 import com.ecwid.parser.fragment.Query;
@@ -9,6 +10,7 @@ import com.ecwid.parser.fragment.domain.Source;
 import lombok.RequiredArgsConstructor;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -26,6 +28,8 @@ import static com.ecwid.parser.fragment.Join.JoinType.joinTypeFullLexemes;
 })
 @RequiredArgsConstructor
 public class JoinCrawler extends FragmentCrawler {
+
+    private final NestedJoinCrawler nestedJoinCrawler;
 
     @Override
     protected boolean crawlsForSources() {
@@ -60,5 +64,15 @@ public class JoinCrawler extends FragmentCrawler {
                 nextLex);
         join.setType(joinTypeFullLexemes.get(String.join(LEX_SPACE, joinTypeParts)));
         return lexAfterJoin;
+    }
+
+    @Override
+    public Optional<Crawler> nextCrawler(String currentSection) {
+        final var crawler = super.nextCrawler(currentSection);
+        if (crawler.isPresent()) {
+            return crawler;
+        } else {
+            return Optional.of(nestedJoinCrawler);
+        }
     }
 }

@@ -47,7 +47,7 @@ public class ColumnParserIT extends AbstractSpringParserTest {
         @Test
         @DisplayName("with other clauses")
         void withOtherClauses() throws Exception {
-            final var sql = "SELECT 1, 2, 3  WHERE a = 1 LIMIT 1 OFFSET 2";
+            final var sql = "SELECT 1, 2, 3 WHERE a = 1 LIMIT 1 OFFSET 2";
             final var parsed = sqlParser.parse(sql);
             assertEqualsIgnoreCaseTrimmed(sql, parsed.getValue());
         }

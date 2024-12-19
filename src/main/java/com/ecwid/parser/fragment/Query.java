@@ -26,6 +26,13 @@ public class Query implements Source {
     private Integer offset = NO_OFFSET;
     private String alias;
 
+    private QueryType getQueryType() {
+        if (columns.isEmpty()) {
+            return QueryType.NESTED_JOIN;
+        }
+        return QueryType.SELECT;
+    }
+
     @Override
     public String getValue() {
         return toString();
@@ -36,12 +43,19 @@ public class Query implements Source {
         return QueryPrinter.print(this).toLowerCase();
     }
 
+    public enum QueryType {
+        SELECT,
+        NESTED_JOIN,
+        INSERT,
+        UPDATE,
+        DELETE
+    }
+
     static class QueryPrinter {
         public static String print(Query query) {
             final var builder = new LinkedList<String>();
-            builder.add(LEX_SELECT);
-            builder.add(printFragmentsList(query.columns));
-            builder.add(printSources(query.sources));
+            printColumns(query, builder);
+            printSources(query, builder);
             query.getFilters().stream().map(Condition::toString).forEach(builder::add);
             query.getJoins().stream().map(Join::toString).forEach(builder::add);
             // groupings
@@ -61,12 +75,26 @@ public class Query implements Source {
         }
     }
 
-    private static String printSources(List<Source> sources) {
+    private static void printColumns(Query query, List<String> builder) {
+        if (query.getQueryType().equals(QueryType.NESTED_JOIN)) {
+            // nested joins do not have select <columns> clause
+            return;
+        }
+        builder.add(LEX_SELECT);
+        builder.add(printFragmentsList(query.getColumns()));
+    }
+
+    private static void printSources(Query query, List<String> builder) {
+        final var sources = query.getSources();
         if (sources.isEmpty()) {
-            return LEX_EMPTY;
+            return;
         }
         final var casted = sources.stream().map(Fragment.class::cast).toList();
-        return LEX_FROM + LEX_SPACE + printFragmentsList(casted);
+        if (!query.getQueryType().equals(QueryType.NESTED_JOIN)) {
+            // nested joins do not have from <sources> clause
+            builder.add(LEX_FROM);
+        }
+        builder.add(printFragmentsList(casted));
     }
 
     private static String printFragmentsList(List<Fragment> fragments) {

@@ -319,7 +319,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinEquals(JoinType.JOIN, NestedJoin.class, "b JOIN c ON b.id = c.id", "d", join);
+            assertJoinEquals(JoinType.JOIN, Query.class, "b JOIN c ON b.id = c.id", "d", join);
             final var conditions = join.getConditions();
             assertEquals(1, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "d.id", conditions.getFirst());
@@ -338,7 +338,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
             final var parsed = sqlParser.parse(sql);
             assertEquals(1, parsed.getJoins().size());
             final var join = parsed.getJoins().getFirst();
-            assertJoinEquals(JoinType.JOIN, NestedJoin.class, "(%s) JOIN b ON a.id = b.id".formatted(nested), "c", join);
+            assertJoinEquals(JoinType.JOIN, Query.class, "(%s) JOIN b ON a.id = b.id".formatted(nested), "c", join);
             final var conditions = join.getConditions();
             assertEquals(1, conditions.size());
             assertConditionEquals(ClauseType.ON, Column.class, "c.id", Operator.EQUALS, Column.class, "table.id", conditions.getFirst());
@@ -348,7 +348,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
         @DisplayName("2 levels of nested joins")
         void twoLevelsOfNestedJoins() throws Exception {
             final var nestedSelectY = "SELECT * FROM y";
-            final var nestedJoinX = "SELECT x.id, x.some_value FROM x JOIN (%s) z  ON x.id = z.id".formatted(nestedSelectY);
+            final var nestedJoinX = "SELECT x.id, x.some_value FROM x JOIN (%s) z ON x.id = z.id".formatted(nestedSelectY);
             final var sql = """
                     SELECT *
                     FROM a
@@ -361,12 +361,12 @@ public class JoinParserIT extends AbstractSpringParserTest {
             assertEquals(2, parsed.getJoins().size());
             final var joins = parsed.getJoins();
             final var firstJoin = joins.getFirst();
-            assertJoinEquals(JoinType.FULL_OUTER, NestedJoin.class, "b LEFT JOIN (%s) c ON b.id = c.id".formatted(nestedSelectY), "d", firstJoin);
+            assertJoinEquals(JoinType.FULL_OUTER, Query.class, "b LEFT JOIN (%s) c ON b.id = c.id".formatted(nestedSelectY), "d", firstJoin);
             final var conditions = firstJoin.getConditions();
             assertEquals(1, conditions.size());
-            assertConditionEquals(ClauseType.ON, Column.class, "b.id", Operator.EQUALS, Column.class, "c.id", conditions.getFirst());
+            assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "d.id", conditions.getFirst());
             final var secondJoin = joins.getLast();
-            assertJoinEquals(JoinType.NATURAL_RIGHT, NestedJoin.class, nestedJoinX, "e", secondJoin);
+            assertJoinEquals(JoinType.NATURAL_RIGHT, Query.class, nestedJoinX, "e", secondJoin);
             final var conditions1 = secondJoin.getConditions();
             assertEquals(1, conditions1.size());
             assertConditionEquals(ClauseType.ON, Column.class, "d.id", Operator.EQUALS, Column.class, "e.id", conditions1.getFirst());
@@ -417,14 +417,14 @@ public class JoinParserIT extends AbstractSpringParserTest {
 
         // Third Join (Nested Join with LEFT JOIN inside FULL OUTER)
         final var thirdJoin = joins.get(2);
-        assertJoinEquals(JoinType.FULL_OUTER, NestedJoin.class, "table_d LEFT JOIN (%s) f ON table_d.id = f.id".formatted(nestedSelectY), "d", thirdJoin);
+        assertJoinEquals(JoinType.FULL_OUTER, Query.class, "table_d LEFT JOIN (%s) f ON table_d.id = f.id".formatted(nestedSelectY), "d", thirdJoin);
         var thirdConditions = thirdJoin.getConditions();
         assertEquals(1, thirdConditions.size());
         assertConditionEquals(ClauseType.ON, Column.class, "a.id", Operator.EQUALS, Column.class, "d.id", thirdConditions.getFirst());
 
         // Fourth Join (NATURAL RIGHT JOIN with nested SELECT)
         final var fourthJoin = joins.get(3);
-        assertJoinEquals(JoinType.NATURAL_RIGHT, NestedJoin.class, nestedJoinX, "e", fourthJoin);
+        assertJoinEquals(JoinType.NATURAL_RIGHT, Query.class, nestedJoinX, "e", fourthJoin);
         var fourthConditions = fourthJoin.getConditions();
         assertEquals(1, fourthConditions.size());
         assertConditionEquals(ClauseType.ON, Column.class, "d.id", Operator.EQUALS, Column.class, "e.id", fourthConditions.getFirst());

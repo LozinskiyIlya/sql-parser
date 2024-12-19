@@ -1,11 +1,11 @@
-package com.ecwid.parser.crawler.base;
+package com.ecwid.parser.crawler.base.helper;
 
 import lombok.Getter;
 
 import static com.ecwid.parser.Lexemes.LEX_AS;
 
 @Getter
-class NameAliasPair {
+public class NameAliasPair {
 
     private String name;
 

@@ -1,5 +1,6 @@
 package com.ecwid.parser.crawler.base;
 
+import com.ecwid.parser.crawler.base.helper.NameAliasPair;
 import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.Condition.Operator;
 import com.ecwid.parser.fragment.domain.Aliasable;
@@ -8,13 +9,14 @@ import com.ecwid.parser.fragment.domain.Nameable;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
+import static com.ecwid.parser.crawler.base.helper.FragmentUtils.isConstant;
+import static com.ecwid.parser.crawler.base.helper.FragmentUtils.isOperator;
 import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
@@ -142,23 +144,4 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         return nextFragment;
     }
 
-    private boolean isOperator(List<String> parts) {
-        return operatorFullLexemes.containsKey(String.join(LEX_SPACE, parts));
-    }
-
-    private boolean isConstant(String fragment) {
-        return isQuotedString(fragment) || isConstantNumber(fragment) || isNullConstant(fragment);
-    }
-
-    private boolean isQuotedString(String fragment) {
-        return fragment.startsWith(LEX_SINGLE_QUOTE) && fragment.endsWith(LEX_SINGLE_QUOTE);
-    }
-
-    private boolean isNullConstant(String fragment) {
-        return LEX_NULL.equals(fragment);
-    }
-
-    private boolean isConstantNumber(String fragment) {
-        return fragment.matches("^-?\\d+(\\.\\d+)?$");
-    }
 }

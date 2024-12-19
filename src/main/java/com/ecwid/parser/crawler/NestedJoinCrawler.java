@@ -7,16 +7,14 @@ import com.ecwid.parser.fragment.domain.Source;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Supplier;
-
 @Component
 @RequiredArgsConstructor
 public class NestedJoinCrawler extends FragmentCrawler {
 
 
     @Override
-    protected String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex) {
-        return currentSection;
+    protected String processClauseAndReturnNextLex(CrawlContext context) {
+        return context.currentSection();
     }
 
     @Override

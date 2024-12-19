@@ -17,7 +17,7 @@ import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
 
-    protected abstract String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex);
+    protected abstract String processClauseAndReturnNextLex(CrawlContext context);
 
     protected abstract void processFragment(Query query, Fragment fragment);
 
@@ -26,14 +26,17 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     }
 
     @Override
-    public final void crawl(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
+    public final void crawl(CrawlContext context) {
         Fragment fragment = null;
-        int brackets = openBrackets;
-        var lex = processClauseAndReturnNextLex(query, currentSection, nextLex);
+        int brackets = context.openBrackets();
+        var lex = processClauseAndReturnNextLex(context);
+        final var query = context.query();
+        final var nextLex = context.nextLex();
         if (shouldDelegate(lex)) {
-            delegate(query, lex, nextLex, openBrackets);
+            delegate(new CrawlContext(query, lex, nextLex, brackets));
             return;
         }
+
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -63,7 +66,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 if (LEX_SELECT.equals(lex)) {
                     // nested query
                     fragment = new Query();
-                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 1);
+                    nextCrawler(lex).orElseThrow().crawl(new CrawlContext((Query) fragment, lex, nextLex, 1));
                 } else if (isConstant(lex)) {
                     // constant list
                     fragment = new ConstantList();
@@ -71,10 +74,10 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 } else if (crawlsForSources()) {
                     // nested join
                     fragment = new Query();
-                    nextCrawler(lex).orElseThrow().crawl((Query) fragment, lex, nextLex, 1);
+                    nextCrawler(lex).orElseThrow().crawl(new CrawlContext((Query) fragment, lex, nextLex, 1));
                 } else {
                     // nested condition
-                    this.crawl(query, lex, nextLex, 1);
+                    this.crawl(new CrawlContext(query, lex, nextLex, 1));
                 }
             } else if (!StringUtils.hasText(pair.getFirst())) {
                 if (isConstant(lex)) {
@@ -90,7 +93,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         } while (!shouldDelegate(lex = nextLex.get()));
 
         flush(query, fragment, pair);
-        delegate(query, lex, nextLex, brackets);
+        delegate(new CrawlContext(query, lex, nextLex, brackets));
     }
 
     private void flush(Query query, Fragment fragment, NameAliasPair pair) {

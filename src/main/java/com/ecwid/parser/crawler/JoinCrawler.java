@@ -42,10 +42,10 @@ public class JoinCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex) {
+    protected String processClauseAndReturnNextLex(CrawlContext context) {
         final var join = new Join();
-        query.getJoins().add(join);
-        return crawlForJoinType(join, currentSection, nextLex);
+        context.query().getJoins().add(join);
+        return crawlForJoinType(join, context.currentSection(), context.nextLex());
     }
 
     private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {

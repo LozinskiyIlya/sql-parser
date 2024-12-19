@@ -2,6 +2,7 @@ package com.ecwid.parser.service;
 
 
 import com.ecwid.parser.crawler.ColumnCrawler;
+import com.ecwid.parser.crawler.base.Crawler.CrawlContext;
 import com.ecwid.parser.fragment.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 
-import static com.ecwid.parser.Lexemes.*;
+import static com.ecwid.parser.Lexemes.LEX_SELECT;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class SqlParser {
             throw new IllegalStateException("Query should start with SELECT keyword");
         }
         final var query = new Query();
-        firstCrawler.crawl(query, section, () -> lexemeReader.nextLex(reader), 0);
+        firstCrawler.crawl(new CrawlContext(query, section, () -> lexemeReader.nextLex(reader), 0));
         return query;
     }
 

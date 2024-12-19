@@ -1,6 +1,5 @@
 package com.ecwid.parser.crawler.base;
 
-import com.ecwid.parser.fragment.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -17,8 +16,8 @@ public abstract class SectionAwareCrawler implements Crawler {
     private Map<String, Crawler> sectionAgainstCrawler;
 
     @Override
-    public final void delegate(Query query, String currentSection, Supplier<String> nextLex, int openBrackets) {
-        Crawler.super.delegate(query, currentSection, nextLex, openBrackets);
+    public final void delegate(CrawlContext context) {
+        Crawler.super.delegate(context);
     }
 
     @Override

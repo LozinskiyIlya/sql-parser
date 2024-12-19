@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.CONDITION_SEPARATORS;
 
@@ -18,7 +17,10 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected String processClauseAndReturnNextLex(Query query, String curLex, Supplier<String> nextLex) {
+    protected String processClauseAndReturnNextLex(CrawlContext context) {
+        final var query = context.query();
+        final var curLex = context.currentSection();
+        final var nextLex = context.nextLex();
         return ClauseType.fromString(curLex)
                 .map(Condition::new)
                 .map(condition -> {

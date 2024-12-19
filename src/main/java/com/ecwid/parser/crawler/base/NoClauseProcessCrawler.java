@@ -5,7 +5,6 @@ import com.ecwid.parser.fragment.domain.Fragment;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public abstract class NoClauseProcessCrawler extends FragmentCrawler {
@@ -18,7 +17,7 @@ public abstract class NoClauseProcessCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected final String processClauseAndReturnNextLex(Query query, String currentSection, Supplier<String> nextLex) {
-        return nextLex.get();
+    protected final String processClauseAndReturnNextLex(CrawlContext context) {
+        return context.nextLex().get();
     }
 }

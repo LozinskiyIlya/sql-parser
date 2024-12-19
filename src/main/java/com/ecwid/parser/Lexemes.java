@@ -90,15 +90,4 @@ public class Lexemes {
             LEX_ROWS,
             LEX_SEMICOLON
     );
-
-    public static final Set<String> JOIN_PARTS = Set.of(
-            LEX_INNER,
-            LEX_OUTER,
-            LEX_LEFT,
-            LEX_RIGHT,
-            LEX_FULL,
-            LEX_CROSS,
-            LEX_NATURAL,
-            LEX_JOIN
-    );
 }

@@ -1,11 +1,8 @@
 package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.QueryPrinter;
 import com.ecwid.parser.fragment.domain.Fragment;
 import lombok.Data;
-
-import java.util.LinkedList;
-
-import static com.ecwid.parser.Lexemes.*;
 
 @Data
 public class Sort {
@@ -26,11 +23,6 @@ public class Sort {
 
     @Override
     public String toString() {
-        final var builder = new LinkedList<String>();
-        builder.add(sortBy.toString());
-        builder.add(direction.name());
-        builder.add(LEX_NULLS.toUpperCase());
-        builder.add(nulls.name());
-        return String.join(LEX_SPACE, builder);
+        return QueryPrinter.printSort(this);
     }
 }

@@ -432,7 +432,7 @@ public class JoinParserIT extends AbstractSpringParserTest {
 
 
     private void assertJoinEquals(Join.JoinType type, Class<? extends Source> sourceClass, String sourceValue, String sourceAlias, Join actual) {
-        assertEquals(type, actual.getType());
+        assertEquals(type, actual.getJoinType());
         final var source = actual.getSource();
         assertFragmentEquals(sourceClass, sourceValue, sourceAlias, source);
     }

@@ -1,10 +1,10 @@
 package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.QueryPrinter;
 import com.ecwid.parser.fragment.domain.MultiLex;
 import com.ecwid.parser.fragment.domain.Source;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,7 @@ import static com.ecwid.parser.Lexemes.*;
 
 @Data
 public class Join {
-    private JoinType type;
+    private JoinType joinType;
     private Source source;
     private List<Condition> conditions = new LinkedList<>();
 
@@ -49,26 +49,6 @@ public class Join {
 
     @Override
     public String toString() {
-        final var builder = new LinkedList<String>();
-        builder.add(type.getFullLexeme());
-        builder.add(bracketizeSourceIfNested(source));
-        conditions.stream().map(Condition::toString).forEach(builder::add);
-        return String.join(LEX_SPACE, builder);
-    }
-
-    private static String bracketizeSourceIfNested(Source source) {
-        if (source instanceof Query) {
-            return LEX_OPEN_BRACKET + clearFromAlias(source) + LEX_CLOSE_BRACKET + LEX_SPACE + source.getAlias();
-        }
-        return source.toString();
-    }
-
-    private static String clearFromAlias(Source source) {
-        final var alias = source.getAlias();
-        final var fullValue = source.toString();
-        if (StringUtils.hasText(alias)) {
-            return fullValue.substring(0, fullValue.lastIndexOf(LEX_SPACE));
-        }
-        return fullValue;
+       return QueryPrinter.printJoin(this);
     }
 }

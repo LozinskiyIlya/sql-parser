@@ -62,7 +62,7 @@ public class JoinCrawler extends FragmentCrawler {
                 lex -> {
                 },
                 nextLex);
-        join.setType(joinTypeFullLexemes.get(String.join(LEX_SPACE, joinTypeParts)));
+        join.setJoinType(joinTypeFullLexemes.get(String.join(LEX_SPACE, joinTypeParts)));
         return lexAfterJoin;
     }
 

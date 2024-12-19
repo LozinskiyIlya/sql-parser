@@ -1,11 +1,10 @@
 package com.ecwid.parser.fragment;
 
+import com.ecwid.parser.QueryPrinter;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.MultiLex;
 import lombok.*;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -33,31 +32,7 @@ public class Condition {
 
     @Override
     public String toString() {
-        final var builder = new LinkedList<String>();
-        builder.add(clauseType.name());
-        printOperand(builder, leftOperand);
-        printOperator(builder);
-        printOperand(builder, rightOperand);
-        return String.join(LEX_SPACE, builder);
-    }
-
-    private static void printOperand(List<String> builder, Fragment operand) {
-        if (operand == null) {
-            return;
-        }
-        if (operand instanceof Query || operand instanceof ConstantList) {
-            builder.add(LEX_OPEN_BRACKET);
-            builder.add(operand.toString());
-            builder.add(LEX_CLOSE_BRACKET);
-        } else {
-            builder.add(operand.toString());
-        }
-    }
-
-    private void printOperator(List<String> builder) {
-        if (operator != null) {
-            builder.add(operator.getFullLexeme());
-        }
+        return QueryPrinter.printCondition(this);
     }
 
     @Getter

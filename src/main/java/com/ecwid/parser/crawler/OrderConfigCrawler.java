@@ -15,10 +15,10 @@ import static com.ecwid.parser.Lexemes.*;
 public class OrderConfigCrawler extends FragmentCrawler {
 
     @Override
-    protected String onClause(CrawlContext context) {
+    protected void onClause(CrawlContext context) {
         final var query = context.getQuery();
-        final var nextLex = context.getNextLexSupplier();
-        final var currentSection = context.getCurrentLex();
+        final var nextLex = context.getNext();
+        final var currentSection = context.getCurrent();
         String lex;
         if (LEX_NULLS.equals(currentSection)) {
             lex = setNullsAndReturnNext(query, nextLex);
@@ -28,16 +28,20 @@ public class OrderConfigCrawler extends FragmentCrawler {
                 lex = setNullsAndReturnNext(query, nextLex);
             }
         }
+
         if (LEX_COMMA.equals(lex)) {
             final var sort = new Sort();
             query.getSorts().add(sort);
-            return nextLex.get();
+            context.move();
+            return;
         }
         if (shouldDelegate(lex)) {
             delegate(context.moveTo(lex));
-            return LEX_SEMICOLON;
+            context.moveTo(LEX_SEMICOLON);
+            return;
         }
-        return lex;
+
+        context.moveTo(lex);
     }
 
     @Override

@@ -12,10 +12,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NestedJoinCrawler extends FragmentCrawler {
 
-
     @Override
-    protected String onClause(CrawlContext context) {
-        return context.getCurrentLex();
+    protected void onClause(CrawlContext context) {
     }
 
     @Override

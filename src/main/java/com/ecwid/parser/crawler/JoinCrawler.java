@@ -43,10 +43,11 @@ public class JoinCrawler extends FragmentCrawler {
     }
 
     @Override
-    protected String onClause(CrawlContext context) {
+    protected void onClause(CrawlContext context) {
         final var join = new Join();
+        final var lexAfterJoin = crawlForJoinType(join, context.getCurrent(), context.getNext());
         context.getQuery().getJoins().add(join);
-        return crawlForJoinType(join, context.getCurrentLex(), context.getNextLexSupplier());
+        context.moveTo(lexAfterJoin);
     }
 
     private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {
@@ -72,8 +73,7 @@ public class JoinCrawler extends FragmentCrawler {
         final var crawler = super.nextCrawler(currentSection);
         if (crawler.isPresent()) {
             return crawler;
-        } else {
-            return Optional.of(nestedJoinCrawler);
         }
+        return Optional.of(nestedJoinCrawler);
     }
 }

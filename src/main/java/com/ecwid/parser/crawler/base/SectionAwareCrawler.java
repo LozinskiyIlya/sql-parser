@@ -5,9 +5,6 @@ import org.springframework.context.annotation.Lazy;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public abstract class SectionAwareCrawler implements Crawler {
 
@@ -32,17 +29,5 @@ public abstract class SectionAwareCrawler implements Crawler {
 
     protected boolean shouldDelegate(String nextSection) {
         return sectionAgainstCrawler.containsKey(nextSection);
-    }
-
-
-    protected final String crawlUntilAndReturnNext(Predicate<String> lexIs, Consumer<String> andDoAction, Supplier<String> nextLex) {
-        String lex;
-        while ((lex = nextLex.get()) != null) {
-            if (lexIs.test(lex)) {
-                break;
-            }
-            andDoAction.accept(lex);
-        }
-        return lex;
     }
 }

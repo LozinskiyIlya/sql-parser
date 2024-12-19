@@ -10,6 +10,8 @@ import org.springframework.util.StringUtils;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -20,10 +22,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     protected abstract String lexAfterClause(CrawlContext context);
 
     protected abstract void onFragment(Query query, Fragment fragment);
-
-    protected boolean crawlsForSources() {
-        return false;
-    }
 
     @Override
     public final void crawl(CrawlContext context) {
@@ -85,6 +83,19 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
 
         flush(query, fragment, pair);
         delegate(new CrawlContext(query, lex, nextLex, brackets));
+    }
+
+
+    protected boolean crawlsForSources() {
+        return false;
+    }
+
+    protected final String crawlUntilAndReturnNext(Predicate<String> lexEquals, Consumer<String> andDoAction, Supplier<String> nextLex) {
+        String lex;
+        while ((lex = nextLex.get()) != null && lexEquals.negate().test(lex)) {
+            andDoAction.accept(lex);
+        }
+        return lex;
     }
 
     private void flush(Query query, Fragment fragment, NameAliasPair pair) {

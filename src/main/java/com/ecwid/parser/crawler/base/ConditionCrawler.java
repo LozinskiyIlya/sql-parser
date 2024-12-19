@@ -21,7 +21,7 @@ public abstract class ConditionCrawler extends FragmentCrawler {
     protected String lexAfterClause(CrawlContext context) {
         final var query = context.getQuery();
         final var curLex = context.getCurrentSection();
-        final var nextLex = context.getNextLexSupplier();
+        final var nextLex = context.getNextLex();
         return ClauseType.fromString(curLex)
                 .map(Condition::new)
                 .map(condition -> {

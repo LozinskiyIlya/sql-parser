@@ -30,9 +30,8 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
     public final void crawl(CrawlContext context) {
         Fragment fragment = null;
         var lex = lexAfterClause(context);
-        int brackets = context.getOpenBrackets();
         final var query = context.getQuery();
-        final var nextLex = context.getNextLexSupplier();
+        final var nextLex = context.getNextLex();
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -43,7 +42,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 continue;
             }
             if (LEX_CLOSE_BRACKET.equals(lex)) {
-                if (--brackets == 0) {
+                if (context.decrementOpenBrackets() == 0) {
                     break;
                 }
                 continue;
@@ -85,7 +84,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         } while (!shouldDelegate(lex = nextLex.get()));
 
         flush(query, fragment, pair);
-        delegate(new CrawlContext(query, lex, nextLex, brackets));
+        delegate(context.moveTo(lex));
     }
 
 

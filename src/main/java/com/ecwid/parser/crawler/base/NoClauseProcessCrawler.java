@@ -18,6 +18,6 @@ public abstract class NoClauseProcessCrawler extends FragmentCrawler {
 
     @Override
     protected final String processClauseAndReturnNextLex(CrawlContext context) {
-        return context.nextLex().get();
+        return context.lexSupplier().get();
     }
 }

@@ -45,7 +45,7 @@ public class JoinCrawler extends FragmentCrawler {
     protected String processClauseAndReturnNextLex(CrawlContext context) {
         final var join = new Join();
         context.query().getJoins().add(join);
-        return crawlForJoinType(join, context.currentSection(), context.nextLex());
+        return crawlForJoinType(join, context.currentSection(), context.lexSupplier());
     }
 
     private String crawlForJoinType(Join join, String joinFirstLex, Supplier<String> nextLex) {

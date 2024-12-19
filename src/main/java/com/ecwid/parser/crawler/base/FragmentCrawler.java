@@ -31,7 +31,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         int brackets = context.openBrackets();
         var lex = processClauseAndReturnNextLex(context);
         final var query = context.query();
-        final var nextLex = context.nextLex();
+        final var nextLex = context.lexSupplier();
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
@@ -58,18 +58,14 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
 
             if (LEX_OPEN_BRACKET.equals(lex)) {
                 lex = nextLex.get();
-                if (LEX_SELECT.equals(lex)) {
-                    // nested query
+                if (LEX_SELECT.equals(lex) || crawlsForSources()) {
+                    // nested query or join
                     fragment = new Query();
                     nextCrawler(lex).orElseThrow().crawl(new CrawlContext((Query) fragment, lex, nextLex, 1));
                 } else if (isConstant(lex)) {
                     // constant list
                     fragment = new ConstantList();
                     lex = crawlForList((ConstantList) fragment, lex, nextLex);
-                } else if (crawlsForSources()) {
-                    // nested join
-                    fragment = new Query();
-                    nextCrawler(lex).orElseThrow().crawl(new CrawlContext((Query) fragment, lex, nextLex, 1));
                 } else {
                     // nested condition
                     this.crawl(new CrawlContext(query, lex, nextLex, 1));

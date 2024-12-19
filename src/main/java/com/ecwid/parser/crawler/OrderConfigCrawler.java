@@ -17,7 +17,7 @@ public class OrderConfigCrawler extends FragmentCrawler {
     protected String processClauseAndReturnNextLex(CrawlContext context) {
         final var currentSection = context.currentSection();
         final var query = context.query();
-        final var nextLex = context.nextLex();
+        final var nextLex = context.lexSupplier();
         String lex;
         if (LEX_NULLS.equals(currentSection)) {
             lex = setNullsAndReturnNext(query, nextLex);

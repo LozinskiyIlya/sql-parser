@@ -15,12 +15,14 @@ public class SqlParserApplication {
         final var sqlParser = context.getBean(SqlParser.class);
         try (PushbackReader reader = new PushbackReader(new InputStreamReader(System.in))) {
             while (true) {
-                System.out.println("\nEnter a query to parse");
+                System.out.println("Enter a query to parse");
                 System.out.println(" - type 'q' to finish");
                 System.out.println(" - use ';' as a separator\n");
 
-                char c = (char) reader.read();
-                if (c == 'q') {
+                int c = reader.read();
+                if (c == 113) {
+                    // 'q'
+                    System.out.println("Bye!");
                     break;
                 }
                 reader.unread(c);

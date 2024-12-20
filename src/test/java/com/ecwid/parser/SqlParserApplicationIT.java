@@ -23,6 +23,20 @@ public class SqlParserApplicationIT extends AbstractSpringParserTest {
     }
 
     @Test
+    @DisplayName("multiline query")
+    void multiline() throws IOException {
+        final var sql = " select u.*, n.status_changed_at\n" +
+                "        from notifications n\n" +
+                "        join users u on u.id = n.user_id\n" +
+                "        where n.status = 'DISMISSED';\n";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(2, parsed.getColumns().size());
+        assertEquals(1, parsed.getSources().size());
+        assertEquals(1, parsed.getJoins().size());
+        assertEquals(1, parsed.getFilters().size());
+    }
+
+    @Test
     @DisplayName("with all that beauty")
     void withAllThatBeauty() throws IOException {
         final var sql = """

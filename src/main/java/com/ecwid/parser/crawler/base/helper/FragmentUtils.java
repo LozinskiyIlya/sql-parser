@@ -1,5 +1,7 @@
 package com.ecwid.parser.crawler.base.helper;
 
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 
 import static com.ecwid.parser.Lexemes.*;
@@ -12,6 +14,10 @@ public class FragmentUtils {
 
     public static boolean isConstant(String fragment) {
         return isQuotedString(fragment) || isConstantNumber(fragment) || isNullConstant(fragment);
+    }
+
+    public static boolean nameNotSet(NameAliasPair pair) {
+        return !StringUtils.hasText(pair.getName());
     }
 
     private static boolean isQuotedString(String fragment) {

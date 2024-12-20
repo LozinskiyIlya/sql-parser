@@ -3,11 +3,9 @@ package com.ecwid.parser.crawler.base;
 import com.ecwid.parser.crawler.base.helper.CrawlContext;
 import com.ecwid.parser.crawler.base.helper.NameAliasPair;
 import com.ecwid.parser.fragment.*;
-import com.ecwid.parser.fragment.Condition.Operator;
 import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Nameable;
-import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.function.Consumer;
@@ -15,8 +13,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.ecwid.parser.Lexemes.*;
-import static com.ecwid.parser.crawler.base.helper.FragmentUtils.isConstant;
-import static com.ecwid.parser.crawler.base.helper.FragmentUtils.isOperator;
+import static com.ecwid.parser.crawler.base.helper.FragmentUtils.*;
 import static com.ecwid.parser.fragment.Condition.Operator.operatorFullLexemes;
 
 public abstract class FragmentCrawler extends SectionAwareCrawler {
@@ -65,14 +62,8 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                     // nested condition
                     this.crawl(new CrawlContext(query, lex, nextLex, 1));
                 }
-            } else if (!StringUtils.hasText(pair.getName())) {
-                if (isConstant(lex)) {
-                    fragment = new Constant(lex);
-                } else if (crawlsForSources()) {
-                    fragment = new Table();
-                } else {
-                    fragment = new Column();
-                }
+            } else if (nameNotSet(pair)) {
+                fragment = crawlForFragment(lex);
             }
 
             pair.push(lex);
@@ -81,7 +72,6 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         flush(query, fragment, pair);
         delegate(context.moveTo(lex));
     }
-
 
     protected boolean crawlsForSources() {
         return false;
@@ -109,6 +99,16 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         pair.reset();
     }
 
+    private Fragment crawlForFragment(String curLex) {
+        if (isConstant(curLex)) {
+            return new Constant(curLex);
+        } else if (crawlsForSources()) {
+            return new Table();
+        } else {
+            return new Column();
+        }
+    }
+
     private String crawlForList(ConstantList list, String firstItem, Supplier<String> nextLex) {
         final var values = list.getValues();
         values.add(firstItem);
@@ -127,11 +127,11 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         final var operatorParts = new LinkedList<String>();
         operatorParts.add(context.getCurrent());
         crawlUntilAndReturnNext(
-                fragment -> {
-                    operatorParts.add(fragment);
+                nextLex -> {
+                    operatorParts.add(nextLex);
                     return !isOperator(operatorParts);
                 },
-                fragment -> {
+                nextLex -> {
                 },
                 context.getNext());
         final var nextLex = operatorParts.removeLast();

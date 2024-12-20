@@ -20,6 +20,10 @@ public class FragmentUtils {
         return !StringUtils.hasText(pair.getName());
     }
 
+    public static boolean bracketsClosed(String curLex, CrawlContext context) {
+        return LEX_CLOSE_BRACKET.equals(curLex) && context.decrementOpenBrackets() == 0;
+    }
+
     private static boolean isQuotedString(String fragment) {
         return fragment.startsWith(LEX_SINGLE_QUOTE) && fragment.endsWith(LEX_SINGLE_QUOTE);
     }

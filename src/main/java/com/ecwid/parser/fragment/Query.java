@@ -3,6 +3,7 @@ package com.ecwid.parser.fragment;
 import com.ecwid.parser.QueryPrinter;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Source;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ public class Query implements Source {
     private Integer offset = NO_OFFSET;
     private String alias;
 
+    @JsonIgnore
     public QueryType getQueryType() {
         if (columns.isEmpty()) {
             return QueryType.NESTED_JOIN;

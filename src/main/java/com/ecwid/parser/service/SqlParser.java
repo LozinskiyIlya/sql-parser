@@ -22,15 +22,17 @@ public class SqlParser {
     private final LexemeReader lexemeReader;
 
     public Query parse(String sql) throws IOException {
-        return parse(readerFromString(sql));
+        final var reader = readerFromString(sql);
+        try {
+            return parse(reader);
+        } catch (IOException e) {
+            reader.close();
+            throw e;
+        }
     }
 
     public Query parse(PushbackReader reader) throws IOException {
-        try (reader) {
-            return parseQuery(reader);
-        } catch (IllegalStateException e) {
-            throw new IOException(e);
-        }
+        return parseQuery(reader);
     }
 
     private Query parseQuery(PushbackReader reader) throws IllegalStateException {

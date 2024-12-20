@@ -4,6 +4,9 @@ import com.ecwid.parser.fragment.*;
 import com.ecwid.parser.fragment.Condition.Operator;
 import com.ecwid.parser.fragment.domain.Fragment;
 import com.ecwid.parser.fragment.domain.Source;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
@@ -15,6 +18,12 @@ import static com.ecwid.parser.QueryConstants.LIMIT_ALL;
 import static com.ecwid.parser.QueryConstants.NO_OFFSET;
 
 public class QueryPrinter {
+    public static final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @SneakyThrows
+    public static String printJson(Query query) {
+        return mapper.writeValueAsString(query);
+    }
 
     public static String print(Query query) {
         final var builder = new LinkedList<String>();

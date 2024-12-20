@@ -17,14 +17,10 @@ public class Condition {
 
     @Getter(AccessLevel.NONE)
     private BuildStep buildStep = BuildStep.EXPECTING_LEFT;
-
-    private Fragment leftOperand;
-
-    private Fragment rightOperand;
-
-    private Operator operator;
-
     private final ClauseType clauseType;
+    private Fragment leftOperand;
+    private Operator operator;
+    private Fragment rightOperand;
 
     public void addNextPart(Fragment part) {
         switch (buildStep) {

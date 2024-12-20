@@ -88,6 +88,8 @@ public class Lexemes {
             LEX_BY,
             LEX_AS,
             LEX_ROWS,
+            LEX_COMMA,
+            LEX_CLOSE_BRACKET,
             LEX_SEMICOLON
     );
 }

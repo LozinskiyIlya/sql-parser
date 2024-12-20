@@ -10,7 +10,6 @@ import com.ecwid.parser.fragment.domain.Nameable;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -36,25 +35,20 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         final var pair = new NameAliasPair();
         do {
             if (SKIP_LEX.contains(lex)) {
-                continue;
-            }
-            if (LEX_COMMA.equals(lex)) {
-                flush(query, fragment, pair);
-                continue;
-            }
-            if (LEX_CLOSE_BRACKET.equals(lex)) {
-                if (context.decrementOpenBrackets() == 0) {
+                if (bracketsClosed(lex, context)) {
                     break;
+                }
+                if (LEX_COMMA.equals(lex)) {
+                    flush(query, fragment, pair);
                 }
                 continue;
             }
 
             if (OPERATORS.contains(lex)) {
-                flush(query, fragment, pair); // flush left operand
-                final var operator = new AtomicReference<Operator>();
-                lex = crawlForOperator(operator, lex, nextLex); // first lexeme of right operand
-                fragment = operator.get();
-                flush(query, fragment, pair); // flush operator
+                // flush left operand
+                flush(query, fragment, pair);
+                // first lexeme of the right operand
+                lex = crawlForOperator(context.moveTo(lex), pair);
             }
 
             if (LEX_OPEN_BRACKET.equals(lex)) {
@@ -129,9 +123,9 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 nextLex);
     }
 
-    private String crawlForOperator(AtomicReference<Operator> operator, String operatorFirstLex, Supplier<String> nextLex) {
+    private String crawlForOperator(CrawlContext context, NameAliasPair pair) {
         final var operatorParts = new LinkedList<String>();
-        operatorParts.add(operatorFirstLex);
+        operatorParts.add(context.getCurrent());
         crawlUntilAndReturnNext(
                 fragment -> {
                     operatorParts.add(fragment);
@@ -139,10 +133,15 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
                 },
                 fragment -> {
                 },
-                nextLex);
-        final var nextFragment = operatorParts.removeLast();
-        operator.set(operatorFullLexemes.get(String.join(LEX_SPACE, operatorParts)));
-        return nextFragment;
+                context.getNext());
+        final var nextLex = operatorParts.removeLast();
+        final var operator = operatorFullLexemes.get(String.join(LEX_SPACE, operatorParts));
+        flush(context.getQuery(), operator, pair);
+        return nextLex;
+    }
+
+    private boolean bracketsClosed(String curLex, CrawlContext context) {
+        return LEX_CLOSE_BRACKET.equals(curLex) && context.decrementOpenBrackets() == 0;
     }
 
 }

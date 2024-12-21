@@ -2,6 +2,8 @@ package com.ecwid.parser.config;
 
 import com.ecwid.parser.crawler.base.Crawler;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import org.springframework.aop.framework.Advised;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
@@ -22,18 +24,25 @@ public class LexemeHandlerBeanPostProcessor implements BeanPostProcessor {
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        LexemeHandler annotation = bean.getClass().getAnnotation(LexemeHandler.class);
+        LexemeHandler annotation = getAnnotation(bean);
         if (annotation != null) {
-            for (String lex : annotation.lexemes()) {
+            for (var lex : annotation.lexemes()) {
                 crawlersMap.put(lex, (Crawler) bean);
-
+                // additional case for Finisher.class
                 if (lex.equals(LEX_EMPTY)) {
-                    // additional case for Finisher.class
                     crawlersMap.put(null, (Crawler) bean);
                 }
             }
         }
+
         return bean;
     }
 
+    @SneakyThrows
+    private LexemeHandler getAnnotation(Object bean) {
+        if (bean instanceof Advised) {
+            bean = ((Advised) bean).getTargetSource().getTarget();
+        }
+        return bean.getClass().getAnnotation(LexemeHandler.class);
+    }
 }

@@ -16,8 +16,8 @@ public class CrawlContext {
     private final AtomicInteger openBrackets;
 
     public CrawlContext(Query query, String current, Supplier<String> next, int openBrackets) {
-        this.query = query;
         this.current = current;
+        this.query = query;
         this.next = next;
         this.openBrackets = new AtomicInteger(openBrackets);
     }

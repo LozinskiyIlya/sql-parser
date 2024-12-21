@@ -1,8 +1,21 @@
 # SQL Query Parser
 
-## Chosen Pattern and Why
+## Query Structure
 
+## Chain of Responsibility
 
+The implementation delegates SQL query parsing to different handlers (crawlers), where each crawler handles a specific part of the query.
+
+#### Crawler
+This serves as the base handler in the chain. Each crawler is responsible for parsing a specific part of the SQL query (e.g., SELECT, FROM, JOIN). After doing its part, it delegates the responsibility to the next crawler in the chain.
+
+#### CrawlContext
+The CrawlContext keeps track of the current state of the parsing. It holds the current lexeme being processed, the query, and other parsing-related data such as opened/closed brackets for nested cases
+
+#### LexemeHandler
+The @LexemeHandler is used to associate a specific crawler implementation with a particular SQL clause or lexeme (like SELECT, JOIN, ON, etc.). This allows the system to wire up the right crawler for each part of the SQL query, based on the lexeme currently being parsed.
+
+With this architecture, each crawler is responsible for parsing its specific clause or lexeme. When it finishes its job, it passes control to the next appropriate crawler, ensuring that the entire SQL query is parsed step by step, with each handler knowing exactly which part it is responsible for.
 
 ## Key features
 

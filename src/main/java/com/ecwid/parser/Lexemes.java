@@ -6,7 +6,6 @@ import java.util.Set;
 public class Lexemes {
 
     public static final String LEX_SELECT = "select";
-    public static final String LEX_ASTER = "*";
     public static final String LEX_AS = "as";
     public static final String LEX_FROM = "from";
     public static final String LEX_JOIN = "join";
@@ -32,16 +31,9 @@ public class Lexemes {
     public static final String LEX_ASC = "asc";
     public static final String LEX_DESC = "desc";
     public static final String LEX_NULLS = "nulls";
-    public static final String LEX_LAST = "last";
-    public static final String LEX_FIRST = "first";
     public static final String LEX_LIMIT = "limit";
     public static final String LEX_OFFSET = "offset";
     public static final String LEX_ROWS = "rows";
-    public static final String LEX_COUNT = "count";
-    public static final String LEX_SUM = "sum";
-    public static final String LEX_AVG = "avg";
-    public static final String LEX_MIN = "min";
-    public static final String LEX_MAX = "max";
     public static final String LEX_NULL = "null";
     public static final String LEX_EQUALS = "=";
     public static final String LEX_NOT_EQUALS = "!=";
@@ -49,7 +41,6 @@ public class Lexemes {
     public static final String LEX_LESS_THAN = "<";
     public static final String LEX_GREATER_THAN_OR_EQUALS = ">=";
     public static final String LEX_LESS_THAN_OR_EQUALS = "<=";
-    public static final String LEX_DOT = ".";
     public static final String LEX_COMMA = ",";
     public static final String LEX_SEMICOLON = ";";
     public static final String LEX_OPEN_BRACKET = "(";

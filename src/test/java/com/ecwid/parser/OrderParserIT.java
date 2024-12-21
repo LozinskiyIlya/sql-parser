@@ -203,7 +203,7 @@ public class OrderParserIT extends AbstractSpringParserTest {
     @Test
     @DisplayName("with all that beauty")
     void withAllThatBeauty() throws IOException {
-        final var nested = "SELECT department_id FROM departments WHERE employees.department_id = departments.id";
+        final var nested = "SELECT department_id FROM departments WHERE employees.department_id = departments.id ORDER BY 1 DESC NULLS FIRST";
         final var sql = """
                 SELECT employee_id, department_id, hire_date, salary
                 FROM employees
@@ -217,6 +217,9 @@ public class OrderParserIT extends AbstractSpringParserTest {
         assertSortEquals(Column.class, "lower(employee_name)", ASC, LAST, parsed.getSorts().get(2));
         assertSortEquals(Query.class, nested, ASC, LAST, parsed.getSorts().get(3));
         assertSortEquals(Column.class, "hire_date", DESC, LAST, parsed.getSorts().get(4));
+
+        final var nestedQuery = (Query) parsed.getSorts().get(3).getSortBy();
+        assertSortEquals(Constant.class, "1", DESC, FIRST, nestedQuery.getSorts().getFirst());
     }
 
     private void assertSortEquals(Class<? extends Fragment> type, String value, Direction direction, Nulls nulls, Sort actual) {

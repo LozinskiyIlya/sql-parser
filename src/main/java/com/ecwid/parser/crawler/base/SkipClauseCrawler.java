@@ -13,12 +13,12 @@ public abstract class SkipClauseCrawler extends FragmentCrawler {
     protected final BiConsumer<Query, Fragment> onFragment;
 
     @Override
-    protected final void onFragment(Query query, Fragment fragment) {
-        onFragment.accept(query, fragment);
+    protected final void onClause(CrawlContext context) {
+        context.move();
     }
 
     @Override
-    protected final void onClause(CrawlContext context) {
-        context.move();
+    protected final void onFragment(Query query, Fragment fragment) {
+        onFragment.accept(query, fragment);
     }
 }

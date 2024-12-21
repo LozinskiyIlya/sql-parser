@@ -1,5 +1,6 @@
 package com.ecwid.parser;
 
+import com.ecwid.parser.fragment.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -64,11 +65,24 @@ public class PaginationParserIT extends AbstractSpringParserTest {
     }
 
     @Test
+    @DisplayName("offset in inner limit in outer")
+    void offsetInNestedQuery() throws IOException {
+        final var sql = "SELECT * FROM (SELECT * FROM table OFFSET 5 ROWS) AS t LIMIT 1;";
+        final var parsed = sqlParser.parse(sql);
+        assertEquals(1, parsed.getLimit());
+        final var nested = (Query) parsed.getSources().getFirst();
+        assertEquals(5, nested.getOffset());
+    }
+
+    @Test
     @DisplayName("with all that beauty")
     void withAllThatBeauty() throws IOException {
-        final var sql = "SELECT * FROM table LIMIT 10 OFFSET 5 ROWS;";
+        final var sql = "SELECT * FROM (SELECT * FROM table OFFSET 5 ROWS LIMIT 10) LIMIT 10 OFFSET 5 ROWS;";
         final var parsed = sqlParser.parse(sql);
         assertEquals(10, parsed.getLimit());
         assertEquals(5, parsed.getOffset());
+        final var nested = (Query) parsed.getSources().getFirst();
+        assertEquals(10, nested.getLimit());
+        assertEquals(5, nested.getOffset());
     }
 }

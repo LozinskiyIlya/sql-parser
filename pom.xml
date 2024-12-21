@@ -40,6 +40,10 @@
             <version>${spring.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-test</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>io.micrometer</groupId>
                     <artifactId>micrometer-observation</artifactId>
                 </exclusion>
@@ -49,6 +53,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!--******************-->
         <!--Test dependencies -->
         <!--******************-->

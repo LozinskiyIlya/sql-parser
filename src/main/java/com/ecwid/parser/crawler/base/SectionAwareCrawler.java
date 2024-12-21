@@ -23,11 +23,6 @@ public abstract class SectionAwareCrawler implements Crawler {
         return Optional.ofNullable(sectionAgainstCrawler.get(currentSection));
     }
 
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName();
-    }
-
     protected boolean shouldDelegate(String nextSection) {
         return sectionAgainstCrawler.containsKey(nextSection);
     }

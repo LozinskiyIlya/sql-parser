@@ -105,7 +105,7 @@ public abstract class FragmentCrawler extends SectionAwareCrawler {
         final var nextLex = context.getNext();
         final var query = context.getQuery();
         if (LEX_SELECT.equals(curLex) || crawlsForSources()) {
-            // nested query or join
+            // nested query or nested join
             fragment = new Query();
             nextCrawler(curLex).orElseThrow().crawl(new CrawlContext((Query) fragment, curLex, nextLex, 1));
         } else if (isConstant(curLex)) {

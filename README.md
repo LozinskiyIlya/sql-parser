@@ -71,8 +71,7 @@ handler knowing exactly which part it is responsible for.
 - **Streaming Support**. Using PushbackReader, this parser can handle streams with `parseQuery(PushbackReader reader)`.
 
 
-- **Spring IOC**. Spring Context is used to streamline dependency injection. This setup is minimal, pulling only the
-  necessary parts of Spring required for IoC functionality.
+- **Spring IOC**. While arguably overkill for a standalone task, Spring Context is used to streamline dependency injection with a minimal setup, incorporating only the necessary parts of Spring for IoC
 
 ## Terminal Copy-Pasting
 

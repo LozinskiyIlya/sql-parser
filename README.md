@@ -6,7 +6,7 @@ To divide the SQL query into its constituent parts the following interface hiera
 
 ![](https://mermaid.ink/img/pako:eNp1UtFqwjAU_ZVyn2tpNa01D4MxGQy2wdCnkZdrG21Zc1PShM2J_77UqqjbQh7OPfdwzuUmOyh0KYHDutGfRYXGBsu5oEeDGyXJBqPRXXDf1NjhqpGCzvDQWGhnil_sKyr5l_pBU2eRrKCT4kg3TtENuRwMhoB_mDcnzfZm1FPGc935HEGdW20MtlXwpNpG9rJOUODPKbXHR-seHj0HxaXVJSNIUgkhKGkU1qVf3q4XCLCVjxDAPSzRfAgQtPc6dFYvtlQAt8bJEIx2mwr4GpvOV64t0cp5jX5QdWZbpHetr2rgO_gCnifRLGMszWczf5NJFsIWeJIlUcrYeBKzaZL65j6E74NBHE0Zi1meZyyejJN8zEKQZW21eRle_vAB9j8QHqma?type=png "Interfaces")
 
-The Query class serves as the central structure, containing all parts of the SQL query. Its fields are designed to
+The **Query** class serves as the central structure, containing all parts of the SQL query. Its fields are designed to
 represent the specific 'fragment types' that can be used in different SQL clauses:
 
 ```java
@@ -78,4 +78,4 @@ handler knowing exactly which part it is responsible for.
 
 If you're using a `main` method and pasting a query, make sure to paste it with the `;` at the end to avoid any weird
 parsing issues as some terminal might lag on pasting.
-The full functionality is thoroughly demonstrated through the provided tests
+The full functionality is thoroughly demonstrated through the provided test suite of 180+ tests.

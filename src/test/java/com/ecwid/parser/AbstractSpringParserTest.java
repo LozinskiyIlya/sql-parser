@@ -6,7 +6,6 @@ import com.ecwid.parser.fragment.Condition;
 import com.ecwid.parser.fragment.Query;
 import com.ecwid.parser.fragment.domain.Aliasable;
 import com.ecwid.parser.fragment.domain.Fragment;
-import com.ecwid.parser.fragment.domain.Nameable;
 import com.ecwid.parser.service.SqlParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,11 +66,6 @@ public abstract class AbstractSpringParserTest {
             return;
         }
         assertAliasableEquals((Aliasable) actual, (Class<? extends Aliasable>) type, alias);
-    }
-
-    protected void assertNameableEquals(Nameable nameable, Class<? extends Nameable> type, String name, String alias) {
-        assertAliasableEquals(nameable, type, alias);
-        assertEquals(name, nameable.getName(), "Name mismatch");
     }
 
     protected void assertAliasableEquals(Aliasable aliasable, Class<? extends Aliasable> type, String alias) {

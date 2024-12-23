@@ -46,7 +46,8 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
                 new TestCase("is a list of values", "a b c", List.of("a", "b", "c")),
                 new TestCase("is a list of values with quotes", "a 'b c'", List.of("a", "'b c'")),
                 new TestCase("is csv", "a,b,c", List.of("a", ",", "b", ",", "c")),
-                new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'"))
+                new TestCase("is csv with quotes", "a, 'b, c'", List.of("a", ",", "'b, c'")),
+                new TestCase("is csv with brackets", "a, (b, c)", List.of("a", ",", "(", "b", ",", "c", ")"))
         ).map(testCase -> DynamicTest.dynamicTest(
                 testCase.displayName(),
                 () -> assertInputProduces(testCase.input(), testCase.expected())
@@ -54,11 +55,11 @@ public class LexemeReaderTest extends AbstractSpringParserTest {
     }
 
     @Test
-    @DisplayName("has all that beauty")
+    @DisplayName("with all that beauty")
     void withAllThatBeauty() {
-        final var complexInputWithAllCases = "a, (a, 'b', c(a.d), e), 'e'";
+        final var input = "a, (a, 'b', c(a.d), e), 'e'";
         final var expected = List.of("a", ",", "(", "a", ",", "'b'", ",", "c(a.d)", ",", "e", ")", ",", "'e'");
-        assertInputProduces(complexInputWithAllCases, expected);
+        assertInputProduces(input, expected);
     }
 
     private void assertInputProduces(String input, List<String> expected) {

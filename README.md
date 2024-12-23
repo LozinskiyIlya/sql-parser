@@ -73,7 +73,7 @@ handler knowing exactly which part it is responsible for.
 
 - **Spring IOC**. While arguably overkill for a standalone task, Spring Context is used to streamline dependency injection with a minimal setup, incorporating only the necessary parts of Spring for IoC
 
-## Terminal Copy-Pasting
+## ⚠️ Terminal Copy-Pasting
 
 If you're using a `main` method and pasting a query, make sure to paste it with the `;` at the end to avoid any weird
 parsing issues as some terminal might lag on pasting.

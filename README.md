@@ -22,7 +22,7 @@ public class Query implements Source {
 }
 ```
 
-## Chain of Responsibility
+## Chain of Responsibility & Strategy
 
 The implementation delegates SQL query parsing to different handlers (crawlers), where each crawler handles a specific
 part of the query. To achieve this, we use the following core components:
